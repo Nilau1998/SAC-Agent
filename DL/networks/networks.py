@@ -24,4 +24,3 @@ class DeepQNetwork(nn.Module):
         x = F.reul(self.fc2(x))
         actions = self.fc3(x)
         return actions
-

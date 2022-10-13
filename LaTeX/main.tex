@@ -1,0 +1,61 @@
+\documentclass[]{iat}
+
+%Hier können weitere benötigte Pakete Eingebunden werden
+%\usepackage[backend=biber,style=alphabetic,]{biblatex}
+\usepackage{float}
+\usepackage{listingsutf8}
+\usepackage{color}
+\usepackage{gensymb}
+\usepackage{caption}
+\usepackage{hyperref}
+%Namen eingeben / Insert Name
+\renewcommand{\author}{Nico Spiske}
+%Art der Arbeit / Scope (Project, Thesis...)
+\providecommand{\scope}{Projektarbeit}
+%Thema der Arbeit / Theme of Thesis
+\renewcommand{\subject}{Modellierung des hydraulischen und instationären thermischen Verhaltens eines Fernwärmenetzes durch maschinelles Lernen}
+%Schlagwörter / Keywords
+\providecommand{\keywords}{Fernwärmenetz, Projektarbeit, Projekt, Maschinelles Lernen}
+%Literaturliste *.bib / Bibliography
+\providecommand{\bibfile}{literature}
+%Matrikelnummer / Student ID
+\providecommand{\studentID}{4436923}
+%Betreuer /& Tutors
+\providecommand{\tutora}{M.Sc. Oliver Feindt}
+\providecommand{\tutorb}{}
+%Prüfer / Examiner
+\providecommand{\examinera}{Prof. Dr.-Ing. Kai Michels}
+\providecommand{\examinerb}{}
+%Farben
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\definecolor{cyan}{rgb}{0.0,0.6,0.6}
+%lst überschrift
+\captionsetup[lstlisting]{font={Large}}
+
+\hypersetup{%
+	pdftitle	={\subject -- \author -- \today},
+	pdfauthor	={\author},
+	pdfsubject	={\subject},
+	pdfkeywords ={\keywords}
+}
+
+\addbibresource{literature.bib}
+
+\setlength{\footheight}{21pt}
+
+\begin{document}
+%Pfad zu Grafiken:
+	\graphicspath{{./project_graphics/}}
+% Sprachauswahl /Language Selection (ngerman/english)
+	\selectlanguage{ngerman}
+% \pagenumbering{roman}
+\input{iat_title}
+%Urherberrechtserklärung / Confirmation of Conformity Comment if not needed
+%\input{declaration_conformity_en}
+\tableofcontents
+\newpage
+\chapter{Einleitung}
+\end{document}
