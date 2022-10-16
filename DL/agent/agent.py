@@ -1,31 +1,53 @@
-import os
 import torch as T
 import torch.nn.functional as F
-import numpy as np
 from agent.buffer import ReplayBuffer
 from networks.networks import ActorNetwork, CriticNetwork, ValueNetwork
-from util.config_reader import ConfigReader
 
-class Agent():
-    def __init__(self, alpha=0.0003, beta=0.0003, input_dims=[8],
-            env=None, gamma=0.99, n_actions=2, max_size=1000000, tau=0.005,
-            layer1_size=256, layer2_size=256, batch_size=256, reward_scale=2):
-        self.gamma = gamma
-        self.tau = tau
-        self.memory = ReplayBuffer(max_size, input_dims, n_actions)
-        self.batch_size = batch_size
+class Agent:
+    def __init__(self, config, experiment_dir, input_dims=[8], env=None, n_actions=2):
+        self.config = config
+        self.gamma = config.agent.gamma
+        self.tau = config.agent.tau
+        self.memory = ReplayBuffer(config.agent.max_size, input_dims, n_actions)
+        self.batch_size = config.agent.batch_size
         self.n_actions = n_actions
 
-        self.actor = ActorNetwork(alpha, input_dims, n_actions=n_actions,
-                    name='actor', max_action=env.action_space.high)
-        self.critic_1 = CriticNetwork(beta, input_dims, n_actions=n_actions,
-                    name='critic_1')
-        self.critic_2 = CriticNetwork(beta, input_dims, n_actions=n_actions,
-                    name='critic_2')
-        self.value = ValueNetwork(beta, input_dims, name='value')
-        self.target_value = ValueNetwork(beta, input_dims, name='target_value')
+        self.actor = ActorNetwork(
+            experiment_dir=experiment_dir,
+            alpha=config.agent.alpha,
+            input_dims=input_dims,
+            max_action=env.action_space.high,
+            n_actions=n_actions,
+            name='actor_network',
+        )
+        self.critic_1 = CriticNetwork(
+            experiment_dir=experiment_dir,
+            beta=config.agent.beta,
+            input_dims=input_dims,
+            n_actions=n_actions,
+            name='critic_network_1'
+        )
+        self.critic_2 = CriticNetwork(
+            experiment_dir=experiment_dir,
+            beta=config.agent.beta,
+            input_dims=input_dims,
+            n_actions=n_actions,
+            name='critic_network_2'
+        )
+        self.value = ValueNetwork(
+            experiment_dir=experiment_dir,
+            beta=config.agent.beta,
+            input_dims=input_dims,
+            name='value_network'
+        )
+        self.target_value = ValueNetwork(
+            experiment_dir=experiment_dir,
+            beta=config.agent.beta,
+            input_dims=input_dims,
+            name='target_value_network'
+        )
 
-        self.scale = reward_scale
+        self.scale = self.config.agent.reward_scale
         self.update_network_parameters(tau=1)
 
     def choose_action(self, observation):
@@ -48,8 +70,8 @@ class Agent():
         value_state_dict = dict(value_params)
 
         for name in value_state_dict:
-            value_state_dict[name] = tau*value_state_dict[name].clone() + \
-                    (1-tau)*target_value_state_dict[name].clone()
+            value_state_dict[name] = tau * value_state_dict[name].clone() + \
+                    (1-tau) * target_value_state_dict[name].clone()
 
         self.target_value.load_state_dict(value_state_dict)
 
@@ -114,7 +136,7 @@ class Agent():
 
         self.critic_1.optimizer.zero_grad()
         self.critic_2.optimizer.zero_grad()
-        q_hat = self.scale*reward + self.gamma*value_
+        q_hat = self.scale*reward + self.gamma * value_
         q1_old_policy = self.critic_1.forward(state, action).view(-1)
         q2_old_policy = self.critic_2.forward(state, action).view(-1)
         critic_1_loss = 0.5 * F.mse_loss(q1_old_policy, q_hat)

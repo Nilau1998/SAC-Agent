@@ -1,20 +1,22 @@
-import pybullet_envs
+import os
 import gym
+import pybullet_envs
 import numpy as np
 from agent.agent import Agent
 from util.plot_learning_curve import plot_learning_curve
+from util.build_experiment_dir import build_experiment_dir
+from util.config_reader import get_config
 
 if __name__ == '__main__':
+    experiment_dir = build_experiment_dir()
+    config = get_config("config.json")
     env = gym.make('InvertedPendulumBulletEnv-v0')
-    agent = Agent(input_dims=env.observation_space.shape, env=env,
+    agent = Agent(config=config, experiment_dir=experiment_dir, input_dims=env.observation_space.shape, env=env,
             n_actions=env.action_space.shape[0])
-    n_games = 250
-    # uncomment this line and do a mkdir tmp && mkdir video if you want to
-    # record video of the agent playing the game.
-    #env = wrappers.Monitor(env, 'tmp/video', video_callable=lambda episode_id: True, force=True)
-    filename = 'inverted_pendulum.png'
+    n_games = 50
+    filename = 'frozen_lake.png'
 
-    figure_file = 'plots/' + filename
+    figure_file = os.path.join(experiment_dir, "plots", filename)
 
     best_score = env.reward_range[0]
     score_history = []
