@@ -1,0 +1,19 @@
+# General settings
+base_settings:
+  n_games: 11
+
+# Agent settings
+agent:
+  alpha: 0.0003
+  beta: 0.0003
+  gamma: 0.99
+  tau: 0.005
+  max_size: 1_000_000
+  layer1_size: 256
+  layer2_size: 256
+  batch_size: 256
+  reward_scale: 2
+
+# Network settings
+networks:
+  bla: 5

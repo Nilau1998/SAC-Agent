@@ -3,20 +3,31 @@ import gym
 import pybullet_envs
 import numpy as np
 from agent.agent import Agent
-from util.plot_learning_curve import plot_learning_curve
-from util.build_experiment_dir import build_experiment_dir
-from util.config_reader import get_config
+from utilities.plot_learning_curve import plot_learning_curve
+from utilities.build_experiment import Experiment
+from utilities.config_reader import get_config
 
 if __name__ == '__main__':
-    experiment_dir = build_experiment_dir()
-    config = get_config("config.json")
-    env = gym.make('InvertedPendulumBulletEnv-v0')
-    agent = Agent(config=config, experiment_dir=experiment_dir, input_dims=env.observation_space.shape, env=env,
-            n_actions=env.action_space.shape[0])
-    n_games = 50
-    filename = 'frozen_lake.png'
+    experiment = Experiment()
+    experiment.save_configs()
+    config = get_config(os.path.join("config.yaml"))
 
-    figure_file = os.path.join(experiment_dir, "plots", filename)
+    environment = "InvertedPendulumBulletEnv-v0"
+
+    env = gym.make(environment)
+
+    agent = Agent(
+        config=config,
+        experiment_dir=experiment.experiment_dir,
+        input_dims=env.observation_space.shape,
+        env=env,
+        n_actions=env.action_space.shape[0]
+    )
+
+    n_games = config.base_settings.n_games
+    filename = environment
+
+    figure_file = os.path.join(experiment.experiment_dir, "plots", filename)
 
     best_score = env.reward_range[0]
     score_history = []
