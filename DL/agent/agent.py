@@ -4,7 +4,7 @@ from agent.buffer import ReplayBuffer
 from networks.networks import ActorNetwork, CriticNetwork, ValueNetwork
 
 class Agent:
-    def __init__(self, config, experiment_dir, input_dims=[8], env=None, n_actions=2):
+    def __init__(self, config, experiment_dir, input_dims, env, n_actions):
         self.config = config
         self.gamma = config.agent.gamma
         self.tau = config.agent.tau
@@ -47,7 +47,7 @@ class Agent:
             name='target_value_network'
         )
 
-        self.scale = self.config.agent.reward_scale
+        self.scale = config.agent.reward_scale
         self.update_network_parameters(tau=1)
 
     def choose_action(self, observation):
@@ -127,7 +127,7 @@ class Agent:
         q2_new_policy = self.critic_2.forward(state, actions)
         critic_value = T.min(q1_new_policy, q2_new_policy)
         critic_value = critic_value.view(-1)
-        
+
         actor_loss = log_probs - critic_value
         actor_loss = T.mean(actor_loss)
         self.actor.optimizer.zero_grad()

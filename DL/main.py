@@ -1,7 +1,7 @@
 import os
 import gym
-import pybullet_envs
 import numpy as np
+import pybullet_envs
 from agent.agent import Agent
 from utilities.plot_learning_curve import plot_learning_curve
 from utilities.build_experiment import Experiment
@@ -12,6 +12,7 @@ if __name__ == '__main__':
     experiment.save_configs()
     config = get_config(os.path.join("config.yaml"))
 
+    # environment = "MountainCarContinuous-v0"
     environment = "InvertedPendulumBulletEnv-v0"
 
     env = gym.make(environment)
@@ -41,6 +42,12 @@ if __name__ == '__main__':
         observation = env.reset()
         done = False
         score = 0
+
+        agent.actor.return_summed_weights()
+        agent.value.return_summed_weights()
+        agent.critic_1.return_summed_weights()
+        agent.critic_2.return_summed_weights()
+
         while not done:
             action = agent.choose_action(observation)
             observation_, reward, done, info = env.step(action)

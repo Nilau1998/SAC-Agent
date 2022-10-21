@@ -1,10 +1,10 @@
 # General settings
 base_settings:
-  n_games: 11
+  n_games: 250
 
 # Agent settings
 agent:
-  alpha: 0.0003
+  alpha: 0.0005
   beta: 0.0003
   gamma: 0.99
   tau: 0.005

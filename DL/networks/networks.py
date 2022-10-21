@@ -50,7 +50,7 @@ class ActorNetwork(BaseNetwork):
             actions = probabilities.rsample()
         else:
             actions = probabilities.sample()
-        
+
         action = T.tanh(actions) * T.tensor(self.max_action).to(self.device)
         log_probs = probabilities.log_prob(actions)
         log_probs = T.log(1 - action.pow(2) + self.reparam_noise)
@@ -85,7 +85,7 @@ class CriticNetwork(BaseNetwork):
         action_value = F.relu(action_value)
 
         q = self.q(action_value)
-        
+
         return q
 
 class ValueNetwork(BaseNetwork):
