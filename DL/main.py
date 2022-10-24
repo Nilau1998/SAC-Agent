@@ -14,6 +14,7 @@ if __name__ == '__main__':
 
     # environment = "MountainCarContinuous-v0"
     environment = "InvertedPendulumBulletEnv-v0"
+    # environment = "Pendulum-v1" # Check max actions values
 
     env = gym.make(environment)
 
