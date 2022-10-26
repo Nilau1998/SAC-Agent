@@ -3,7 +3,6 @@ import torch as T
 import torch.nn.functional as F
 import torch.nn as nn
 import torch.optim as optim
-from torch.distributions.normal import Normal
 from networks.base_network import BaseNetwork
 
 class ActorNetwork(BaseNetwork):
@@ -19,8 +18,8 @@ class ActorNetwork(BaseNetwork):
         # Define layers
         self.fc1 = nn.Linear(*self.input_dims, self.fc1_dims)
         self.fc2 = nn.Linear(self.fc1_dims, self.fc2_dims)
-        self.mu = nn.Linear(self.fc2_dims, self.n_actions)
-        self.sigma = nn.Linear(self.fc2_dims, self.n_actions)
+        self.mean = nn.Linear(self.fc2_dims, self.n_actions)
+        self.std = nn.Linear(self.fc2_dims, self.n_actions)
 
         # Define optimizer
         self.optimizer = optim.Adam(self.parameters(), lr=alpha)
@@ -30,30 +29,34 @@ class ActorNetwork(BaseNetwork):
         self.to(self.device)
 
     def forward(self, state):
-        prob = self.fc1(state)
-        prob = F.relu(prob)
-        prob = self.fc2(prob)
-        prob = F.relu(prob)
+        prob = F.relu(self.fc1(state))
+        prob = F.relu(self.fc2(prob))
 
-        mu = self.mu(prob)
-        sigma = self.sigma(prob)
+        mean = self.mean(prob)
+        std = self.std(prob)
 
-        sigma = T.clamp(sigma, min=self.reparam_noise, max=1)
-
-        return mu, sigma
+        return mean, std
 
     def sample_normal(self, state, reparameterize=True):
-        mu, sigma = self.forward(state)
-        probabilities = Normal(mu, sigma)
+        LOG_STD_MAX = 2
+        LOG_STD_MIN = -5 # https://github.com/vwxyzjn/cleanrl/blob/401a4bedf974d0a80b3dcf330c65195fe29cf6cf/cleanrl/sac_continuous_action.py#L107
+
+        mean, std = self.forward(state)
+
+        log_std = T.tanh(std)
+        log_std = LOG_STD_MIN + 0.5 * (LOG_STD_MAX - LOG_STD_MIN) * (log_std + 1)
+        std = log_std.exp()
+
+        normal = T.distributions.Normal(mean, std)
 
         if reparameterize:
-            actions = probabilities.rsample()
+            actions = normal.rsample()
         else:
-            actions = probabilities.sample()
+            actions = normal.sample()
 
         action = T.tanh(actions) * T.tensor(self.max_action).to(self.device)
-        log_probs = probabilities.log_prob(actions)
-        log_probs = T.log(1 - action.pow(2) + self.reparam_noise)
+        log_probs = normal.log_prob(actions)
+        log_probs -= T.log(1 - action.pow(2) + self.reparam_noise)
         log_probs = log_probs.sum(1, keepdim=True)
 
         return action, log_probs

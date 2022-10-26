@@ -44,11 +44,6 @@ if __name__ == '__main__':
         done = False
         score = 0
 
-        agent.actor.return_summed_weights()
-        agent.value.return_summed_weights()
-        agent.critic_1.return_summed_weights()
-        agent.critic_2.return_summed_weights()
-
         while not done:
             action = agent.choose_action(observation)
             observation_, reward, done, info = env.step(action)

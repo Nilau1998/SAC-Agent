@@ -1,6 +1,6 @@
 # General settings
 base_settings:
-  n_games: 250
+  n_games: 200
 
 # Agent settings
 agent:
@@ -15,5 +15,6 @@ agent:
   reward_scale: 2
 
 # Network settings
-networks:
-  bla: 5
+actor:
+  log_mu_max: 2
+  log_mu_min: -5
