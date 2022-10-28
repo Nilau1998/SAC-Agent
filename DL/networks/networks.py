@@ -5,6 +5,11 @@ import torch.nn as nn
 import torch.optim as optim
 from networks.base_network import BaseNetwork
 
+"""
+input_dims = NN input vector
+n_actions = NN output vector
+"""
+
 class ActorNetwork(BaseNetwork):
     def __init__(self, experiment_dir, alpha, input_dims, max_action, fc1_dims=256, fc2_dims=256, n_actions=2, name="actor_network"):
         super().__init__(name, experiment_dir)

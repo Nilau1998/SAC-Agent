@@ -1,37 +1,38 @@
 import torch as T
 import torch.nn.functional as F
 from agent.buffer import ReplayBuffer
+from agent.base_agent import BaseAgent
 from networks.networks import ActorNetwork, CriticNetwork, ValueNetwork
 
-class Agent:
-    def __init__(self, config, experiment_dir, input_dims, env, n_actions):
+class ContinuousAgent(BaseAgent):
+    def __init__(self, config, experiment_dir, input_dims, env):
+        super().__init__(env)
         self.config = config
         self.gamma = config.agent.gamma
         self.tau = config.agent.tau
-        self.memory = ReplayBuffer(config.agent.max_size, input_dims, n_actions)
+        self.memory = ReplayBuffer(config.agent.max_size, input_dims, self.get_n_actions())
         self.batch_size = config.agent.batch_size
-        self.n_actions = n_actions
 
         self.actor = ActorNetwork(
             experiment_dir=experiment_dir,
             alpha=config.agent.alpha,
             input_dims=input_dims,
-            max_action=env.action_space.high,
-            n_actions=n_actions,
+            max_action=self.get_max_actions(),
+            n_actions=self.get_n_actions(),
             name='actor_network',
         )
         self.critic_1 = CriticNetwork(
             experiment_dir=experiment_dir,
             beta=config.agent.beta,
             input_dims=input_dims,
-            n_actions=n_actions,
+            n_actions=self.get_n_actions(),
             name='critic_network_1'
         )
         self.critic_2 = CriticNetwork(
             experiment_dir=experiment_dir,
             beta=config.agent.beta,
             input_dims=input_dims,
-            n_actions=n_actions,
+            n_actions=self.get_n_actions(),
             name='critic_network_2'
         )
         self.value = ValueNetwork(

@@ -2,11 +2,12 @@ import os
 import gym
 import numpy as np
 import pybullet_envs
-from agent.agent import Agent
+from gym.spaces import Box
+from agent.continuous_agent import ContinuousAgent
+from utils.plot_learning_curve import plot_learning_curve
+from utils.build_experiment import Experiment
+from utils.config_reader import get_config
 from environments.shower_env import ShowerEnv
-from utilities.plot_learning_curve import plot_learning_curve
-from utilities.build_experiment import Experiment
-from utilities.config_reader import get_config
 
 if __name__ == '__main__':
     experiment = Experiment()
@@ -14,17 +15,19 @@ if __name__ == '__main__':
     config = get_config(os.path.join("config.yaml"))
 
     # environment = "MountainCarContinuous-v0"
-    environment = "InvertedPendulumBulletEnv-v0"
-    # environment = "Pendulum-v1" # Check max actions values
+    # environment = "InvertedPendulumBulletEnv-v0"
+    environment = "MountainCar-v0"
 
-    env = gym.make(environment)
+    # env = gym.make(environment)
 
-    agent = Agent(
+    env = ShowerEnv()
+
+    assert env.action_space == Box, "Action space must be a Box (Continious), Discrete spaces are not implemented yet!"
+    agent = ContinuousAgent(
         config=config,
         experiment_dir=experiment.experiment_dir,
         input_dims=env.observation_space.shape,
-        env=env,
-        n_actions=env.action_space.shape[0]
+        env=env
     )
 
     n_games = config.base_settings.n_games
