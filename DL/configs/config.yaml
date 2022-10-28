@@ -1,6 +1,6 @@
 # General settings
 base_settings:
-  n_games: 200
+  n_games: 100
 
 # Agent settings
 agent:

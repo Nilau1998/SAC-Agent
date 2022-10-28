@@ -3,6 +3,7 @@ import gym
 import numpy as np
 import pybullet_envs
 from agent.agent import Agent
+from environments.shower_env import ShowerEnv
 from utilities.plot_learning_curve import plot_learning_curve
 from utilities.build_experiment import Experiment
 from utilities.config_reader import get_config
