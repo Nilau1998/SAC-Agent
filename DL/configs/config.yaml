@@ -14,6 +14,19 @@ agent:
   batch_size: 256
   reward_scale: 2
 
-boat:
-  velocity: 2
-  angle_scale: 1
+# Env settings
+boat_env:
+  track_width: 6
+  boat_fuel: 120
+  boat_velocity: 1
+  boat_angle_scale: 1 # Action space is -1, 1, this lets you scale it up or down a bit for adjusting
+  wind_events: 3 # num of wind events, 3 would mean the wind changes 3 times
+  wind_force: 1 # How many degrees per step the wind turns the ship
+
+# Permanent settings for testing
+test:
+  nested_test: 5
+  boat_velocity: 1
+  boat_angle_scale: 1
+  wind_events: 3
+  wind_force: 5

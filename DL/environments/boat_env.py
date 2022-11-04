@@ -1,7 +1,7 @@
-from turtle import position
-from typing import Tuple
 from gym import Env
 from gym.spaces import Box, Dict
+import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import random
 import math
@@ -10,8 +10,10 @@ class BoatEnv(Env):
     def __init__(self, config):
         self.config = config
         self.current_step = 0
-        self.boat = Boat()
-        self.reward_function = RewardFunction()
+        self.boat = Boat(config)
+        self.reward_function = RewardFunction(
+            track_width=self.config.boat_env.track_width
+        )
 
         # Define action space
         # The agent can turn the boats angle by a certain amount, nothing more
@@ -26,28 +28,48 @@ class BoatEnv(Env):
         # Define observation space
         # Observered values are the position of the boat, its angle, the wind and when it comes
         self.spaces = {
-            "x_pos": Box(low=0, high=150, dtype=np.float32),
-            "y_pos": Box(low=-5, high=5, dtype=np.float32),
-            "bangle": Box(low=math.radians(-90), high=math.radians(90), dtype=np.float32),
-            "wforce": Box(low=0, high=2, dtype=np.float32),
-            "wangle": Box(low=-1, high=1, dtype=np.float32)
+            "x_pos": Box(low=np.array([0]), high=np.array([150]), dtype=np.float32),
+            "y_pos": Box(low=np.array([-5]), high=np.array([5]), dtype=np.float32),
+            "bangle": Box(low=np.array([math.radians(-90)]), high=np.array([math.radians(90)]), dtype=np.float32),
+            "wforce": Box(low=np.array([0]), high=np.array([2]), dtype=np.float32),
+            "wangle": Box(low=np.array([-1]), high=np.array([1]), dtype=np.float32)
         }
         self.observation_space = Dict(self.spaces)
 
+        # Timeout, so that the simulation doesn't run indefinitely
+        self.boat_fuel = self.config.boat_env.boat_fuel
+
+    # Define the step an agent can take. This means that within a step the agent can change the boats angle
+    # and additionally all other calulcations happen like the wind impact.
     def step(self, action):
-        # Apply action
+        # Recalc boat angle just in case (Probs not needed?), also set attributes
+        self.boat.recalc_angle()
         self.current_step += 1
-        self.state
+        self.boat_fuel -= 1
+
+        # Apply action
+        self.boat.set_velocities(action)
+        # Apply wind
+        self.boat.apply_wind()
+
+        # Finish action with boat reposition after direction change and wind application
+        self.boat.set_boat_position()
 
         # Reward calculation
         reward = self.reward_function.linear_reward(
-            position=boat.position,
+            position=self.boat.position,
             a=1,
             x_pos_multiplier=0
         )
 
-        # Check if goal is reached, or boat died
-        pass
+        # Check if goal is reached, or if the boat ran out of fuel
+        # Timeout
+        done = False
+        if self.boat_fuel <= 0:
+            done = True
+        info = 0
+
+        return self.state, reward, done, info
 
     def render(self):
         pass
@@ -57,47 +79,77 @@ class BoatEnv(Env):
 
 class Boat:
     def __init__(self, config):
+        self.config = config
+
         # Env
         self.current_step = 0
+        self.wind_forecast = generate_randint(self.config)
+        self.wind_forecast = np.sort(self.wind_forecast)
 
         # Boat
-        self.velocity = np.array([1, 0], dtype=np.float32)
+        self.velocity = np.array([self.config.boat_env.boat_velocity, 0], dtype=np.float32)
         self.position = np.array([0, 0], dtype=np.float32)
         self.angle = 0 # In relation to x-axis, +y = +angle, -y = -angle, based on velocity
         self.mass = 0 # Not implemented for now
 
         # Wind
-        self.wind_angle = random.choice([-1, 1]) # From where the wind comes, in relation to x-axis again
-        self.wind_force = random.uniform(1, 2) # How hard the wind influences the boats angle, change happens each tick/step
-        self.wind_delay = random.randint(0, 5) # Delay in steps from wind announcement to actual affect on boat
-        self.wind_change_step = 0
+        self.wind_angle = 0 # From where the wind comes, in relation to x-axis again
+        self.wind_force = 0 # How hard the wind influences the boats angle, change happens each tick/step
 
-    def get_angle(self):
+    def recalc_angle(self):
+        """
+        Recalculates the current angle of the ship based on the velocity vector.
+        """
         abs_velocity = math.sqrt(math.pow(self.velocity[0], 2) + math.pow(self.velocity[1], 2))
         self.angle = math.acos(self.velocity[0] / abs_velocity)
 
     def set_boat_position(self):
+        """
+        Moves the ship based on the current velocity if a step passes.
+        """
         self.position += self.velocity
 
     def set_velocities(self, delta_angle):
-        self.get_angle()
-        self.angle += delta_angle
+        """
+        Rotates the velocity vector by delta_angle. The absolute value of the velocity vector stays constant.
+        delta_angle is passed in degree
+        """
+        self.angle += math.radians(delta_angle * self.config.boat_env.boat_angle_scale)
         abs_velocity = math.sqrt(math.pow(self.velocity[0], 2) + math.pow(self.velocity[1], 2))
         self.velocity[0] = abs_velocity * math.cos(self.angle)
         self.velocity[1] = abs_velocity * math.sin(self.angle)
 
+    def next_wind_change(self):
+        """
+        Returns the amount of timesteps until the next weather event happens
+        This is used to simulate the latency of the dynamic system
+        This method also sets the new wind attributes so they can be applied on the ship
+        """
+        steps_until_wind_change = self.wind_forecast[0] - self.current_step
+        if self.wind_forecast[0] == self.current_step:
+            self.set_wind_attributes()
+            self.wind_forecast = np.delete(self.wind_forecast, 0, 0)
+        return steps_until_wind_change
+
     def set_wind_attributes(self):
-        self.wind_change_step = self.current_step
+        """
+        Sets a new set of angle and force values for the wind. This method is called
+        on every forecast step in next_wind_change().
+        """
         self.wind_angle = random.choice([-1, 1])
-        self.force = random.uniform(1, 2) # Set config
-        self.wind_delay = random.randint(0, 5)
+        self.wind_force = random.uniform(0, self.config.boat_env.wind_force)
 
 
     def apply_wind(self):
-        self.get_angle()
+        """
+        Applies the wind on the boat.
+        Wind can blow from either 90° or -90° in relation to the x-axis. (90° towads -y, -90° is towards y).
+        Wind changes the rotation of the boat and therefore gives it a little challenge the agent has to solve,
+        the challenge is increased by the wind changes that happen after every couple steps.
+        """
         # Wind only affects the boat angle for now, wind comes from 90° or -90°
-        if self.current_step - self.wind_change_step >= self.wind_delay:
-            self.set_velocities(math.radians(1) * self.wind_angle * self.wind_force)
+        self.set_velocities(self.wind_angle * self.wind_force)
+        self.recalc_angle()
 
 
 class RewardFunction:
@@ -122,8 +174,16 @@ class RewardFunction:
         exponential_function = a * math.exp(y)
         return self.track_width - exponential_function + x
 
-if __name__ == '__main__':
-    boat = Boat("bla")
-    print(boat.velocity, boat.angle)
-    boat.set_velocities(math.radians(90))
-    print(boat.velocity, boat.angle)
+
+def generate_randint(config):
+    """
+    This method creates a basic np randint but makes sure there are no duplicates.
+    """
+    while True:
+        wind_forecast = np.random.randint( # at which step the wind should be changed/set
+                low=0,
+                high=config.boat_env.boat_fuel - 15, # Little offset to make it more interesting
+                size=config.boat_env.wind_events)
+        if np.sum(np.unique(wind_forecast, return_counts=True)[1]) == config.boat_env.wind_events:
+            break
+    return wind_forecast
