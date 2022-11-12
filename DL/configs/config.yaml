@@ -25,6 +25,7 @@ boat_env:
 
 # Permanent settings for testing
 test:
+  track_width: 5
   nested_test: 5
   boat_velocity: 1
   boat_angle_scale: 1
