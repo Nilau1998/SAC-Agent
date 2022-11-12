@@ -1,12 +1,13 @@
 from gym import Env
-from gym.spaces import Box, Dict
+from gym.spaces import Box
 import numpy as np
 import random
 import math
 
 class BoatEnv(Env):
-    def __init__(self, config):
+    def __init__(self, config, experiment=None):
         self.config = config
+        self.experiment_dir = experiment.experiment_dir
         self.boat = Boat(self.config)
         self.reward_function = RewardFunction(
             track_width=self.config.boat_env.track_width
@@ -22,19 +23,21 @@ class BoatEnv(Env):
             dtype=np.float32
         )
 
-        # Define observation space
-        self.spaces = {
-            "x_pos": Box(low=np.array([0]), high=np.array([150]), dtype=np.float32),
-            "y_pos": Box(low=np.array([-5]), high=np.array([5]), dtype=np.float32),
-            "boat_angle": Box(low=np.array([math.radians(-90)]), high=np.array([math.radians(90)]), dtype=np.float32),
-            "current_wind_force": Box(low=np.array([0]), high=np.array([2]), dtype=np.float32),
-            "current_wind_angle": Box(low=np.array([-1]), high=np.array([1]), dtype=np.float32),
-            "next_wind_angle": Box(low=np.array([-1]), high=np.array([1]), dtype=np.float32)
-        }
-        self.observation_space = Dict(self.spaces)
 
-        # bounds = np.ones((6), dtype=np.float32)
-        # self.observation_space = Box(low=-bounds, high=bounds)
+        # Define obersvation space
+        # Following states are observed:
+        # x_pos, y_pos, boat_angle, current_wind_force, current_wind_angle, next_wind_angle
+        self.low_state = np.array(
+            [0, -5, math.radians(-90), 0, -1, -1], dtype=np.float32
+        )
+        self.high_state = np.array(
+            [150, 5, math.radians(90), 2, 1, 1], dtype=np.float32
+        )
+        self.observation_space = Box(
+            low=self.low_state,
+            high=self.high_state,
+            dtype=np.float32
+        )
 
     # Define the step an agent can take. This means that within a step the agent can change the boats angle
     # and additionally all other calulcations happen like the wind impact.
@@ -53,15 +56,9 @@ class BoatEnv(Env):
         # Finish action with boat reposition after direction change and wind application
         self.boat.set_boat_position()
 
+        self.boat.recalc_angle()
 
-        self.state = {
-            "x_pos": self.boat.position[0],
-            "y_pos": self.boat.position[1],
-            "boat_angle": self.boat.angle,
-            "current_wind_force": self.boat.current_wind_force,
-            "current_wind_angle": self.boat.current_wind_angle,
-            "next_wind_angle": self.boat.next_wind_angle
-        }
+        self.state = self.boat.return_state()
 
         # Reward calculation
         reward = self.reward_function.linear_reward(
@@ -74,8 +71,13 @@ class BoatEnv(Env):
         # Timeout
         done = False
         if self.boat.fuel <= 0:
+            print(f"Boat ran out of fuel!")
             done = True
-        elif self.boat.position[0] >= 100:
+        elif self.boat.position[0] >= self.config.boat_env.goal_line:
+            print(f"Boat reached the destination!")
+            done = True
+        elif abs(self.boat.position[1]) > 8:
+            print(f"Boat out of bounds!")
             done = True
 
         info = {}
@@ -88,14 +90,7 @@ class BoatEnv(Env):
     def reset(self):
         self.boat = Boat(self.config)
 
-        self.state = {
-            "x_pos": self.boat.position[0],
-            "y_pos": self.boat.position[1],
-            "boat_angle": self.boat.angle,
-            "current_wind_force": self.boat.current_wind_force,
-            "current_wind_angle": self.boat.current_wind_angle,
-            "next_wind_angle": self.boat.next_wind_angle
-        }
+        self.state = self.boat.return_state()
 
         info = {}
 
@@ -151,19 +146,22 @@ class Boat:
         This is used to simulate the latency of the dynamic system
         This method also sets the new wind attributes so they can be applied on the ship
         """
-        steps_until_wind_change = self.wind_forecast[0] - self.current_step
-        # Create initial next attributes for the first forecast
-        if self.current_step == 0:
-            self.set_wind_attributes()
-            self.wind_forecast = np.delete(self.wind_forecast, 0, 0)
+        if len(self.wind_forecast) is 0:
+            pass
+        else:
+            steps_until_wind_change = self.wind_forecast[0] - self.current_step
+            # Create initial next attributes for the first forecast
+            if self.current_step == 0:
+                self.set_wind_attributes()
+                self.wind_forecast = np.delete(self.wind_forecast, 0, 0)
 
-        # On weather forecast step, next -> current, generate new next, pop current forecast
-        if self.wind_forecast[0] == self.current_step:
-            self.current_wind_angle = self.next_wind_angle
-            self.current_wind_force = self.next_wind_angle
-            self.set_wind_attributes()
-            self.wind_forecast = np.delete(self.wind_forecast, 0, 0)
-        return steps_until_wind_change
+            # On weather forecast step, next -> current, generate new next, pop current forecast
+            if self.wind_forecast[0] == self.current_step:
+                self.current_wind_angle = self.next_wind_angle
+                self.current_wind_force = self.next_wind_angle
+                self.set_wind_attributes()
+                self.wind_forecast = np.delete(self.wind_forecast, 0, 0)
+            return steps_until_wind_change
 
     def set_wind_attributes(self):
         """
@@ -182,6 +180,17 @@ class Boat:
         # Wind only affects the boat angle for now, wind comes from 90° or -90°
         self.set_velocities(self.current_wind_angle * self.current_wind_force)
         self.recalc_angle()
+
+    def return_state(self):
+        state = np.array([
+            self.position[0],
+            self.position[1],
+            self.angle,
+            self.current_wind_force,
+            self.current_wind_angle,
+            self.next_wind_angle
+        ])
+        return state
 
 
 class RewardFunction:

@@ -11,7 +11,7 @@ from pathlib import Path
 import yaml
 from dotmap import DotMap
 
-class EnvironmentVisualizer:
+class EnvironmentRenderer:
     """
     A visulization tool that uses the gym render method to render the environment to the screen in real time by using matplotlib.
     """
@@ -25,6 +25,8 @@ class EnvironmentVisualizer:
         with imageio.get_writer(os.path.join(experiment_path, file_name + ".gif"), mode="I") as writer:
             for image in self.image_buffer:
                 writer.append_data(image)
+        self.image_buffer = []
+        self.previous_position = []
 
     def create_new_image(self, angle, position):
         # Save this position
@@ -39,8 +41,8 @@ class EnvironmentVisualizer:
         ax.set_ylim([ymin, ymax])
         ax.axhline(self.config.boat_env.track_width, color="black")
         ax.axhline(-self.config.boat_env.track_width, color="black")
+        ax.axvline(self.config.boat_env.goal_line, color="green")
         ax.set_title(self.title)
-
         self.gradient_image(
             ax,
             direction=0,
@@ -132,7 +134,7 @@ def get_config(config_file):
     return DotMap(raw_config)
 
 if __name__ == "__main__":
-    render = EnvironmentVisualizer(
+    render = EnvironmentRenderer(
         config=get_config(os.path.join("config.yaml")),
         title="Quadratic spinup (x^2 deg)"
     )
