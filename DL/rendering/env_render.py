@@ -18,20 +18,22 @@ class EnvironmentRenderer:
     def __init__(self, config, title=None):
         self.config = config
         self.image_buffer = []
-        self.previous_position = []
+        self.previous_positions = [[], []]
         self.title = title
+
+    def reset_renderer(self):
+        self.image_buffer = []
+        self.previous_positions = [[], []]
 
     def create_gif_from_buffer(self, experiment_path, file_name):
         with imageio.get_writer(os.path.join(experiment_path, file_name + ".gif"), mode="I") as writer:
             for image in self.image_buffer:
                 writer.append_data(image)
-        self.image_buffer = []
-        self.previous_position = []
 
     def create_new_image(self, angle, position):
         # Save this position
-        self.previous_position.append(position)
-        previous_path = np.array(self.previous_position).T
+        self.previous_positions[0].append(position[0])
+        self.previous_positions[1].append(position[1])
 
         # Create base plot without boat
         fig, ax = plt.subplots()
@@ -43,6 +45,10 @@ class EnvironmentRenderer:
         ax.axhline(-self.config.boat_env.track_width, color="black")
         ax.axvline(self.config.boat_env.goal_line, color="green")
         ax.set_title(self.title)
+
+        # Plot previous path
+        ax.plot(self.previous_positions[0], self.previous_positions[1], color="red")
+
         self.gradient_image(
             ax,
             direction=0,
@@ -60,11 +66,11 @@ class EnvironmentRenderer:
         ax.set_aspect('auto')
 
         # Render boat
-        boat_imagebox = self.render_asset(angle, position, 1.5, "boat_topdown.png")
+        boat_imagebox = self.render_asset(angle, position, 1, "boat_topdown.png")
         ax.add_artist(boat_imagebox)
 
-        # Plot previous path
-        ax.plot(previous_path[0], previous_path[1], color="red")
+        # Draw velocity arrow
+        self.draw_arrow(ax, angle, position, 7)
 
         # Create image and save to image_buffer
         fig.canvas.draw()
@@ -81,11 +87,7 @@ class EnvironmentRenderer:
         boat_image = self.load_asset(asset)
         rotated_boat_image = ndimage.rotate((boat_image * 255).astype(np.uint8), math.degrees(angle) - 90)
         imagebox = OffsetImage(rotated_boat_image, zoom=zoom)
-        imagebox = AnnotationBbox(
-            imagebox,
-            (x, y),
-            frameon=False
-        )
+        imagebox = AnnotationBbox(imagebox, (x, y), frameon=False)
         return imagebox
 
     def gradient_image(self, ax, extent, direction=0.3, cmap_range=(0, 1), **kwargs):
@@ -120,6 +122,12 @@ class EnvironmentRenderer:
         im = ax.imshow(X, extent=extent, interpolation='bicubic',
                     vmin=0, vmax=1, **kwargs)
         return im
+
+    def draw_arrow(self, ax, angle, position, length):
+        dx = math.cos(angle) * length + position[0]
+        dy = math.sin(angle) * length + position[1]
+        prop = dict(arrowstyle="->, head_width=0.4, head_length=0.8", color="red", shrinkA=0, shrinkB=0)
+        ax.annotate("", xy=(dx, dy), xytext=(position[0], position[1]), arrowprops=prop)
 
     def load_asset(self, asset):
         return mpimg.imread(os.path.join("rendering", "assets", asset))
