@@ -131,37 +131,3 @@ class EnvironmentRenderer:
 
     def load_asset(self, asset):
         return mpimg.imread(os.path.join("rendering", "assets", asset))
-
-
-
-
-
-
-def get_config(config_file):
-    raw_config = yaml.safe_load(Path("configs", config_file).read_text())
-    return DotMap(raw_config)
-
-if __name__ == "__main__":
-    render = EnvironmentRenderer(
-        config=get_config(os.path.join("config.yaml")),
-        title="Quadratic spinup (x^2 deg)"
-    )
-    angle = []
-    x = []
-    y = []
-    for i in range(120):
-        x.append(i)
-        angle.append(math.radians(math.pow(i, 2)))
-        if i < 4:
-            y.append(i/2)
-        elif i > 40:
-            y.append(-3)
-        else:
-            y.append(2)
-
-    for x, y, angle in zip(x, y, angle):
-        render.create_new_image(angle, [x, y])
-    render.create_gif_from_buffer(
-        experiment_path="rendering",
-        file_name="boat_spin_test"
-    )
