@@ -26,12 +26,12 @@ class BoatEnv(Env):
 
         # Define obersvation space
         # Following states are observed:
-        # x_pos, y_pos, boat_angle, current_wind_force, current_wind_angle, next_wind_angle
+        # x_pos, y_pos, boat_angle, current_wind_force, current_wind_angle, next_wind_angle, steps_until_wind_change
         self.low_state = np.array(
-            [0, -5, math.radians(-90), 0, -1, -1], dtype=np.float32
+            [0, -5, math.radians(-90), 0, -1, -1, 0], dtype=np.float32
         )
         self.high_state = np.array(
-            [150, 5, math.radians(90), 2, 1, 1], dtype=np.float32
+            [150, 5, math.radians(90), 2, 1, 1, 120], dtype=np.float32
         )
         self.observation_space = Box(
             low=self.low_state,
@@ -112,6 +112,7 @@ class Boat:
         self.mass = 0 # Not implemented for now
 
         # Wind
+        self.steps_until_wind_change = 0
         self.current_wind_angle = 0 # From where the wind comes, in relation to x-axis again
         self.current_wind_force = 0 # How hard the wind influences the boats angle, change happens each tick/step
         self.next_wind_angle = 0
@@ -149,7 +150,7 @@ class Boat:
         if len(self.wind_forecast) is 0:
             pass
         else:
-            steps_until_wind_change = self.wind_forecast[0] - self.current_step
+            self.steps_until_wind_change = self.wind_forecast[0] - self.current_step
             # Create initial next attributes for the first forecast
             if self.current_step == 0:
                 self.set_wind_attributes()
@@ -161,7 +162,6 @@ class Boat:
                 self.current_wind_force = self.next_wind_angle
                 self.set_wind_attributes()
                 self.wind_forecast = np.delete(self.wind_forecast, 0, 0)
-            return steps_until_wind_change
 
     def set_wind_attributes(self):
         """
@@ -188,7 +188,8 @@ class Boat:
             self.angle,
             self.current_wind_force,
             self.current_wind_angle,
-            self.next_wind_angle
+            self.next_wind_angle,
+            self.steps_until_wind_change
         ])
         return state
 
