@@ -13,9 +13,16 @@ class BoatEnv(Env):
             track_width=self.config.boat_env.track_width
         )
 
+        self.info = {
+            "termination": "",
+            "out_of_fuel": 0,
+            "reached_goal": 0,
+            "out_of_bounds": 0
+        }
+
         # Define action space
-        self.min_action = -1.0
-        self.max_action = 1.0
+        self.min_action = -1.0  * self.config.boat_env.boat_angle_scale
+        self.max_action = 1.0  * self.config.boat_env.boat_angle_scale
         self.action_space = Box(
             low=self.min_action,
             high=self.max_action,
@@ -71,18 +78,21 @@ class BoatEnv(Env):
         # Timeout
         done = False
         if self.boat.fuel <= 0:
-            print(f"Boat ran out of fuel!")
             done = True
+            self.info["termination"] = "Boat ran out of fuel!"
+            self.info["out_of_fuel"] += 1
+
         elif self.boat.position[0] >= self.config.boat_env.goal_line:
-            print(f"Boat reached the destination!")
             done = True
+            self.info["termination"] = "Boat reached the destination!"
+            self.info["reached_goal"] += 1
+
         elif abs(self.boat.position[1]) > 8:
-            print(f"Boat out of bounds!")
             done = True
+            self.info["termination"] = f"Boat out of bounds!"
+            self.info["out_of_bounds"] += 1
 
-        info = {}
-
-        return self.state, reward, done, info
+        return self.state, reward, done, self.info
 
     def render(self):
         pass
@@ -113,6 +123,7 @@ class Boat:
 
         # Wind
         self.steps_until_wind_change = 0
+        self.temp = 0
         self.current_wind_angle = 0 # From where the wind comes, in relation to x-axis again
         self.current_wind_force = 0 # How hard the wind influences the boats angle, change happens each tick/step
         self.next_wind_angle = 0
@@ -136,31 +147,33 @@ class Boat:
         Rotates the velocity vector by delta_angle. The absolute value of the velocity vector stays constant.
         delta_angle is passed in degree
         """
-        self.angle += math.radians(delta_angle * self.config.boat_env.boat_angle_scale)
+        self.angle += math.radians(delta_angle)
         abs_velocity = math.sqrt(math.pow(self.velocity[0], 2) + math.pow(self.velocity[1], 2))
         self.velocity[0] = abs_velocity * math.cos(self.angle)
         self.velocity[1] = abs_velocity * math.sin(self.angle)
 
-    def next_wind_change(self) -> int:
+    def next_wind_change(self):
         """
         Returns the amount of timesteps until the next weather event happens
         This is used to simulate the latency of the dynamic system
         This method also sets the new wind attributes so they can be applied on the ship
         """
-        if len(self.wind_forecast) is 0:
+        # Create initial next attributes for the first forecast
+        if self.current_step == 0:
+            self.set_wind_attributes()
+            self.wind_forecast = np.delete(self.wind_forecast, 0, 0)
+
+
+        if len(self.wind_forecast) == 0:
             pass
         else:
             self.steps_until_wind_change = self.wind_forecast[0] - self.current_step
-            # Create initial next attributes for the first forecast
-            if self.current_step == 0:
-                self.set_wind_attributes()
-                self.wind_forecast = np.delete(self.wind_forecast, 0, 0)
-
             # On weather forecast step, next -> current, generate new next, pop current forecast
             if self.wind_forecast[0] == self.current_step:
                 self.current_wind_angle = self.next_wind_angle
                 self.current_wind_force = self.next_wind_angle
                 self.set_wind_attributes()
+                self.temp += self.wind_forecast[0]
                 self.wind_forecast = np.delete(self.wind_forecast, 0, 0)
 
     def set_wind_attributes(self):
@@ -232,10 +245,11 @@ def generate_randint(config):
     while True:
         wind_forecast = np.random.randint( # at which step the wind should be changed/set
                 low=10,
-                high=config.boat_env.boat_fuel - 15, # Little offset to make it more interesting
+                high=config.boat_env.boat_fuel - 30, # Little offset to make it more interesting
                 size=config.boat_env.wind_events)
         # Check if every value is unique in the generated randint array.
         if np.sum(np.unique(wind_forecast, return_counts=True)[1]) == config.boat_env.wind_events:
             wind_forecast = np.insert(wind_forecast, 0, 0)
+            wind_forecast = np.sort(wind_forecast)
             break
     return wind_forecast

@@ -1,6 +1,6 @@
 # General settings
 base_settings:
-  n_games: 250
+  n_games: 500
 
 # Agent settings
 agent:
@@ -21,8 +21,8 @@ boat_env:
   boat_fuel: 120
   boat_velocity: 1
   boat_angle_scale: 1 # Action space is -1, 1, this lets you scale it up or down a bit for adjusting
-  wind_events: 3 # num of wind events, 3 would mean the wind changes 3 times
-  wind_force: 1 # How many degrees per step the wind turns the ship
+  wind_events: 5 # num of wind events, 3 would mean the wind changes 3 times
+  wind_force: 0.5 # How many degrees per step the wind turns the ship
   goal_line: 100
 
 # Permanent settings for testing

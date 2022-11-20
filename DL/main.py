@@ -62,6 +62,7 @@ if __name__ == '__main__':
                 agent.save_models()
 
         print('episode ', i, 'score %.1f' % score, 'avg_score %.1f' % avg_score)
+        print(info, "\n")
 
     if not load_checkpoint:
         x = [i+1 for i in range(n_games)]
