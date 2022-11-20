@@ -122,7 +122,6 @@ class Boat:
 
         # Wind
         self.steps_until_wind_change = 0
-        self.temp = 0
         self.current_wind_angle = 0 # From where the wind comes, in relation to x-axis again
         self.current_wind_force = 0 # How hard the wind influences the boats angle, change happens each tick/step
         self.next_wind_angle = 0
@@ -165,7 +164,6 @@ class Boat:
                 self.current_wind_angle = self.next_wind_angle
                 self.current_wind_force = self.next_wind_angle
                 self.set_wind_attributes()
-                self.temp += self.wind_forecast[0]
                 self.wind_forecast = np.delete(self.wind_forecast, 0, 0)
 
     def set_wind_attributes(self):
