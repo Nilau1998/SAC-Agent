@@ -1,7 +1,5 @@
 import os
-import gym
 import numpy as np
-import pybullet_envs
 from agent.continuous_agent import ContinuousAgent
 from utils.plotting import plot_learning_curve
 from utils.build_experiment import Experiment
@@ -19,7 +17,6 @@ if __name__ == '__main__':
     environment = "boat_env"
 
     env = BoatEnv(config, experiment)
-    print(env.observation_space)
 
     agent = ContinuousAgent(
         config=config,
@@ -46,7 +43,7 @@ if __name__ == '__main__':
         score = 0
 
         while not done:
-            env_render.create_new_image(env.boat.angle, env.boat.position)
+            env_render.create_new_image(env)
             action = agent.choose_action(observation)
             observation_, reward, done, info = env.step(action)
             score += reward
@@ -55,6 +52,7 @@ if __name__ == '__main__':
                 agent.learn()
             observation = observation_
         env_render.create_gif_from_buffer(os.path.join(experiment.experiment_dir, "rendering"), f"episode_{i}")
+        env_render.reset_renderer()
         score_history.append(score)
         avg_score = np.mean(score_history[-100:])
 

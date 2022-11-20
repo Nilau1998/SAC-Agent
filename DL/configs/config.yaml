@@ -17,6 +17,7 @@ agent:
 # Env settings
 boat_env:
   track_width: 6
+  track_width_offset: 3
   boat_fuel: 120
   boat_velocity: 1
   boat_angle_scale: 1 # Action space is -1, 1, this lets you scale it up or down a bit for adjusting

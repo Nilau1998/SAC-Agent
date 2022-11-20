@@ -7,10 +7,6 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from scipy import ndimage
 import imageio
 
-from pathlib import Path
-import yaml
-from dotmap import DotMap
-
 class EnvironmentRenderer:
     """
     A visulization tool that uses the gym render method to render the environment to the screen in real time by using matplotlib.
@@ -30,21 +26,32 @@ class EnvironmentRenderer:
             for image in self.image_buffer:
                 writer.append_data(image)
 
-    def create_new_image(self, angle, position):
+    def create_new_image(self, env):
+        """
+        Creates a new image of the current state of the env that is being passed.
+        """
         # Save this position
-        self.previous_positions[0].append(position[0])
-        self.previous_positions[1].append(position[1])
+        self.previous_positions[0].append(env.boat.position[0])
+        self.previous_positions[1].append(env.boat.position[1])
 
         # Create base plot without boat
         fig, ax = plt.subplots()
         xmin, xmax = -5, self.config.boat_env.boat_fuel + 10
-        ymin, ymax = -self.config.boat_env.track_width - 3, self.config.boat_env.track_width + 3
+        ymin, ymax = -self.config.boat_env.track_width - self.config.boat_env.track_width_offset, self.config.boat_env.track_width + self.config.boat_env.track_width_offset
         ax.set_xlim([xmin, xmax])
         ax.set_ylim([ymin, ymax])
         ax.axhline(self.config.boat_env.track_width, color="black")
         ax.axhline(-self.config.boat_env.track_width, color="black")
         ax.axvline(self.config.boat_env.goal_line, color="green")
         ax.set_title(self.title)
+
+        ax.text(
+            0,
+            self.config.boat_env.track_width + self.config.boat_env.track_width_offset + 0.1,
+            f"Current step: {env.boat.current_step}, "
+            f"steps until wind change: {env.boat.steps_until_wind_change}, "
+            f"wind direction: {env.boat.current_wind_angle * 90}"
+        )
 
         # Plot previous path
         ax.plot(self.previous_positions[0], self.previous_positions[1], color="red")
@@ -66,11 +73,17 @@ class EnvironmentRenderer:
         ax.set_aspect('auto')
 
         # Render boat
-        boat_imagebox = self.render_asset(angle, position, 1, "boat_topdown.png")
+        boat_imagebox = self.render_asset(env.boat.angle, env.boat.position, 1, "boat_topdown.png")
         ax.add_artist(boat_imagebox)
 
-        # Draw velocity arrow
-        self.draw_arrow(ax, angle, position, 7)
+        # Draw boat velocity arrow
+        self.draw_arrow(ax, env.boat.angle, env.boat.position, 7, "red")
+
+        # Draw current wind direction & force
+        if env.boat.current_wind_angle == 1:
+            self.draw_arrow(ax, math.radians(90), env.boat.position, 2, "blue")
+        elif env.boat.current_wind_angle == -1:
+            self.draw_arrow(ax, math.radians(-90), env.boat.position, 2, "blue")
 
         # Create image and save to image_buffer
         fig.canvas.draw()
@@ -123,10 +136,10 @@ class EnvironmentRenderer:
                     vmin=0, vmax=1, **kwargs)
         return im
 
-    def draw_arrow(self, ax, angle, position, length):
+    def draw_arrow(self, ax, angle, position, length, color):
         dx = math.cos(angle) * length + position[0]
         dy = math.sin(angle) * length + position[1]
-        prop = dict(arrowstyle="->, head_width=0.4, head_length=0.8", color="red", shrinkA=0, shrinkB=0)
+        prop = dict(arrowstyle="->, head_width=0.4, head_length=0.8", color=color, shrinkA=0, shrinkB=0)
         ax.annotate("", xy=(dx, dy), xytext=(position[0], position[1]), arrowprops=prop)
 
     def load_asset(self, asset):

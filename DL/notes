@@ -1,1 +1,5 @@
 - Alpha value needs a lot of tweaking according to this video/timestamp, remember that when tuning! https://youtu.be/14iI6jtewIk?list=PLQpKd36nzSuMynZLU2soIpNSMeXMplnKP&t=312
+- visualize training this way: https://towardsdatascience.com/visualizing-stock-trading-agents-using-matplotlib-and-gym-584c992bc6d4
+
+
+- Wind forecast isn't working properly yet. The boat should know where the wind is coming from and how hard it will hit before it actually applies.
