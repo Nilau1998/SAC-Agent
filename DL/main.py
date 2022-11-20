@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     figure_file = os.path.join(experiment.experiment_dir, "plots", filename)
 
-    best_score = env.reward_range[0]
+    best_score = 0
     score_history = []
     load_checkpoint = False
 
@@ -51,16 +51,19 @@ if __name__ == '__main__':
             if not load_checkpoint:
                 agent.learn()
             observation = observation_
-        env_render.create_gif_from_buffer(os.path.join(experiment.experiment_dir, "rendering"), f"episode_{i}")
-        env_render.reset_renderer()
-        score_history.append(score)
-        avg_score = np.mean(score_history[-100:])
 
-        if avg_score > best_score:
-            best_score = avg_score
+        if score > best_score:
+            best_score = score
+            env_render.set_best_path()
+            env_render.create_gif_from_buffer(os.path.join(experiment.experiment_dir, "rendering"), f"episode_{i}")
+            env_render.reset_renderer()
             if not load_checkpoint:
                 agent.save_models()
 
+        env_render.reset_renderer()
+
+        score_history.append(score)
+        avg_score = np.mean(score_history[-100:])
         print('episode ', i, 'score %.1f' % score, 'avg_score %.1f' % avg_score)
         print(info, "\n")
 

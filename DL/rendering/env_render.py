@@ -14,12 +14,13 @@ class EnvironmentRenderer:
     def __init__(self, config, title=None):
         self.config = config
         self.image_buffer = []
-        self.previous_positions = [[], []]
+        self.current_path = [[], []]
+        self.previous_best_path = [[], []]
         self.title = title
 
     def reset_renderer(self):
         self.image_buffer = []
-        self.previous_positions = [[], []]
+        self.current_path = [[], []]
 
     def create_gif_from_buffer(self, experiment_path, file_name):
         with imageio.get_writer(os.path.join(experiment_path, file_name + ".gif"), mode="I") as writer:
@@ -31,8 +32,8 @@ class EnvironmentRenderer:
         Creates a new image of the current state of the env that is being passed.
         """
         # Save this position
-        self.previous_positions[0].append(env.boat.position[0])
-        self.previous_positions[1].append(env.boat.position[1])
+        self.current_path[0].append(env.boat.position[0])
+        self.current_path[1].append(env.boat.position[1])
 
         # Create base plot without boat
         fig, ax = plt.subplots()
@@ -50,11 +51,15 @@ class EnvironmentRenderer:
             self.config.boat_env.track_width + self.config.boat_env.track_width_offset + 0.1,
             f"Current step: {env.boat.current_step}, "
             f"steps until wind change: {env.boat.steps_until_wind_change}, "
-            f"wind direction: {env.boat.current_wind_angle * 90}"
+            f"ship angle: {math.degrees(env.boat.angle):.2f}, "
+            f"actor action: {env.action[0]:.2f}, "
+            f"wind action: {(env.boat.current_wind_angle * env.boat.current_wind_force):.2f}",
+            fontsize=7
         )
 
-        # Plot previous path
-        ax.plot(self.previous_positions[0], self.previous_positions[1], color="red")
+        # Plot current path and previous best path
+        ax.plot(self.previous_best_path[0], self.previous_best_path[1], color="orange")
+        ax.plot(self.current_path[0], self.current_path[1], color="red")
 
         self.gradient_image(
             ax,
@@ -79,11 +84,24 @@ class EnvironmentRenderer:
         # Draw boat velocity arrow
         self.draw_arrow(ax, env.boat.angle, env.boat.position, 7, "red")
 
+        # Draw action arrow
+        self.draw_arrow(
+            ax,
+            math.radians(90 * math.copysign(1, env.action[0])),
+            env.boat.position,
+            2 * np.abs(env.action[0]),
+            "green"
+        )
+
         # Draw current wind direction & force
-        if env.boat.current_wind_angle == 1:
-            self.draw_arrow(ax, math.radians(90), env.boat.position, 2, "blue")
-        elif env.boat.current_wind_angle == -1:
-            self.draw_arrow(ax, math.radians(-90), env.boat.position, 2, "blue")
+        if env.boat.current_wind_angle != 0:
+            self.draw_arrow(
+                ax,
+                math.radians(90 * env.boat.current_wind_angle),
+                env.boat.position,
+                2 * env.boat.current_wind_angle,
+                "blue"
+            )
 
         # Create image and save to image_buffer
         fig.canvas.draw()
@@ -141,6 +159,9 @@ class EnvironmentRenderer:
         dy = math.sin(angle) * length + position[1]
         prop = dict(arrowstyle="->, head_width=0.4, head_length=0.8", color=color, shrinkA=0, shrinkB=0)
         ax.annotate("", xy=(dx, dy), xytext=(position[0], position[1]), arrowprops=prop)
+
+    def set_best_path(self):
+        self.previous_best_path = self.current_path
 
     def load_asset(self, asset):
         return mpimg.imread(os.path.join("rendering", "assets", asset))
