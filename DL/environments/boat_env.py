@@ -8,6 +8,7 @@ class BoatEnv(Env):
     def __init__(self, config, experiment=None):
         self.config = config
         self.experiment_dir = experiment.experiment_dir
+        self.action = [0]
         self.boat = Boat(self.config)
         self.reward_function = RewardFunction(
             track_width=self.config.boat_env.track_width
@@ -49,21 +50,19 @@ class BoatEnv(Env):
     # Define the step an agent can take. This means that within a step the agent can change the boats angle
     # and additionally all other calulcations happen like the wind impact.
     def step(self, action):
-        # Recalc boat angle just in case (Probs not needed?), also set attributes
-        self.boat.recalc_angle()
+        self.action = action
         self.boat.next_wind_change()
         self.boat.current_step += 1
         self.boat.fuel -= 1
 
         # Apply action
-        self.boat.set_velocities(action)
+        self.boat.set_velocities(action[0])
+
         # Apply wind
         self.boat.apply_wind()
 
         # Finish action with boat reposition after direction change and wind application
         self.boat.set_boat_position()
-
-        self.boat.recalc_angle()
 
         self.state = self.boat.return_state()
 
@@ -79,17 +78,17 @@ class BoatEnv(Env):
         done = False
         if self.boat.fuel <= 0:
             done = True
-            self.info["termination"] = "Boat ran out of fuel!"
+            self.info["termination"] = "out_of_fuel"
             self.info["out_of_fuel"] += 1
 
         elif self.boat.position[0] >= self.config.boat_env.goal_line:
             done = True
-            self.info["termination"] = "Boat reached the destination!"
+            self.info["termination"] = "reached_goal"
             self.info["reached_goal"] += 1
 
         elif abs(self.boat.position[1]) > 8:
             done = True
-            self.info["termination"] = f"Boat out of bounds!"
+            self.info["termination"] = "out_of_bounds"
             self.info["out_of_bounds"] += 1
 
         return self.state, reward, done, self.info
@@ -128,13 +127,6 @@ class Boat:
         self.current_wind_force = 0 # How hard the wind influences the boats angle, change happens each tick/step
         self.next_wind_angle = 0
         self.next_wind_force = 0
-
-    def recalc_angle(self):
-        """
-        Recalculates the current angle of the ship based on the velocity vector.
-        """
-        abs_velocity = math.sqrt(math.pow(self.velocity[0], 2) + math.pow(self.velocity[1], 2))
-        self.angle = math.acos(self.velocity[0] / abs_velocity)
 
     def set_boat_position(self):
         """
@@ -192,7 +184,6 @@ class Boat:
         """
         # Wind only affects the boat angle for now, wind comes from 90° or -90°
         self.set_velocities(self.current_wind_angle * self.current_wind_force)
-        self.recalc_angle()
 
     def return_state(self):
         state = np.array([
