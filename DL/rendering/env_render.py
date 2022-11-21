@@ -11,8 +11,9 @@ class EnvironmentRenderer:
     """
     A visulization tool that uses the gym render method to render the environment to the screen in real time by using matplotlib.
     """
-    def __init__(self, config, title=None):
+    def __init__(self, config, env, title=None):
         self.config = config
+        self.env = env
         self.image_buffer = []
         self.current_path = [[], []]
         self.previous_best_path = [[], []]
@@ -27,13 +28,13 @@ class EnvironmentRenderer:
             for image in self.image_buffer:
                 writer.append_data(image)
 
-    def create_new_image(self, env):
+    def create_new_image(self):
         """
         Creates a new image of the current state of the env that is being passed.
         """
         # Save this position
-        self.current_path[0].append(env.boat.position[0])
-        self.current_path[1].append(env.boat.position[1])
+        self.current_path[0].append(self.env.boat.position[0])
+        self.current_path[1].append(self.env.boat.position[1])
 
         # Create base plot without boat
         fig, ax = plt.subplots()
@@ -46,14 +47,21 @@ class EnvironmentRenderer:
         ax.axvline(self.config.boat_env.goal_line, color="green")
         ax.set_title(self.title)
 
+        # Text infos
         ax.text(
-            0,
+            -5,
+            self.config.boat_env.track_width + self.config.boat_env.track_width_offset + 0.6,
+            f"current step: {self.env.boat.current_step}, "
+            f"steps until wind change: {self.env.boat.steps_until_wind_change}, "
+            f"ship angle: {math.degrees(self.env.boat.angle):.2f}, "
+            f"actor action: {self.env.action[0]:.2f}, "
+            f"wind action: {(self.env.boat.current_wind_angle * self.env.boat.current_wind_force):.2f}, ",
+            fontsize=7
+        )
+        ax.text(
+            -5,
             self.config.boat_env.track_width + self.config.boat_env.track_width_offset + 0.1,
-            f"Current step: {env.boat.current_step}, "
-            f"steps until wind change: {env.boat.steps_until_wind_change}, "
-            f"ship angle: {math.degrees(env.boat.angle):.2f}, "
-            f"actor action: {env.action[0]:.2f}, "
-            f"wind action: {(env.boat.current_wind_angle * env.boat.current_wind_force):.2f}",
+            f"reward: {self.env.reward:.2f}, ",
             fontsize=7
         )
 
@@ -78,28 +86,28 @@ class EnvironmentRenderer:
         ax.set_aspect('auto')
 
         # Render boat
-        boat_imagebox = self.render_asset(env.boat.angle, env.boat.position, 1, "boat_topdown.png")
+        boat_imagebox = self.render_asset(self.env.boat.angle, self.env.boat.position, 1, "boat_topdown.png")
         ax.add_artist(boat_imagebox)
 
         # Draw boat velocity arrow
-        self.draw_arrow(ax, env.boat.angle, env.boat.position, 7, "red")
+        self.draw_arrow(ax, self.env.boat.angle, self.env.boat.position, 7, "red")
 
         # Draw action arrow
         self.draw_arrow(
             ax,
-            math.radians(90 * math.copysign(1, env.action[0])),
-            env.boat.position,
-            2 * np.abs(env.action[0]),
+            math.radians(90 * math.copysign(1, self.env.action[0])),
+            self.env.boat.position,
+            2 * np.abs(self.env.action[0]),
             "green"
         )
 
         # Draw current wind direction & force
-        if env.boat.current_wind_angle != 0:
+        if self.env.boat.current_wind_angle != 0:
             self.draw_arrow(
                 ax,
-                math.radians(90 * env.boat.current_wind_angle),
-                env.boat.position,
-                2 * env.boat.current_wind_angle,
+                math.radians(90 * self.env.boat.current_wind_angle),
+                self.env.boat.position,
+                2 * self.env.boat.current_wind_angle,
                 "blue"
             )
 

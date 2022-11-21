@@ -9,9 +9,11 @@ class BoatEnv(Env):
         self.config = config
         self.experiment_dir = experiment.experiment_dir
         self.action = [0]
+        self.reward = 0
         self.boat = Boat(self.config)
         self.reward_function = RewardFunction(
-            track_width=self.config.boat_env.track_width
+            track_width=self.config.boat_env.track_width,
+            a=1
         )
 
         self.info = {
@@ -67,11 +69,7 @@ class BoatEnv(Env):
         self.state = self.boat.return_state()
 
         # Reward calculation
-        reward = self.reward_function.linear_reward(
-            position=self.boat.position,
-            a=1,
-            x_pos_multiplier=0
-        )
+        self.reward = self.reward_function.linear_reward(position=self.boat.position)
 
         # Check if goal is reached, or if the boat ran out of fuel
         # Timeout
@@ -85,13 +83,12 @@ class BoatEnv(Env):
             done = True
             self.info["termination"] = "reached_goal"
             self.info["reached_goal"] += 1
-
-        elif abs(self.boat.position[1]) > 8:
+        elif abs(self.boat.position[1]) > self.boat.out_of_bounds:
             done = True
             self.info["termination"] = "out_of_bounds"
             self.info["out_of_bounds"] += 1
 
-        return self.state, reward, done, self.info
+        return self.state, self.reward, done, self.info
 
     def render(self):
         pass
@@ -118,6 +115,7 @@ class Boat:
         self.position = np.array([0, 0], dtype=np.float32)
         self.angle = 0 # In relation to x-axis, +y = +angle, -y = -angle, based on velocity
         self.fuel = self.config.boat_env.boat_fuel
+        self.out_of_bounds = self.config.boat_env.track_width + self.config.boat_env.boat_out_of_bounds_offset
         self.mass = 0 # Not implemented for now
 
         # Wind
@@ -204,25 +202,27 @@ class RewardFunction:
     Additionally the reward functions have a x_pos_multiplier that gives extra reward the further the boat gets
     this parameter however can be turned off by just not setting it and leaving it in its default being 0.
     """
-    def __init__(self, track_width):
+    def __init__(self, track_width, a=0, b=0):
         self.track_width = track_width
+        self.a = a
+        self.b = b
 
-    def linear_reward(self, position, a, x_pos_multiplier=0) -> float:
+    def linear_reward(self, position, x_pos_multiplier=0):
         x = position[0] * x_pos_multiplier
-        y = position[1]
-        linear_function = y * a
+        y = np.abs(position[1])
+        linear_function = y * self.a
         return self.track_width - linear_function + x
 
-    def quadratic_reward(self, position, a, b, x_pos_multiplier=0) -> float:
+    def quadratic_reward(self, position, x_pos_multiplier=0):
         x = position[0] * x_pos_multiplier
-        y = position[1]
-        quadratic_function = math.pow(y, 2) * a + y * b
+        y = np.abs(position[1])
+        quadratic_function = math.pow(y, 2) * self.a + y * self.b
         return self.track_width - quadratic_function + x
 
-    def exponential_reward(self, position, a, x_pos_multiplier=0) -> float:
+    def exponential_reward(self, position, x_pos_multiplier=0):
         x = position[0] * x_pos_multiplier
-        y = position[1]
-        exponential_function = a * math.exp(y)
+        y = np.abs(position[1])
+        exponential_function = self.a * math.exp(y)
         return self.track_width - exponential_function + x
 
 

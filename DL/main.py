@@ -12,11 +12,11 @@ if __name__ == '__main__':
     experiment.save_configs()
     config = get_config(os.path.join("config.yaml"))
 
-    env_render = EnvironmentRenderer(config)
-
     environment = "boat_env"
 
     env = BoatEnv(config, experiment)
+
+    env_render = EnvironmentRenderer(config, env)
 
     agent = ContinuousAgent(
         config=config,
@@ -43,7 +43,7 @@ if __name__ == '__main__':
         score = 0
 
         while not done:
-            env_render.create_new_image(env)
+            env_render.create_new_image()
             action = agent.choose_action(observation)
             observation_, reward, done, info = env.step(action)
             score += reward
@@ -64,7 +64,12 @@ if __name__ == '__main__':
 
         score_history.append(score)
         avg_score = np.mean(score_history[-100:])
-        print('episode ', i, 'score %.1f' % score, 'avg_score %.1f' % avg_score)
+        print(
+            f"episode: {i}, "
+            f"score: {score:.1f}, "
+            f"best score: {best_score:.1f}, "
+            f"avg_score: {avg_score:.1f}"
+        )
         print(info, "\n")
 
     if not load_checkpoint:
