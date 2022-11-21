@@ -11,13 +11,13 @@ class EnvironmentRenderer:
     """
     A visulization tool that uses the gym render method to render the environment to the screen in real time by using matplotlib.
     """
-    def __init__(self, config, env, title=None):
+    def __init__(self, config, env):
         self.config = config
         self.env = env
         self.image_buffer = []
         self.current_path = [[], []]
         self.previous_best_path = [[], []]
-        self.title = title
+        self.title = None
 
     def reset_renderer(self):
         self.image_buffer = []
@@ -105,9 +105,9 @@ class EnvironmentRenderer:
         if self.env.boat.current_wind_angle != 0:
             self.draw_arrow(
                 ax,
-                math.radians(90 * self.env.boat.current_wind_angle),
+                math.radians(90 * math.copysign(1, self.env.boat.current_wind_angle)),
                 self.env.boat.position,
-                2 * self.env.boat.current_wind_angle,
+                2 * np.abs(self.env.boat.current_wind_force),
                 "blue"
             )
 

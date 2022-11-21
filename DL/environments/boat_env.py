@@ -113,17 +113,17 @@ class Boat:
         # Boat
         self.velocity = np.array([self.config.boat_env.boat_velocity, 0], dtype=np.float32)
         self.position = np.array([0, 0], dtype=np.float32)
-        self.angle = 0 # In relation to x-axis, +y = +angle, -y = -angle, based on velocity
+        self.angle = 0.0 # In relation to x-axis, +y = +angle, -y = -angle, based on velocity
         self.fuel = self.config.boat_env.boat_fuel
         self.out_of_bounds = self.config.boat_env.track_width + self.config.boat_env.boat_out_of_bounds_offset
         self.mass = 0 # Not implemented for now
 
         # Wind
         self.steps_until_wind_change = 0
-        self.current_wind_angle = 0 # From where the wind comes, in relation to x-axis again
-        self.current_wind_force = 0 # How hard the wind influences the boats angle, change happens each tick/step
-        self.next_wind_angle = 0
-        self.next_wind_force = 0
+        self.current_wind_angle = 0.0 # From where the wind comes, in relation to x-axis again
+        self.current_wind_force = 0.0 # How hard the wind influences the boats angle, change happens each tick/step
+        self.next_wind_angle = 0.0
+        self.next_wind_force = 0.0
 
     def set_boat_position(self):
         """
@@ -160,7 +160,7 @@ class Boat:
             # On weather forecast step, next -> current, generate new next, pop current forecast
             if self.wind_forecast[0] == self.current_step:
                 self.current_wind_angle = self.next_wind_angle
-                self.current_wind_force = self.next_wind_angle
+                self.current_wind_force = self.next_wind_force
                 self.set_wind_attributes()
                 self.wind_forecast = np.delete(self.wind_forecast, 0, 0)
 

@@ -52,9 +52,14 @@ if __name__ == '__main__':
                 agent.learn()
             observation = observation_
 
+        score_history.append(score)
+        avg_score = np.mean(score_history[-100:])
+
         if score > best_score:
-            best_score = score
             env_render.set_best_path()
+            best_score = score
+
+        if score > avg_score:
             env_render.create_gif_from_buffer(os.path.join(experiment.experiment_dir, "rendering"), f"episode_{i}")
             env_render.reset_renderer()
             if not load_checkpoint:
@@ -62,8 +67,6 @@ if __name__ == '__main__':
 
         env_render.reset_renderer()
 
-        score_history.append(score)
-        avg_score = np.mean(score_history[-100:])
         print(
             f"episode: {i}, "
             f"score: {score:.1f}, "
