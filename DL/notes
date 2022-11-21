@@ -1,7 +1,7 @@
 - Alpha value needs a lot of tweaking according to this video/timestamp, remember that when tuning! https://youtu.be/14iI6jtewIk?list=PLQpKd36nzSuMynZLU2soIpNSMeXMplnKP&t=312
 
 - swap current model to force model instead of vel
-- smooth wind function
+- smooth wind function, show wind function below normal plot?
 - try without wind information
 
 

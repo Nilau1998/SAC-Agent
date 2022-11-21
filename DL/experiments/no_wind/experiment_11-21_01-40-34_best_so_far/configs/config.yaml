@@ -1,0 +1,36 @@
+# General settings
+base_settings:
+  n_games: 250
+
+# Agent settings
+agent:
+  alpha: 0.0005
+  beta: 0.0003
+  gamma: 0.99
+  tau: 0.005
+  max_size: 1_000_000
+  layer1_size: 256
+  layer2_size: 256
+  batch_size: 256
+  reward_scale: 2
+
+# Env settings
+boat_env:
+  track_width: 6
+  track_width_offset: 3
+  boat_out_of_bounds_offset: 2
+  boat_fuel: 120
+  boat_velocity: 1
+  boat_angle_scale: 1 # Action space is -1, 1, this lets you scale it up or down a bit for adjusting
+  wind_events: 0 # num of wind events, 3 would mean the wind changes 3 times
+  wind_force: 1 # How many degrees per step the wind turns the ship
+  goal_line: 100
+
+# Permanent settings for testing
+test:
+  track_width: 5
+  nested_test: 5
+  boat_velocity: 1
+  boat_angle_scale: 1
+  wind_events: 3
+  wind_force: 5
