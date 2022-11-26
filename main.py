@@ -5,7 +5,7 @@ from utils.plotting import plot_learning_curve
 from utils.build_experiment import Experiment
 from utils.config_reader import get_config
 from environments.boat_env import BoatEnv
-from rendering.env_render import EnvironmentRenderer
+from data_loader.recorder import Recorder
 
 if __name__ == '__main__':
     experiment = Experiment()
@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     env = BoatEnv(config, experiment)
 
-    env_render = EnvironmentRenderer(config, env)
+    recorder = Recorder(config, env)
 
     agent = ContinuousAgent(
         config=config,
@@ -27,8 +27,6 @@ if __name__ == '__main__':
 
     n_games = config.base_settings.n_games
     filename = environment
-
-    figure_file = os.path.join(experiment.experiment_dir, "plots", filename)
 
     best_score = 0
     score_history = []
@@ -43,7 +41,7 @@ if __name__ == '__main__':
         score = 0
 
         while not done:
-            env_render.create_new_image()
+            recorder.write_data(i)
             action = agent.choose_action(observation)
             observation_, reward, done, info = env.step(action)
             score += reward
@@ -56,16 +54,11 @@ if __name__ == '__main__':
         avg_score = np.mean(score_history[-100:])
 
         if score > best_score:
-            env_render.set_best_path()
             best_score = score
 
         if score > avg_score:
-            env_render.create_gif_from_buffer(os.path.join(experiment.experiment_dir, "rendering"), f"episode_{i}")
-            env_render.reset_renderer()
             if not load_checkpoint:
                 agent.save_models()
-
-        env_render.reset_renderer()
 
         print(
             f"episode: {i}, "
@@ -77,4 +70,6 @@ if __name__ == '__main__':
 
     if not load_checkpoint:
         x = [i+1 for i in range(n_games)]
+        figure_file = os.path.join(
+            experiment.experiment_dir, "plots", filename)
         plot_learning_curve(x, score_history, figure_file)

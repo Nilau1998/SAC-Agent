@@ -22,6 +22,7 @@ class Experiment:
         os.makedirs(os.path.join(self.experiment_dir, "checkpoints"))
         os.makedirs(os.path.join(self.experiment_dir, "configs"))
         os.makedirs(os.path.join(self.experiment_dir, "rendering"))
+        os.makedirs(os.path.join(self.experiment_dir, "episodes"))
 
         print(f"Created: {self.experiment_dir}")
 

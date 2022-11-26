@@ -164,3 +164,4 @@ bla.py
 experiments/
 notes
 out.profile
+.gitlab-ci.yml
