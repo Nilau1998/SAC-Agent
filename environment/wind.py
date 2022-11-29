@@ -11,6 +11,14 @@ class Wind:
 
     def __init__(self, config):
         self.config = config
+        self.wind_force = self.generate_wind_force()
+        self.wind_angle = self.generate_wind_angle()
+
+    def get_wind(self, dt):
+        """
+        Returns wind attributes for this timestep.
+        """
+        return np.array([self.wind_force[dt], self.wind_angle[dt]])
 
     def generate_wind_force(self):
         """
