@@ -5,8 +5,8 @@ from utils.plotting import plot_learning_curve
 from utils.build_experiment import Experiment
 from utils.config_reader import get_config
 from environment.boat_env import BoatEnv
-from environment.wind import Wind
-from data_loader.recorder import Recorder
+from postprocessing.recorder import Recorder
+from postprocessing.replayer import Replayer
 
 if __name__ == '__main__':
     experiment = Experiment()
@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     env = BoatEnv(config, experiment)
 
-    recorder = Recorder(config, env)
+    recorder = Recorder(env)
 
     agent = ContinuousAgent(
         config=config,
@@ -80,4 +80,6 @@ if __name__ == '__main__':
         plot_learning_curve(x, score_history, figure_file)
 
     print(f"Creating gifs...")
-    # TODO
+    replayer = Replayer(env)
+    for i in range(n_games):
+        print(type(replayer.read_data_csv(i)))

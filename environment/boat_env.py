@@ -20,7 +20,6 @@ class BoatEnv(Env):
 
         self.info = {
             "termination": "",
-            "out_of_fuel": 0,
             "reached_goal": 0,
             "out_of_bounds": 0,
             "episode_reward": 0
@@ -95,6 +94,8 @@ class BoatEnv(Env):
 
         self.state = self.boat.return_state()
 
+        self.info["episode_reward"] = 0
+
         info = {}
 
         return self.state, info
@@ -108,8 +109,8 @@ class BoatEnv(Env):
             "boat_velocity_y": self.boat.velocity[1],
             "boat_angle": self.boat.angle,
             "boat_mass": self.boat.mass,
-            "current_wind_angle": self.boat.wind.get_wind(self.boat.dt)[1],
-            "current_wind_force": self.boat.wind.get_wind(self.boat.dt)[0],
+            "wind_angle": self.boat.wind.get_wind(self.boat.dt)[1],
+            "wind_force": self.boat.wind.get_wind(self.boat.dt)[0],
             # Agent
             "action": self.action[0],
             "reward": self.reward
