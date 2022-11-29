@@ -55,7 +55,7 @@ class EnvironmentRenderer:
         ax.text(
             -5,
             self.config.boat_env.track_width + self.config.boat_env.track_width_offset + 0.6,
-            f"current step: {self.env.boat.current_step}, "
+            f"dt: {self.env.boat.dt}, "
             f"steps until wind change: {self.env.boat.steps_until_wind_change}, "
             f"ship angle: {math.degrees(self.env.boat.angle):.2f}, "
             f"actor action: {self.env.action[0]:.2f}, "

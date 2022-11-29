@@ -5,6 +5,7 @@ from utils.plotting import plot_learning_curve
 from utils.build_experiment import Experiment
 from utils.config_reader import get_config
 from environments.boat_env import BoatEnv
+from environments.wind import Wind
 from data_loader.recorder import Recorder
 
 if __name__ == '__main__':
@@ -40,10 +41,10 @@ if __name__ == '__main__':
         done = False
         score = 0
 
-        recorder.create_csv(i)
+        recorder.create_csvs(i)
 
         while not done:
-            recorder.write_to_csv()
+            recorder.write_data_to_csv()
             action = agent.choose_action(observation)
             observation_, reward, done, info = env.step(action)
             score += reward
@@ -51,6 +52,8 @@ if __name__ == '__main__':
             if not load_checkpoint:
                 agent.learn()
             observation = observation_
+
+        recorder.write_info_to_csv()
 
         score_history.append(score)
         avg_score = np.mean(score_history[-100:])
@@ -75,3 +78,6 @@ if __name__ == '__main__':
         figure_file = os.path.join(
             experiment.experiment_dir, "plots", filename)
         plot_learning_curve(x, score_history, figure_file)
+
+    print(f"Creating gifs...")
+    # TODO

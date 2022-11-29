@@ -1,5 +1,6 @@
 from gym import Env
 from gym.spaces import Box
+from environments.reward_functions import RewardFunction
 import numpy as np
 import random
 import math
@@ -21,7 +22,8 @@ class BoatEnv(Env):
             "termination": "",
             "out_of_fuel": 0,
             "reached_goal": 0,
-            "out_of_bounds": 0
+            "out_of_bounds": 0,
+            "episode_reward": 0
         }
 
         # Define action space
@@ -54,8 +56,7 @@ class BoatEnv(Env):
     def step(self, action):
         self.action = action
         self.boat.next_wind_change()
-        self.boat.current_step += 1
-        self.boat.fuel -= 1
+        self.boat.dt += 1
 
         # Apply action
         self.boat.set_velocities(action[0])
@@ -71,16 +72,12 @@ class BoatEnv(Env):
         # Reward calculation
         self.reward = self.reward_function.linear_reward(
             position=self.boat.position)
+        self.info["episode_reward"] += self.reward
 
         # Check if goal is reached, or if the boat ran out of fuel
         # Timeout
         done = False
-        if self.boat.fuel <= 0:
-            done = True
-            self.info["termination"] = "out_of_fuel"
-            self.info["out_of_fuel"] += 1
-
-        elif self.boat.position[0] >= self.config.boat_env.goal_line:
+        if self.boat.position[0] >= self.config.boat_env.goal_line:
             done = True
             self.info["termination"] = "reached_goal"
             self.info["reached_goal"] += 1
@@ -128,7 +125,7 @@ class Boat:
         self.config = config
 
         # Env
-        self.current_step = 0
+        self.dt = 0
         self.wind_forecast = generate_randint(self.config)
 
         # Boat
@@ -136,7 +133,6 @@ class Boat:
         self.velocity = np.array(
             [self.config.boat_env.boat_velocity, 0], dtype=np.float32)
         self.angle = 0.0  # In relation to x-axis, +y = +angle, -y = -angle, based on velocity
-        self.fuel = self.config.boat_env.boat_fuel
         self.out_of_bounds = self.config.boat_env.track_width + \
             self.config.boat_env.boat_out_of_bounds_offset
         self.mass = 0  # Not implemented for now
@@ -156,12 +152,12 @@ class Boat:
         """
         self.position += self.velocity
 
-    def set_velocities(self, delta_angle):
+    def set_velocities(self, d_angle):
         """
         Rotates the velocity vector by delta_angle. The absolute value of the velocity vector stays constant.
         delta_angle is passed in degree
         """
-        self.angle += math.radians(delta_angle)
+        self.angle += math.radians(d_angle)
         abs_velocity = math.sqrt(
             math.pow(self.velocity[0], 2) + math.pow(self.velocity[1], 2))
         self.velocity[0] = abs_velocity * math.cos(self.angle)
@@ -174,7 +170,7 @@ class Boat:
         This method also sets the new wind attributes so they can be applied on the ship
         """
         # Create initial next attributes for the first forecast
-        if self.current_step == 0:
+        if self.dt == 0:
             self.set_wind_attributes()
             self.wind_forecast = np.delete(self.wind_forecast, 0, 0)
 
@@ -182,9 +178,9 @@ class Boat:
             pass
         else:
             self.steps_until_wind_change = self.wind_forecast[0] - \
-                self.current_step
+                self.dt
             # On weather forecast step, next -> current, generate new next, pop current forecast
-            if self.wind_forecast[0] == self.current_step:
+            if self.wind_forecast[0] == self.dt:
                 self.current_wind_angle = self.next_wind_angle
                 self.current_wind_force = self.next_wind_force
                 self.set_wind_attributes()
@@ -217,39 +213,6 @@ class Boat:
             self.current_wind_angle
         ])
         return state
-
-
-class RewardFunction:
-    """
-    Class that implements a bunch of reward functions that can be used to calculate the rewards
-    for the agent.
-    The reward functions need a track_width which describes the area the boat should stay in.
-    Additionally the reward functions have a x_pos_multiplier that gives extra reward the further the boat gets
-    this parameter however can be turned off by just not setting it and leaving it in its default being 0.
-    """
-
-    def __init__(self, track_width, a=0, b=0):
-        self.track_width = track_width
-        self.a = a
-        self.b = b
-
-    def linear_reward(self, position, x_pos_multiplier=0):
-        x = position[0] * x_pos_multiplier
-        y = np.abs(position[1])
-        linear_function = y * self.a
-        return self.track_width - linear_function + x
-
-    def quadratic_reward(self, position, x_pos_multiplier=0):
-        x = position[0] * x_pos_multiplier
-        y = np.abs(position[1])
-        quadratic_function = math.pow(y, 2) * self.a + y * self.b
-        return self.track_width - quadratic_function + x
-
-    def exponential_reward(self, position, x_pos_multiplier=0):
-        x = position[0] * x_pos_multiplier
-        y = np.abs(position[1])
-        exponential_function = self.a * math.exp(y)
-        return self.track_width - exponential_function + x
 
 
 def generate_randint(config):
