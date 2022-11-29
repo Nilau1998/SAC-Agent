@@ -40,8 +40,10 @@ if __name__ == '__main__':
         done = False
         score = 0
 
+        recorder.create_csv(i)
+
         while not done:
-            recorder.write_data(i)
+            recorder.write_to_csv()
             action = agent.choose_action(observation)
             observation_, reward, done, info = env.step(action)
             score += reward

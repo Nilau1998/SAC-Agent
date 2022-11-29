@@ -104,22 +104,22 @@ class BoatEnv(Env):
         return self.state, info
 
     def return_all_data(self):
-        data = np.array([
+        data = {
             # Boat
-            self.boat.position[0],
-            self.boat.position[1],
-            self.boat.velocity[0],
-            self.boat.velocity[1],
-            self.boat.angle,
-            self.boat.fuel,
-            self.boat.mass,
-            self.boat.steps_until_wind_change,
-            self.boat.current_wind_angle,
-            self.boat.current_wind_force,
+            "boat_position_x": self.boat.position[0],
+            "boat_position_y": self.boat.position[1],
+            "boat_velocity_x": self.boat.velocity[0],
+            "boat_velocity_y": self.boat.velocity[1],
+            "boat_angle": self.boat.angle,
+            "boat_fuel": self.boat.fuel,
+            "boat_mass": self.boat.mass,
+            "steps_until_wind_change": self.boat.steps_until_wind_change,
+            "current_wind_angle": self.boat.current_wind_angle,
+            "current_wind_force": self.boat.current_wind_force,
             # Agent
-            self.action[0],
-            self.reward
-        ])
+            "action": self.action[0],
+            "reward": self.reward
+        }
         return data
 
 

@@ -7,10 +7,12 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from scipy import ndimage
 import imageio
 
+
 class EnvironmentRenderer:
     """
     A visulization tool that uses the gym render method to render the environment to the screen in real time by using matplotlib.
     """
+
     def __init__(self, config, env):
         self.config = config
         self.env = env
@@ -39,7 +41,9 @@ class EnvironmentRenderer:
         # Create base plot without boat
         fig, ax = plt.subplots()
         xmin, xmax = -5, self.config.boat_env.boat_fuel + 10
-        ymin, ymax = -self.config.boat_env.track_width - self.config.boat_env.track_width_offset, self.config.boat_env.track_width + self.config.boat_env.track_width_offset
+        ymin, ymax = -self.config.boat_env.track_width - \
+            self.config.boat_env.track_width_offset, self.config.boat_env.track_width + \
+            self.config.boat_env.track_width_offset
         ax.set_xlim([xmin, xmax])
         ax.set_ylim([ymin, ymax])
         ax.axhline(self.config.boat_env.track_width, color="black")
@@ -66,7 +70,8 @@ class EnvironmentRenderer:
         )
 
         # Plot current path and previous best path
-        ax.plot(self.previous_best_path[0], self.previous_best_path[1], color="orange")
+        ax.plot(self.previous_best_path[0],
+                self.previous_best_path[1], color="orange")
         ax.plot(self.current_path[0], self.current_path[1], color="red")
 
         self.gradient_image(
@@ -86,11 +91,13 @@ class EnvironmentRenderer:
         ax.set_aspect('auto')
 
         # Render boat
-        boat_imagebox = self.render_asset(self.env.boat.angle, self.env.boat.position, 1, "boat_topdown.png")
+        boat_imagebox = self.render_asset(
+            self.env.boat.angle, self.env.boat.position, 1, "boat_topdown.png")
         ax.add_artist(boat_imagebox)
 
         # Draw boat velocity arrow
-        self.draw_arrow(ax, self.env.boat.angle, self.env.boat.position, 7, "red")
+        self.draw_arrow(ax, self.env.boat.angle,
+                        self.env.boat.position, 7, "red")
 
         # Draw action arrow
         self.draw_arrow(
@@ -105,7 +112,8 @@ class EnvironmentRenderer:
         if self.env.boat.current_wind_angle != 0:
             self.draw_arrow(
                 ax,
-                math.radians(90 * math.copysign(1, self.env.boat.current_wind_angle)),
+                math.radians(
+                    90 * math.copysign(1, self.env.boat.current_wind_angle)),
                 self.env.boat.position,
                 2 * np.abs(self.env.boat.current_wind_force),
                 "blue"
@@ -114,7 +122,8 @@ class EnvironmentRenderer:
         # Create image and save to image_buffer
         fig.canvas.draw()
         image_data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
-        image_data = image_data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+        image_data = image_data.reshape(
+            fig.canvas.get_width_height()[::-1] + (3,))
         self.image_buffer.append(image_data)
         plt.close("all")
 
@@ -124,7 +133,8 @@ class EnvironmentRenderer:
         """
         x, y = position[0], position[1]
         boat_image = self.load_asset(asset)
-        rotated_boat_image = ndimage.rotate((boat_image * 255).astype(np.uint8), math.degrees(angle) - 90)
+        rotated_boat_image = ndimage.rotate(
+            (boat_image * 255).astype(np.uint8), math.degrees(angle) - 90)
         imagebox = OffsetImage(rotated_boat_image, zoom=zoom)
         imagebox = AnnotationBbox(imagebox, (x, y), frameon=False)
         return imagebox
@@ -155,18 +165,20 @@ class EnvironmentRenderer:
         phi = direction * np.pi / 2
         v = np.array([np.cos(phi), np.sin(phi)])
         X = np.array([[v @ [1, 0], v @ [1, 1]],
-                    [v @ [0, 0], v @ [0, 1]]])
+                      [v @ [0, 0], v @ [0, 1]]])
         a, b = cmap_range
         X = a + (b - a) / X.max() * X
         im = ax.imshow(X, extent=extent, interpolation='bicubic',
-                    vmin=0, vmax=1, **kwargs)
+                       vmin=0, vmax=1, **kwargs)
         return im
 
     def draw_arrow(self, ax, angle, position, length, color):
         dx = math.cos(angle) * length + position[0]
         dy = math.sin(angle) * length + position[1]
-        prop = dict(arrowstyle="->, head_width=0.4, head_length=0.8", color=color, shrinkA=0, shrinkB=0)
-        ax.annotate("", xy=(dx, dy), xytext=(position[0], position[1]), arrowprops=prop)
+        prop = dict(arrowstyle="->, head_width=0.4, head_length=0.8",
+                    color=color, shrinkA=0, shrinkB=0)
+        ax.annotate("", xy=(dx, dy), xytext=(
+            position[0], position[1]), arrowprops=prop)
 
     def set_best_path(self):
         self.previous_best_path = self.current_path
