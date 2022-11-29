@@ -4,8 +4,8 @@ from agent.continuous_agent import ContinuousAgent
 from utils.plotting import plot_learning_curve
 from utils.build_experiment import Experiment
 from utils.config_reader import get_config
-from environments.boat_env import BoatEnv
-from environments.wind import Wind
+from environment.boat_env import BoatEnv
+from environment.wind import Wind
 from data_loader.recorder import Recorder
 
 if __name__ == '__main__':
