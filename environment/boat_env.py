@@ -1,6 +1,6 @@
 from gym import Env
 from gym.spaces import Box
-from environments.reward_functions import RewardFunction
+from environment.reward_functions import RewardFunction
 import numpy as np
 import random
 import math

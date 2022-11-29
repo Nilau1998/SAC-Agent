@@ -3,7 +3,7 @@ import random
 import os
 import math
 import pytest
-from environments.boat_env import Boat, RewardFunction
+from environment.boat_env import Boat, RewardFunction
 # from environments.boat_env import BoatEnv
 
 # Ever tried testing with randomness? It sucks!
