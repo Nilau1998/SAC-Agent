@@ -54,14 +54,15 @@ class Wind:
         fixed_points = np.linspace(
             0, self.config.wind.range_length, num=self.config.wind.fixed_points)
         fixed_point_values = np.random.sample(
-            self.config.wind.fixed_points) * (2 * np.pi)
+            self.config.wind.fixed_points)
 
         complete_range = np.linspace(0, self.config.wind.range_length,
                                      num=self.config.wind.range_length + 1, endpoint=True)
         interpolation = interp1d(
             fixed_points, fixed_point_values, kind="cubic", fill_value="extrapolate")
         interpolated_range = interpolation(complete_range)
-        # Normalize incase interpolation exceeds 0-2*pi range.
-        if np.any((interpolated_range < 0) | (interpolated_range > (2 * np.pi))):
-            interpolated_range *= ((2 * np.pi)/np.max(interpolated_range))
+        # Normalize incase interpolation exceeds 0-1 range.
+        if np.any((interpolated_range < 0) | (interpolated_range > 1)):
+            interpolated_range = (interpolated_range - np.min(interpolated_range)) / (
+                np.max(interpolated_range) - np.min(interpolated_range))
         return interpolated_range

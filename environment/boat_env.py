@@ -161,7 +161,7 @@ class Boat:
         """
         # Wind only affects the boat angle for now, wind comes from 90° or -90°
         wind_attr = self.wind.get_wind(self.dt)
-        self.set_velocities(wind_attr[0])
+        self.set_velocities(wind_attr[0] * (np.pi * 2))
 
     def return_state(self):
         state = np.array([
