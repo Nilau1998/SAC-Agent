@@ -6,7 +6,7 @@ from utils.build_experiment import Experiment
 from utils.config_reader import get_config
 from environment.boat_env import BoatEnv
 from postprocessing.recorder import Recorder
-from postprocessing.replayer import Replayer
+from rendering.boat_env_render import BoatEnvironmentRenderer
 
 if __name__ == '__main__':
     experiment = Experiment()
@@ -79,7 +79,13 @@ if __name__ == '__main__':
             experiment.experiment_dir, "plots", filename)
         plot_learning_curve(x, score_history, figure_file)
 
-    print(f"Creating gifs...")
-    replayer = Replayer(env)
-    for i in range(n_games):
-        print(type(replayer.read_data_csv(i)))
+    print(f"Starting rendering...")
+    renderer = BoatEnvironmentRenderer(experiment.experiment_dir)
+    for episode_index in range(renderer.replayer.total_episodes):
+        renderer.replayer.read_data_csv(episode_index)
+        for dt in range(renderer.replayer.total_dt):
+            print(episode_index, dt)
+            renderer.update_objects_on_image(episode_index, dt)
+            renderer.draw_image_to_buffer()
+        renderer.create_gif_from_buffer(f"episode_{episode_index}")
+        renderer.reset_renderer()
