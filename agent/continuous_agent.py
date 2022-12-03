@@ -1,8 +1,10 @@
 import torch as T
 import torch.nn.functional as F
+import numpy as np
 from agent.buffer import ReplayBuffer
 from agent.base_agent import BaseAgent
 from networks.networks import ActorNetwork, CriticNetwork, ValueNetwork
+
 
 class ContinuousAgent(BaseAgent):
     def __init__(self, config, experiment_dir, input_dims, env):
@@ -10,7 +12,8 @@ class ContinuousAgent(BaseAgent):
         self.config = config
         self.gamma = config.agent.gamma
         self.tau = config.agent.tau
-        self.memory = ReplayBuffer(config.agent.max_size, input_dims, self.get_n_actions())
+        self.memory = ReplayBuffer(
+            config.agent.max_size, input_dims, self.get_n_actions())
         self.batch_size = config.agent.batch_size
 
         self.actor = ActorNetwork(
@@ -72,7 +75,7 @@ class ContinuousAgent(BaseAgent):
 
         for name in value_state_dict:
             value_state_dict[name] = tau * value_state_dict[name].clone() + \
-                    (1-tau) * target_value_state_dict[name].clone()
+                (1-tau) * target_value_state_dict[name].clone()
 
         self.target_value.load_state_dict(value_state_dict)
 
@@ -97,7 +100,7 @@ class ContinuousAgent(BaseAgent):
             return
 
         state, action, reward, new_state, done = \
-                self.memory.sample_buffer(self.batch_size)
+            self.memory.sample_buffer(self.batch_size)
 
         reward = T.tensor(reward, dtype=T.float).to(self.actor.device)
         done = T.tensor(done).to(self.actor.device)
@@ -109,7 +112,8 @@ class ContinuousAgent(BaseAgent):
         value_ = self.target_value(state_).view(-1)
         value_[done] = 0.0
 
-        actions, log_probs = self.actor.sample_normal(state, reparameterize=False)
+        actions, log_probs = self.actor.sample_normal(
+            state, reparameterize=False)
         log_probs = log_probs.view(-1)
         q1_new_policy = self.critic_1.forward(state, actions)
         q2_new_policy = self.critic_2.forward(state, actions)
@@ -122,7 +126,8 @@ class ContinuousAgent(BaseAgent):
         value_loss.backward(retain_graph=True)
         self.value.optimizer.step()
 
-        actions, log_probs = self.actor.sample_normal(state, reparameterize=True)
+        actions, log_probs = self.actor.sample_normal(
+            state, reparameterize=True)
         log_probs = log_probs.view(-1)
         q1_new_policy = self.critic_1.forward(state, actions)
         q2_new_policy = self.critic_2.forward(state, actions)
