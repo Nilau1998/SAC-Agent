@@ -1,6 +1,6 @@
 # General settings
 base_settings:
-  n_games: 10
+  n_games: 1
 
 # Agent settings
 agent:
@@ -21,7 +21,6 @@ boat_env:
   boat_out_of_bounds_offset: 2
   boat_velocity: 1
   boat_angle_scale: 1 # Action space is -1, 1, this lets you scale it up or down a bit for adjusting
-  wind_events: 6 # how many fixed points are used to interpolate a force/angle curve
   wind_force: 1 # How many degrees per step the wind turns the ship
   goal_line: 200
 

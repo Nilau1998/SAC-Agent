@@ -109,8 +109,6 @@ class BoatEnv(Env):
             "boat_velocity_y": self.boat.velocity[1],
             "boat_angle": self.boat.angle,
             "boat_mass": self.boat.mass,
-            "wind_angle": self.boat.wind.get_wind(self.boat.dt)[1],
-            "wind_force": self.boat.wind.get_wind(self.boat.dt)[0],
             # Agent
             "action": self.action[0],
             "reward": self.reward

@@ -35,8 +35,9 @@ class Wind:
         complete_range = np.linspace(0, self.config.wind.range_length,
                                      num=self.config.wind.range_length + 1, endpoint=True)
         interpolation = interp1d(
-            fixed_points, fixed_point_values, kind="cubic", fill_value="extrapolate")
+            fixed_points, fixed_point_values, kind='cubic', fill_value='extrapolate')
         interpolated_range = interpolation(complete_range)
+
         # Normalize incase interpolation exceeds 0-1 range.
         if np.any((interpolated_range < 0) | (interpolated_range > 1)):
             interpolated_range = (interpolated_range - np.min(interpolated_range)) / (
@@ -59,8 +60,9 @@ class Wind:
         complete_range = np.linspace(0, self.config.wind.range_length,
                                      num=self.config.wind.range_length + 1, endpoint=True)
         interpolation = interp1d(
-            fixed_points, fixed_point_values, kind="cubic", fill_value="extrapolate")
+            fixed_points, fixed_point_values, kind='cubic', fill_value='extrapolate')
         interpolated_range = interpolation(complete_range)
+
         # Normalize incase interpolation exceeds 0-1 range.
         if np.any((interpolated_range < 0) | (interpolated_range > 1)):
             interpolated_range = (interpolated_range - np.min(interpolated_range)) / (

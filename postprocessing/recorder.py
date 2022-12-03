@@ -1,6 +1,7 @@
 import csv
 import os
 import pandas as pd
+import numpy as np
 
 
 class Recorder:
@@ -16,25 +17,37 @@ class Recorder:
 
     def create_csvs(self, episode_index):
         self.data_file = os.path.join(
-            self.experiment_dir, "episodes", f"episode_{episode_index}_data.csv")
+            self.experiment_dir, 'episodes', f"episode_{episode_index}_data.csv")
         if not os.path.exists(self.data_file):
-            with open(self.data_file, "x") as csv_file:
-                writer = csv.writer(csv_file, delimiter=";")
+            with open(self.data_file, 'x') as csv_file:
+                writer = csv.writer(csv_file, delimiter=';')
                 writer.writerow(self.env.return_all_data().keys())
 
         self.info_file = os.path.join(
-            self.experiment_dir, "episodes", "info.csv")
+            self.experiment_dir, 'episodes', 'info.csv')
         if not os.path.exists(self.info_file):
-            with open(self.info_file, "x") as csv_file:
-                writer = csv.writer(csv_file, delimiter=";")
+            with open(self.info_file, 'x') as csv_file:
+                writer = csv.writer(csv_file, delimiter=';')
                 writer.writerow(self.env.info.keys())
 
     def write_data_to_csv(self):
-        with open(self.data_file, "a") as csv_file:
+        with open(self.data_file, 'a') as csv_file:
             writer = csv.writer(csv_file, delimiter=";")
             writer.writerow(self.env.return_all_data().values())
 
     def write_info_to_csv(self):
-        with open(self.info_file, "a") as csv_file:
-            writer = csv.writer(csv_file, delimiter=";")
+        with open(self.info_file, 'a') as csv_file:
+            writer = csv.writer(csv_file, delimiter=';')
             writer.writerow(self.env.info.values())
+
+    def write_winds_to_csv(self):
+        wind = np.column_stack(
+            (self.env.boat.wind.wind_force, self.env.boat.wind.wind_angle * np.pi * 2)
+        )
+        self.wind_file = os.path.join(
+            self.experiment_dir, 'episodes', 'wind.csv')
+        with open(self.wind_file, 'x') as csv_file:
+            writer = csv.writer(csv_file, delimiter=';')
+            writer.writerow(['wind_force', 'wind_angle'])
+            for _ in wind:
+                writer.writerow(_)
