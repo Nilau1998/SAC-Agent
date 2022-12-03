@@ -23,9 +23,8 @@ class BoatEnvironmentRenderer:
         self.config = get_experiment_config(experiment_dir, "config.yaml")
         self.image_buffer = []
         self.replayer = Replayer(experiment_dir)
-        self.fig = plt.figure()
-        self.axb = self.fig.add_subplot(111)
-        self.axo = self.fig.add_subplot(111, frame_on=False)
+        self.fig, (self.axb, self.axwa, self.axwf) = plt.subplots(
+            3, 1, height_ratios=[3, 1, 1])
         self.plt_objects = {}
 
         self.current_path = [[], []]
@@ -48,12 +47,6 @@ class BoatEnvironmentRenderer:
         self.axb.axhline(-self.config.boat_env.track_width, color='black')
         self.axb.axvline(self.config.boat_env.goal_line, color='green')
 
-        # Objet image axis settings
-        self.axo.set_xlim([xmin, xmax])
-        self.axo.set_ylim([ymin, ymax])
-        self.axo.get_xaxis().set_visible(False)
-        self.axo.get_yaxis().set_visible(False)
-
         self.gradient_image(
             self.axb,
             direction=0,
@@ -68,7 +61,27 @@ class BoatEnvironmentRenderer:
             cmap=plt.cm.Blues,
             cmap_range=(0.5, 0.1)
         )
-        self.axb.set_aspect('auto')
+
+        # Wind image settings and plots
+        env_data = self.replayer.episode_data
+        wind_xmax = xmax + 50
+
+        self.axwf.set_xlim([0, wind_xmax])
+        self.axwf.set_ylim([0, 1])
+        self.axwf.set_yticks([0, 1])
+        self.axwf.set_yticklabels([0, 1])
+        self.axwf.plot(np.arange(0, wind_xmax + 1),
+                       env_data.loc[:, 'wind_force'].head(wind_xmax + 1),
+                       color='blue')
+
+        self.axwa.set_xlim([0, wind_xmax])
+        self.axwa.set_ylim([0, np.pi * 2])
+        self.axwa.set_yticks([0, np.pi, np.pi * 2])
+        self.axwa.set_yticklabels([0, 'π', '2π'])
+        self.axwa.get_xaxis().set_visible(False)
+        self.axwa.plot(np.arange(0, wind_xmax + 1),
+                       env_data.loc[:, 'wind_angle'].head(wind_xmax + 1),
+                       color='blue')
 
     def update_objects_on_image(self, episode_index, dt):
         """
@@ -76,19 +89,18 @@ class BoatEnvironmentRenderer:
         """
         self.create_base_image()
         env_data = self.replayer.episode_data
-        self.plt_objects['text1'] = self.axo.text(
+
+        self.plt_objects['text1'] = self.axb.text(
             y=self.config.boat_env.track_width +
-            self.config.boat_env.track_width_offset + 0.6,
+            self.config.boat_env.track_width_offset + 0.85,
             x=-5,
             s=f"dt: {dt}, "
             f"ship angle: {math.degrees(env_data.iloc[dt]['boat_angle']):.2f}, "
-            f"actor action: {env_data.iloc[dt]['action']:.2f}, "
-            f"wind angle: {env_data.iloc[dt]['wind_angle']:.2f}, "
-            f"wind force: {env_data.iloc[dt]['wind_force']:.2f}, ",
+            f"actor action: {env_data.iloc[dt]['action']:.2f}, ",
             fontsize=7
         )
 
-        self.plt_objects['text2'] = self.axo.text(
+        self.plt_objects['text2'] = self.axb.text(
             y=self.config.boat_env.track_width +
             self.config.boat_env.track_width_offset + 0.1,
             x=-5,
@@ -96,19 +108,19 @@ class BoatEnvironmentRenderer:
             fontsize=7
         )
 
-        self.plt_objects['previous_best_path'] = self.axo.plot(
+        self.plt_objects['previous_best_path'] = self.axb.plot(
             self.previous_best_path[0],
             self.previous_best_path[1],
             color='orange'
         )
 
-        self.plt_objects['best_path'] = self.axo.plot(
+        self.plt_objects['best_path'] = self.axb.plot(
             self.current_path[0],
             self.current_path[1],
             color='red'
         )
 
-        self.plt_objects['boat'] = self.axo.add_artist(
+        self.plt_objects['boat'] = self.axb.add_artist(
             self.CustomPltObject('boat_topdown.png').set_object_state(
                 angle=env_data.iloc[dt]['boat_angle'],
                 position=[
@@ -118,6 +130,8 @@ class BoatEnvironmentRenderer:
                 zoom=1
             )
         )
+
+        # Wind arrow length calculation
 
         self.plt_objects['velocity_vector'] = self.draw_arrow(
             angle=env_data.iloc[dt]['boat_angle'],
@@ -140,14 +154,43 @@ class BoatEnvironmentRenderer:
         )
 
         self.plt_objects['wind_vector'] = self.draw_arrow(
-            angle=math.radians(
-                90 * math.copysign(1, env_data.iloc[dt]['wind_angle'])),
+            angle=env_data.iloc[dt]['wind_angle'],
             position=[
                 env_data.iloc[dt]['boat_position_x'],
                 env_data.iloc[dt]['boat_position_y']
             ],
             length=2,
             color='blue'
+        )
+
+        self.plt_objects['wind_angle_line_indicator'] = self.axwa.axvline(
+            dt, color='black'
+        )
+
+        # Calculate y pos for text
+        wa_text_y = 2 * np.pi * 0.08
+        if env_data.iloc[dt]['wind_angle'] < np.pi:
+            wa_text_y = 2 * np.pi * 0.85
+        self.plt_objects['wind_angle_line_indicator_text'] = self.axwa.text(
+            y=wa_text_y,
+            x=dt + 2,
+            s=f"w_angle {env_data.iloc[dt]['wind_angle']:.2f}",
+            fontsize=7
+        )
+
+        self.plt_objects['wind_force_line_indicator'] = self.axwf.axvline(
+            dt, color='black'
+        )
+
+        # Calculate y pos for text
+        wf_text_y = 1 * 0.08
+        if env_data.iloc[dt]['wind_force'] < 0.5:
+            wf_text_y = 1 * 0.85
+        self.plt_objects['wind_force_line_indicator_text'] = self.axwf.text(
+            y=wf_text_y,
+            x=dt + 2,
+            s=f"w_force {env_data.iloc[dt]['wind_force']:.2f}",
+            fontsize=7
         )
 
     def reset_renderer(self):
@@ -163,8 +206,9 @@ class BoatEnvironmentRenderer:
 
     def draw_image_to_buffer(self):
         self.fig.canvas.draw()
-        self.axo.clear()
         self.axb.clear()
+        self.axwa.clear()
+        self.axwf.clear()
         plt.close("all")
         image_data = np.frombuffer(
             self.fig.canvas.tostring_rgb(),
@@ -195,7 +239,7 @@ class BoatEnvironmentRenderer:
         dy = math.sin(angle) * length + position[1]
         prop = dict(arrowstyle="->, head_width=0.4, head_length=0.8",
                     color=color, shrinkA=0, shrinkB=0)
-        return self.axo.annotate("", xy=(dx, dy), xytext=(
+        return self.axb.annotate("", xy=(dx, dy), xytext=(
             position[0],
             position[1]),
             arrowprops=prop

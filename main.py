@@ -1,5 +1,7 @@
 import os
 import numpy as np
+import argparse
+
 from agent.continuous_agent import ContinuousAgent
 from utils.plotting import plot_learning_curve
 from utils.build_experiment import Experiment
@@ -9,15 +11,24 @@ from postprocessing.recorder import Recorder
 from rendering.boat_env_render import BoatEnvironmentRenderer
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-r',
+        action='store_true',
+        help='turn on renderer after learning'
+    )
+    args = parser.parse_args()
+
     experiment = Experiment()
     experiment.save_configs()
-    config = get_config(os.path.join("config.yaml"))
+    config = get_config(os.path.join('config.yaml'))
 
-    environment = "boat_env"
+    environment = 'boat_env'
 
     env = BoatEnv(config, experiment)
 
     recorder = Recorder(env)
+    recorder.write_winds_to_csv()
 
     agent = ContinuousAgent(
         config=config,
@@ -76,16 +87,16 @@ if __name__ == '__main__':
     if not load_checkpoint:
         x = [i+1 for i in range(n_games)]
         figure_file = os.path.join(
-            experiment.experiment_dir, "plots", filename)
+            experiment.experiment_dir, 'plots', filename)
         plot_learning_curve(x, score_history, figure_file)
 
-    print(f"Starting rendering...")
-    renderer = BoatEnvironmentRenderer(experiment.experiment_dir)
-    for episode_index in range(renderer.replayer.total_episodes):
-        renderer.replayer.read_data_csv(episode_index)
-        for dt in range(renderer.replayer.total_dt):
-            print(episode_index, dt)
-            renderer.update_objects_on_image(episode_index, dt)
-            renderer.draw_image_to_buffer()
-        renderer.create_gif_from_buffer(f"episode_{episode_index}")
-        renderer.reset_renderer()
+    if args.r:
+        print(f"Starting rendering...")
+        renderer = BoatEnvironmentRenderer(experiment.experiment_dir)
+        for episode_index in range(renderer.replayer.total_episodes):
+            renderer.replayer.read_data_csv(episode_index)
+            for dt in range(renderer.replayer.total_dt):
+                renderer.update_objects_on_image(episode_index, dt)
+                renderer.draw_image_to_buffer()
+            renderer.create_gif_from_buffer(f"episode_{episode_index}")
+            renderer.reset_renderer()
