@@ -160,7 +160,7 @@ dmypy.json
 
 # Personal settings
 .vscode/
-bla.py
+toy.py
 experiments/
 notes
 out.profile

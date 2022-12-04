@@ -34,12 +34,12 @@ class Integrator:
 
         return integrated_value
 
-    def scope(self):
+    def scope(self, file_name='scope'):
         """
         Creates a plot of all integrated input signals. If for example the integrator integrated a bunch of velocities, then calling scope on it will return all positions.
         """
         plt.plot(self.time, self.output_signal)
-        plt.savefig('scope.png')
+        plt.savefig(f"{file_name}.png")
         plt.close()
 
 
