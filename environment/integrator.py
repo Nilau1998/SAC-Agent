@@ -2,11 +2,13 @@ import matplotlib.pyplot as plt
 
 
 class Integrator:
-    def __init__(self, initial_value=0):
+    def __init__(self, initial_value=0, lower_limit=float('-inf'), upper_limit=float('inf')):
         self.dt = 0.1
         self.counter = 0
         self.time = [self.counter]
         self.initial_value = initial_value
+        self.lower_limit = lower_limit
+        self.upper_limit = upper_limit
         self.input_signal = []
         self.output_signal = [initial_value]
 
@@ -21,7 +23,12 @@ class Integrator:
             integrated_value = input_signal * self.dt + \
                 self.output_signal[-1]
 
-        self.output_signal.append(integrated_value)
+        if integrated_value <= self.lower_limit:
+            self.output_signal.append(self.lower_limit)
+        elif integrated_value >= self.upper_limit:
+            self.output_signal.append(self.upper_limit)
+        else:
+            self.output_signal.append(integrated_value)
         self.counter += 1
         self.time.append(self.counter)
 
