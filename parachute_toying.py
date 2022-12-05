@@ -1,5 +1,4 @@
 from environment.integrator import Integrator
-import numpy as np
 
 """
 Example usage of the integrator to model a parachute guy jumping from h_0 and opening his parachute at h_1. Included is aerodrag and so on.
@@ -14,7 +13,7 @@ if __name__ == '__main__':
     c_w = 1.3
     p = 1.2
     g = 9.81
-    t, t_max, dt = 0, 500, 0.1
+    t, t_max, dt = 0, 500, 0.01
 
     a_integrator = Integrator()
     v_integrator = Integrator(initial_value=h_0)
@@ -25,7 +24,6 @@ if __name__ == '__main__':
         total_a -= g
         v = a_integrator.integrate_signal(total_a)
         s = v_integrator.integrate_signal(v)
-        print(v_integrator.counter, s)
 
         # Stop if ground reached
         if s < 0:
