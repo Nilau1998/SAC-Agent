@@ -61,6 +61,7 @@ class BoatEnvironmentRenderer:
             cmap=plt.cm.Blues,
             cmap_range=(0.5, 0.1)
         )
+        self.axb.set_aspect('auto')
 
         # Wind image settings and plots
         env_data = self.replayer.episode_data
