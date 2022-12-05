@@ -1,4 +1,4 @@
-from environment.integrator import Integrator
+from control_theory.control_blocks import Integrator
 
 """
 Example usage of the integrator to model a parachute guy jumping from h_0 and opening his parachute at h_1. Included is aerodrag and so on.
