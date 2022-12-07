@@ -45,7 +45,7 @@ class Integrator:
 
 
 class Scope:
-    def __init__(self, labels: list):
+    def __init__(self, labels=[]):
         self.signals = []
         self.labels = labels
         self.time = []
