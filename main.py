@@ -9,7 +9,6 @@ import os
 import numpy as np
 import argparse
 from progress_table import ProgressTable
-import sys
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -28,8 +27,6 @@ if __name__ == '__main__':
     experiment.save_configs()
     config = get_config(os.path.join('config.yaml'))
 
-    environment = 'boat_env'
-
     env = BoatEnv(config, experiment)
 
     recorder = Recorder(env)
@@ -45,22 +42,10 @@ if __name__ == '__main__':
     table_training = ProgressTable(
         columns=['Episode', 'Termination', 'Score',
                  'Best Score', 'Average Score', 'RA|N', 'Action RA|N'],
-
-        # Default arguments:
-        refresh_rate=10,
         num_decimal_places=2,
         default_column_width=14,
-        default_column_alignment='center',
-        print_row_on_update=True,
         reprint_header_every_n_rows=0,
-        custom_format=None,
-        embedded_progress_bar=False,
-        table_style='normal',
-        file=sys.stdout,
     )
-
-    n_games = config.base_settings.n_games
-    filename = environment
 
     best_score = 0
     score_history = []
@@ -69,7 +54,7 @@ if __name__ == '__main__':
     if load_checkpoint:
         agent.load_models()
 
-    for i in range(n_games):
+    for i in range(config.base_settings.n_games):
         table_training['Episode'] = i
         observation = env.reset()[0]
         done = False
@@ -112,9 +97,9 @@ if __name__ == '__main__':
     table_training.close()
 
     if not load_checkpoint:
-        x = [i+1 for i in range(n_games)]
+        x = [i+1 for i in range(config.base_settings.n_games)]
         figure_file = os.path.join(
-            experiment.experiment_dir, 'plots', filename)
+            experiment.experiment_dir, 'plots', 'boat_env')
         plot_learning_curve(x, score_history, figure_file)
 
     if args.r:
@@ -122,22 +107,13 @@ if __name__ == '__main__':
 
         table_rendering = ProgressTable(
             columns=['Episode', 'Episodes left to render'],
-
-            # Default arguments:
-            refresh_rate=10,
             num_decimal_places=2,
             default_column_width=8,
-            default_column_alignment='center',
-            print_row_on_update=True,
             reprint_header_every_n_rows=0,
-            custom_format=None,
-            embedded_progress_bar=False,
-            table_style='normal',
-            file=sys.stdout,
         )
         renderer = BoatEnvironmentRenderer(experiment.experiment_dir)
 
-        relevant_episodes = renderer.replayer.analyse_experiment()
+        relevant_episodes, best_episodes = renderer.replayer.analyse_experiment()
         episode_left = len(relevant_episodes) - 1
         for episode_index in relevant_episodes:
             table_rendering['Episode'] = episode_index

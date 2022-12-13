@@ -28,7 +28,7 @@ boat_env:
 # Boat modelling settings
 boat:
   n_max: 20
-  fuel: 6000 # Also t_max
+  fuel: 10000 # Also t_max
 
   w: 0.3
   boat_m: 600

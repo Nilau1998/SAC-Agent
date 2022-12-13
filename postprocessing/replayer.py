@@ -44,6 +44,7 @@ class Replayer:
 
     def analyse_experiment(self):
         relevant_episodes = []
+        best_episodes = []
         score = 0
         best_score = 0
         for episode_index in range(self.total_episodes):
@@ -60,4 +61,5 @@ class Replayer:
             if score > best_score and relevant_episodes[-1] != episode_index:
                 best_score = score
                 relevant_episodes.append(episode_index)
-        return relevant_episodes
+                best_episodes.append(episode_index)
+        return relevant_episodes, best_episodes

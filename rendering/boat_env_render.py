@@ -117,7 +117,7 @@ class BoatEnvironmentRenderer:
             color='orange'
         )
 
-        self.plt_objects['best_path'] = self.axb.plot(
+        self.plt_objects['current_path'] = self.axb.plot(
             self.current_path[0],
             self.current_path[1],
             color='red'

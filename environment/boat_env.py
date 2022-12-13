@@ -2,9 +2,8 @@ from gym import Env
 from gym.spaces import Box
 from environment.reward_functions import RewardFunction
 from environment.wind import Wind
-from control_theory.control_blocks import Integrator, Scope
+from control_theory.control_blocks import Integrator
 import numpy as np
-import math
 
 
 class BoatEnv(Env):
@@ -12,7 +11,6 @@ class BoatEnv(Env):
         self.config = config
         self.experiment_dir = experiment.experiment_dir
         self.action = [0]
-        self.reward = 0
         self.boat = Boat(self.config)
         self.reward_function = RewardFunction(
             config=config,
@@ -45,7 +43,7 @@ class BoatEnv(Env):
             [0, -(self.config.boat_env.track_width / 2), 0, -np.pi/4, 0, 0], dtype=np.float32
         )
         self.high_state = np.array(
-            [3900, (self.config.boat_env.track_width / 2), 2*np.pi, np.pi/4, self.config.boat.n_max, self.config.boat.fuel], dtype=np.float32
+            [self.config.boat_env.goal_line, (self.config.boat_env.track_width / 2), 2*np.pi, np.pi/4, self.config.boat.n_max, self.config.boat.fuel], dtype=np.float32
         )
         self.observation_space = Box(
             low=self.low_state,
@@ -53,8 +51,6 @@ class BoatEnv(Env):
             dtype=np.float32
         )
 
-    # Define the step an agent can take. This means that within a step the agent can change the boats angle
-    # and additionally all other calulcations happen like the wind impact.
     def step(self, action):
         self.action = action
         self.boat.t += self.boat.dt
@@ -77,12 +73,10 @@ class BoatEnv(Env):
         self.state = self.boat.return_state()
 
         # Reward calculation
-        self.reward = self.reward_function.linear_reward(
+        reward = self.reward_function.linear_reward(
             position=[self.boat.kinematics[4], self.boat.kinematics[5]])
-        self.info['episode_reward'] += self.reward
+        self.info['episode_reward'] += reward
 
-        # Check if goal is reached, or if the boat ran out of fuel
-        # Timeout
         done = False
         if self.boat.kinematics[4] >= self.config.boat_env.goal_line:
             done = True
@@ -101,7 +95,7 @@ class BoatEnv(Env):
             self.info['termination'] = 'timeout'
             self.info['timeout'] += 1
 
-        return self.state, self.reward, done, self.info
+        return self.state, reward, done, self.info
 
     def render(self):
         pass
@@ -119,14 +113,12 @@ class BoatEnv(Env):
 
     def return_all_data(self):
         data = {
-            # Boat
             'boat_position_x': self.boat.kinematics[4],
             'boat_position_y': self.boat.kinematics[5],
             'boat_velocity_x': self.boat.v_x,
             'boat_velocity_y': self.boat.v_y,
             'boat_angle': self.boat.kinematics[3],
             'boat_mass': self.config.boat.fuel,
-            # Agent
             'action': self.action[0],
             'reward': self.reward,
             'rudder_angle': self.boat.rudder_angle,
@@ -147,7 +139,7 @@ class Boat:
         self.index = 0  # Used to access arrays since dt is a float not an int
         self.wind = Wind(config)
 
-        self.a_x_integrator = Integrator(initial_value=1)
+        self.a_x_integrator = Integrator(initial_value=0.1)
         self.a_x_integrator.dt = self.dt
         self.v_x_integrator = Integrator()
         self.v_x_integrator.dt = self.dt
