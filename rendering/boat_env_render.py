@@ -36,11 +36,14 @@ class BoatEnvironmentRenderer:
         """
         Creates the base image that is being generated for every important episode. This method should be called only one time once the renderer is being constructed.
         """
-        xmin, xmax = -5, self.config.boat_env.goal_line + \
+        xmin = -5
+        xmax = self.config.boat_env.goal_line + \
             int(self.config.boat_env.goal_line * 0.1)
-        ymin, ymax = -self.config.boat_env.track_width - \
-            self.config.boat_env.track_width_offset, self.config.boat_env.track_width + \
-            self.config.boat_env.track_width_offset
+
+        ymin = -self.config.boat_env.track_width - \
+            int(self.config.boat_env.track_width * 0.1)
+        ymax = self.config.boat_env.track_width + \
+            int(self.config.boat_env.track_width * 0.1)
         # Base image axis settings
         self.axb.set_xlim([xmin, xmax])
         self.axb.set_ylim([ymin, ymax])
@@ -66,14 +69,14 @@ class BoatEnvironmentRenderer:
 
         # Wind image settings and plots
         env_data = self.replayer.episode_data
-        wind_xmax = xmax + 50
+        wind_xmax = self.replayer.total_dt
 
         self.axwf.set_xlim([0, wind_xmax])
         self.axwf.set_ylim([0, 1])
         self.axwf.set_yticks([0, 1])
         self.axwf.set_yticklabels([0, 1])
-        self.axwf.plot(np.arange(0, wind_xmax + 1),
-                       env_data.loc[:, 'wind_force'].head(wind_xmax + 1),
+        self.axwf.plot(np.arange(0, wind_xmax),
+                       env_data.loc[:, 'wind_force'].head(wind_xmax),
                        color='blue')
 
         self.axwa.set_xlim([0, wind_xmax])
@@ -81,8 +84,8 @@ class BoatEnvironmentRenderer:
         self.axwa.set_yticks([0, np.pi, np.pi * 2])
         self.axwa.set_yticklabels([0, 'π', '2π'])
         self.axwa.get_xaxis().set_visible(False)
-        self.axwa.plot(np.arange(0, wind_xmax + 1),
-                       env_data.loc[:, 'wind_angle'].head(wind_xmax + 1),
+        self.axwa.plot(np.arange(0, wind_xmax),
+                       env_data.loc[:, 'wind_angle'].head(wind_xmax),
                        color='blue')
 
     def update_objects_on_image(self, episode_index, dt):
@@ -93,8 +96,7 @@ class BoatEnvironmentRenderer:
         env_data = self.replayer.episode_data
 
         self.plt_objects['text1'] = self.axb.text(
-            y=self.config.boat_env.track_width +
-            self.config.boat_env.track_width_offset + 0.85,
+            y=self.config.boat_env.track_width + 0.85,
             x=-5,
             s=f"dt: {dt}, "
             f"ship angle: {math.degrees(env_data.iloc[dt]['boat_angle']):.2f}, "
@@ -103,8 +105,7 @@ class BoatEnvironmentRenderer:
         )
 
         self.plt_objects['text2'] = self.axb.text(
-            y=self.config.boat_env.track_width +
-            self.config.boat_env.track_width_offset + 0.1,
+            y=self.config.boat_env.track_width + 0.1,
             x=-5,
             s=f"reward: {env_data.iloc[dt]['reward']:.2f}, ",
             fontsize=7

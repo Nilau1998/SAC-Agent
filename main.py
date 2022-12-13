@@ -44,12 +44,12 @@ if __name__ == '__main__':
 
     table_training = ProgressTable(
         columns=['Episode', 'Termination', 'Score',
-                 'Best Score', 'Average Score'],
+                 'Best Score', 'Average Score', 'RA|N', 'Action RA|N'],
 
         # Default arguments:
         refresh_rate=10,
         num_decimal_places=2,
-        default_column_width=8,
+        default_column_width=14,
         default_column_alignment='center',
         print_row_on_update=True,
         reprint_header_every_n_rows=0,
@@ -78,7 +78,6 @@ if __name__ == '__main__':
         recorder.create_csvs(i)
         table_training(config.boat.fuel)
         while not done:
-            table_training.update('Score', score, weight=1)
             recorder.write_data_to_csv()
             action = agent.choose_action(observation)
             observation_, reward, done, info = env.step(action)
@@ -87,11 +86,16 @@ if __name__ == '__main__':
             if not load_checkpoint:
                 agent.learn()
             observation = observation_
+            table_training.update('Score', score, weight=1)
+            table_training.update(
+                'RA|N', f"{env.boat.rudder_angle:.2f} | {env.boat.n:.2f}")
+            table_training.update(
+                'Action RA|N', f"{env.action[0]:.2f} | {env.action[1]:.2f}")
 
         recorder.write_info_to_csv()
 
         score_history.append(score)
-        avg_score = np.mean(score_history[-100:])
+        avg_score = np.mean(score_history[-config.base_settings.avg_lookback:])
 
         if score > best_score:
             best_score = score

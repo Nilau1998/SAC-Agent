@@ -15,7 +15,7 @@ class BoatEnv(Env):
         self.reward = 0
         self.boat = Boat(self.config)
         self.reward_function = RewardFunction(
-            track_width=self.config.boat_env.track_width,
+            config=config,
             a=1
         )
 
@@ -24,24 +24,28 @@ class BoatEnv(Env):
             'reached_goal': 0,
             'out_of_bounds': 0,
             'out_of_fuel': 0,
+            'timeout': 0,
             'episode_reward': 0
         }
 
         # Define action space
+        # Following actions can be choosen:
+        # rad rudder, n
         self.action_space = Box(
             low=np.array([-0.1, -1]),
             high=np.array([0.1, 1]),
+            shape=(2,),
             dtype=np.float32
         )
 
         # Define obersvation space
         # Following states are observed:
-        # x_pos, y_pos, boat_angle, rudder angle, n, current_wind_force, current_wind_angle
+        # x_pos, y_pos, boat_angle, rudder angle, n, fuel
         self.low_state = np.array(
-            [0, -(self.config.boat_env.track_width / 2), 0, -np.pi/4, 0], dtype=np.float32
+            [0, -(self.config.boat_env.track_width / 2), 0, -np.pi/4, 0, 0], dtype=np.float32
         )
         self.high_state = np.array(
-            [3900, (self.config.boat_env.track_width / 2), 2*np.pi, np.pi/4, 30], dtype=np.float32
+            [3900, (self.config.boat_env.track_width / 2), 2*np.pi, np.pi/4, self.config.boat.n_max, self.config.boat.fuel], dtype=np.float32
         )
         self.observation_space = Box(
             low=self.low_state,
@@ -55,14 +59,16 @@ class BoatEnv(Env):
         self.action = action
         self.boat.t += self.boat.dt
 
+        self.boat.fuel -= 1
+
         self.boat.rudder_angle += action[0]
         if self.boat.rudder_angle > np.pi/4:
             self.boat.rudder_angle = np.pi/4
         elif self.boat.rudder_angle < -np.pi/4:
             self.boat.rudder_angle = -np.pi/4
         self.boat.n += action[1]
-        if self.boat.n > 30:
-            self.boat.n = 30
+        if self.boat.n > self.config.boat.n_max:
+            self.boat.n = self.config.boat.n_max
         elif self.boat.n < 0:
             self.boat.n = 0
 
@@ -86,10 +92,14 @@ class BoatEnv(Env):
             done = True
             self.info['termination'] = 'out_of_bounds'
             self.info['out_of_bounds'] += 1
-        elif self.boat.t_max <= self.boat.t:
+        elif self.boat.fuel < 0:
             done = True
             self.info['termination'] = 'out_of_fuel'
             self.info['out_of_fuel'] += 1
+        elif self.boat.t_max <= self.boat.t:
+            done = True
+            self.info['termination'] = 'timeout'
+            self.info['timeout'] += 1
 
         return self.state, self.reward, done, self.info
 
@@ -101,7 +111,7 @@ class BoatEnv(Env):
 
         self.state = self.boat.return_state()
 
-        self.info["episode_reward"] = 0
+        self.info['episode_reward'] = 0
 
         info = {}
 
@@ -110,15 +120,17 @@ class BoatEnv(Env):
     def return_all_data(self):
         data = {
             # Boat
-            "boat_position_x": self.boat.kinematics[4],
-            "boat_position_y": self.boat.kinematics[5],
-            "boat_velocity_x": self.boat.v_x,
-            "boat_velocity_y": self.boat.v_y,
-            "boat_angle": self.boat.kinematics[3],
-            "boat_mass": self.config.boat.boat_m,
+            'boat_position_x': self.boat.kinematics[4],
+            'boat_position_y': self.boat.kinematics[5],
+            'boat_velocity_x': self.boat.v_x,
+            'boat_velocity_y': self.boat.v_y,
+            'boat_angle': self.boat.kinematics[3],
+            'boat_mass': self.config.boat.fuel,
             # Agent
-            "action": self.action[0],
-            "reward": self.reward
+            'action': self.action[0],
+            'reward': self.reward,
+            'rudder_angle': self.boat.rudder_angle,
+            'n': self.boat.n
         }
         return data
 
@@ -127,13 +139,15 @@ class Boat:
     def __init__(self, config):
         self.config = config
 
+        self.fuel = config.boat.fuel
+
         self.t = 0
-        self.dt = 0.1
+        self.dt = config.base_settings.dt
         self.t_max = config.boat.fuel
         self.index = 0  # Used to access arrays since dt is a float not an int
         self.wind = Wind(config)
 
-        self.a_x_integrator = Integrator(initial_value=0.1)
+        self.a_x_integrator = Integrator(initial_value=1)
         self.a_x_integrator.dt = self.dt
         self.v_x_integrator = Integrator()
         self.v_x_integrator.dt = self.dt
@@ -206,9 +220,8 @@ class Boat:
             params.rho * params.boat_area_side * v_y_sign
 
         # Rudder force F_RU
-        v_x_r = (self.v_x * params.b) + params.a
-        F_RU = np.square(v_x_r) * ((6.13 * params.aspect_ratio) /
-                                   (params.aspect_ratio + 2.25)) * 0.5 * params.rudder_area
+        F_RU = np.square(self.v_x) * params.c_r_front * \
+            0.5 * params.rho * params.rudder_area
         F_RU = np.sin(self.rudder_angle) * F_RU
 
         # Centrifugal force F_C
@@ -259,7 +272,6 @@ class Boat:
         v_y_new = np.cos(direction) * \
             (np.square(self.v_x) + np.square(self.v_y))
         s_y = self.v_y_integrator.integrate_signal(v_y_new)
-        bla = [v, drift_angle, turning_rate, heading, s_x, s_y]
         return [v, drift_angle, turning_rate, heading, s_x, s_y]
 
     def return_state(self):
@@ -268,8 +280,7 @@ class Boat:
             self.kinematics[5],
             self.kinematics[3],
             self.rudder_angle,
-            self.n
-            # self.wind.get_wind(self.index)[0],
-            # self.wind.get_wind(self.index)[1]
+            self.n,
+            self.fuel
         ])
         return state
