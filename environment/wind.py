@@ -14,11 +14,11 @@ class Wind:
         self.wind_force = self.generate_wind_force()
         self.wind_angle = self.generate_wind_angle()
 
-    def get_wind(self, dt):
+    def get_wind(self, index):
         """
         Returns wind attributes for this timestep.
         """
-        return np.array([self.wind_force[dt], self.wind_angle[dt]])
+        return np.array([self.wind_force[index], self.wind_angle[index]])
 
     def generate_wind_force(self):
         """

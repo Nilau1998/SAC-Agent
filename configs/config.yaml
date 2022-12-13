@@ -1,6 +1,8 @@
 # General settings
 base_settings:
-  n_games: 2
+  n_games: 20
+  render_skip_size: 50
+  avg_lookback: 50
 
 # Agent settings
 agent:
@@ -16,17 +18,46 @@ agent:
 
 # Env settings
 boat_env:
-  track_width: 6
-  track_width_offset: 3
-  boat_out_of_bounds_offset: 2
-  boat_velocity: 1
-  boat_angle_scale: 1 # Action space is -1, 1, this lets you scale it up or down a bit for adjusting
+  track_width: 250
+  track_width_offset: 50
+  boat_out_of_bounds_offset: 10
   wind_force: 1 # How many degrees per step the wind turns the ship
-  goal_line: 200
+  goal_line: 3900
+
+# Boat modelling settings
+boat:
+  fuel: 4000
+
+  w: 0.3
+  boat_m: 600
+  boat_m_x: 50
+  boat_m_y: 100
+
+  boat_I: 6_000_000
+  boat_Iz: 10
+
+  propeller_diameter: 1
+  wake_friction: 0.3
+
+  c_r_front: 0.31
+  c_r_side: 2
+  thrust_deduction: 0.3
+
+  rho: 1
+
+  boat_area_front: 20
+  boat_area_side: 90
+  boat_l: 15
+  boat_b: 6
+
+  rudder_area: 10
+  aspect_ratio: 2
+  a: 4.252
+  b: 0.262
 
 # Wind settings
 wind:
-  range_length: 400
+  range_length: 10000
   fixed_points: 4
   max_force: 1
 

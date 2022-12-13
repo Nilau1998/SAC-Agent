@@ -36,7 +36,8 @@ class BoatEnvironmentRenderer:
         """
         Creates the base image that is being generated for every important episode. This method should be called only one time once the renderer is being constructed.
         """
-        xmin, xmax = -5, self.config.boat_env.goal_line + 10
+        xmin, xmax = -5, self.config.boat_env.goal_line + \
+            int(self.config.boat_env.goal_line * 0.1)
         ymin, ymax = -self.config.boat_env.track_width - \
             self.config.boat_env.track_width_offset, self.config.boat_env.track_width + \
             self.config.boat_env.track_width_offset

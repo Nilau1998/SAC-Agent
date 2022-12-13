@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 from utils.config_reader import get_experiment_config
 
 
@@ -34,3 +35,23 @@ class Replayer:
         info_file = os.path.join(
             self.experiment_dir, 'episodes', 'info.csv')
         return pd.read_csv(info_file, delimiter=';')
+
+    def analyse_experiment(self):
+        relevant_episodes = []
+        score = 0
+        best_score = 0
+        for episode_index in range(self.total_episodes):
+            score = self.info_data.iloc[episode_index]['episode_reward']
+            avg_score = np.average(
+                self.info_data.iloc[-self.experiment_config.base_settings.avg_lookback:]['episode_reward'])
+
+            if episode_index == 0 or episode_index == self.total_episodes:
+                relevant_episodes.append(episode_index)
+
+            if score > avg_score and relevant_episodes[-1] != episode_index:
+                relevant_episodes.append(episode_index)
+
+            if score > best_score and relevant_episodes[-1] != episode_index:
+                best_score = score
+                relevant_episodes.append(episode_index)
+        return relevant_episodes
