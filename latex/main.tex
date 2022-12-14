@@ -11,9 +11,10 @@
 %Namen eingeben / Insert Name
 \renewcommand{\author}{Nico Spiske}
 %Art der Arbeit / Scope (Project, Thesis...)
-\providecommand{\scope}{Projektarbeit}
+\providecommand{\scope}{Bachelorarbeit}
 %Thema der Arbeit / Theme of Thesis
-\renewcommand{\subject}{Modellierung des hydraulischen und instationären thermischen Verhaltens eines Fernwärmenetzes durch maschinelles Lernen}
+\renewcommand{\subject}{Lösungsansätze für die Regelung von dynamischen Systemen mittels
+Reinforcement Learning Algorithmen}
 %Schlagwörter / Keywords
 \providecommand{\keywords}{Fernwärmenetz, Projektarbeit, Projekt, Maschinelles Lernen}
 %Literaturliste *.bib / Bibliography
@@ -21,11 +22,11 @@
 %Matrikelnummer / Student ID
 \providecommand{\studentID}{4436923}
 %Betreuer /& Tutors
-\providecommand{\tutora}{M.Sc. Oliver Feindt}
-\providecommand{\tutorb}{}
+\providecommand{\tutora}{M.Sc. Ricardo Bosold}
+\providecommand{\tutorb}{M.Sc. Phillipp Hendrys}
 %Prüfer / Examiner
 \providecommand{\examinera}{Prof. Dr.-Ing. Kai Michels}
-\providecommand{\examinerb}{}
+\providecommand{\examinerb}{Dr.-Ing. Dennis Pierl}
 %Farben
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -48,14 +49,39 @@
 
 \begin{document}
 %Pfad zu Grafiken:
-	\graphicspath{{./project_graphics/}}
+\graphicspath{{./project_graphics/}}
 % Sprachauswahl /Language Selection (ngerman/english)
-	\selectlanguage{ngerman}
+\selectlanguage{ngerman}
 % \pagenumbering{roman}
 \input{iat_title}
 %Urherberrechtserklärung / Confirmation of Conformity Comment if not needed
-%\input{declaration_conformity_en}
+\input{declaration_conformity}
+
 \tableofcontents
+
 \newpage
+
 \chapter{Einleitung}
+\section{Einleitung und Motivation}
+\section{Zielsetzung}
+\section{Aufbau der Arbeit}
+
+\chapter{Grundlagen des Deep Learnings}
+\section{Was ist Deep Learning?}
+\section{Grundkonzepte und Terminologie}
+\section{Artes des Deep Learnings}
+\section{Soft Actor-Critic (SAC) Agenten}
+
+\chapter{Methode und Umsetzung}
+\section{Verwendete Software und Bibliotheken}
+\section{Implementierung des Agenten}
+\section{Umsetzung des Modells in Simulink}
+\section{Einbindung des Modells in Python}
+
+\chapter{Ergebnisse}
+
+\chapter{Diskussion}
+
+\chapter{Zusammenfassung und Ausblick}
+
 \end{document}
