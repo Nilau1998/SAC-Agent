@@ -2,7 +2,7 @@ from gym import Env
 from gym.spaces import Box
 from environment.reward_functions import RewardFunction
 from environment.wind import Wind
-from control_theory.control_blocks import Integrator
+from environment.control_theory.control_blocks import Integrator
 import numpy as np
 
 
@@ -11,6 +11,7 @@ class BoatEnv(Env):
         self.config = config
         self.experiment_dir = experiment.experiment_dir
         self.action = [0]
+        self.reward = 0
         self.boat = Boat(self.config)
         self.reward_function = RewardFunction(
             config=config,
@@ -73,9 +74,9 @@ class BoatEnv(Env):
         self.state = self.boat.return_state()
 
         # Reward calculation
-        reward = self.reward_function.linear_reward(
+        self.reward = self.reward_function.linear_reward(
             position=[self.boat.kinematics[4], self.boat.kinematics[5]])
-        self.info['episode_reward'] += reward
+        self.info['episode_reward'] += self.reward
 
         done = False
         if self.boat.kinematics[4] >= self.config.boat_env.goal_line:
@@ -95,7 +96,7 @@ class BoatEnv(Env):
             self.info['termination'] = 'timeout'
             self.info['timeout'] += 1
 
-        return self.state, reward, done, self.info
+        return self.state, self.reward, done, self.info
 
     def render(self):
         pass
