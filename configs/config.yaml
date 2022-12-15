@@ -1,6 +1,6 @@
 # General settings
 base_settings:
-  n_games: 40
+  n_games: 1
   render_skip_size: 50
   avg_lookback: 50
   dt: 0.1

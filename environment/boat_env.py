@@ -13,10 +13,7 @@ class BoatEnv(Env):
         self.action = [0]
         self.reward = 0
         self.boat = Boat(self.config)
-        self.reward_function = RewardFunction(
-            config=config,
-            a=1
-        )
+        self.reward_function = RewardFunction(config=config)
 
         self.info = {
             'termination': '',
@@ -58,16 +55,16 @@ class BoatEnv(Env):
 
         self.boat.fuel -= 1
 
-        self.boat.rudder_angle += action[0]
-        if self.boat.rudder_angle > np.pi/4:
-            self.boat.rudder_angle = np.pi/4
-        elif self.boat.rudder_angle < -np.pi/4:
-            self.boat.rudder_angle = -np.pi/4
-        self.boat.n += action[1]
-        if self.boat.n > self.config.boat.n_max:
-            self.boat.n = self.config.boat.n_max
-        elif self.boat.n < 0:
-            self.boat.n = 0
+        # self.boat.rudder_angle += action[0]
+        # if self.boat.rudder_angle > np.pi/4:
+        #     self.boat.rudder_angle = np.pi/4
+        # elif self.boat.rudder_angle < -np.pi/4:
+        #     self.boat.rudder_angle = -np.pi/4
+        # self.boat.n += action[1]
+        # if self.boat.n > self.config.boat.n_max:
+        #     self.boat.n = self.config.boat.n_max
+        # elif self.boat.n < 0:
+        #     self.boat.n = 0
 
         self.boat.run_model_step()
 
@@ -75,7 +72,9 @@ class BoatEnv(Env):
 
         # Reward calculation
         self.reward = self.reward_function.linear_reward(
-            position=[self.boat.kinematics[4], self.boat.kinematics[5]])
+            position=[self.boat.kinematics[4], self.boat.kinematics[5]],
+            x_pos_multiplier=1)
+
         self.info['episode_reward'] += self.reward
 
         done = False
@@ -156,7 +155,7 @@ class Boat:
         self.v_r_integrator.dt = self.dt
 
         # Boat
-        self.n = 0
+        self.n = 30
         self.rudder_angle = 0
 
         self.a_x = 0
