@@ -55,16 +55,16 @@ class BoatEnv(Env):
 
         self.boat.fuel -= 1
 
-        # self.boat.rudder_angle += action[0]
-        # if self.boat.rudder_angle > np.pi/4:
-        #     self.boat.rudder_angle = np.pi/4
-        # elif self.boat.rudder_angle < -np.pi/4:
-        #     self.boat.rudder_angle = -np.pi/4
-        # self.boat.n += action[1]
-        # if self.boat.n > self.config.boat.n_max:
-        #     self.boat.n = self.config.boat.n_max
-        # elif self.boat.n < 0:
-        #     self.boat.n = 0
+        self.boat.rudder_angle += action[0]
+        if self.boat.rudder_angle > np.pi/4:
+            self.boat.rudder_angle = np.pi/4
+        elif self.boat.rudder_angle < -np.pi/4:
+            self.boat.rudder_angle = -np.pi/4
+        self.boat.n += action[1]
+        if self.boat.n > self.config.boat.n_max:
+            self.boat.n = self.config.boat.n_max
+        elif self.boat.n < 0:
+            self.boat.n = 0
 
         self.boat.run_model_step()
 
@@ -155,7 +155,7 @@ class Boat:
         self.v_r_integrator.dt = self.dt
 
         # Boat
-        self.n = 30
+        self.n = 0
         self.rudder_angle = 0
 
         self.a_x = 0
