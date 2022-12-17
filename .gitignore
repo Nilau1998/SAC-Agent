@@ -165,3 +165,4 @@ experiments/
 notes
 out.profile
 .gitlab-ci.yml
+rsync_exclude.txt

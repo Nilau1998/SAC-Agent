@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     table_training = ProgressTable(
         columns=['Episode', 'Termination', 'Score',
-                 'Best Score', 'Average Score', 'RA|N', 'Action RA|N'],
+                 'Best Score', 'Average Score', 'RA', 'Action RA'],
         num_decimal_places=2,
         default_column_width=14,
         reprint_header_every_n_rows=0,
@@ -73,9 +73,9 @@ if __name__ == '__main__':
             observation = observation_
             table_training.update('Score', score, weight=1)
             table_training.update(
-                'RA|N', f"{env.boat.rudder_angle:.2f} | {env.boat.n:.2f}")
+                'RA', f"{env.boat.rudder_angle:.2f}")
             table_training.update(
-                'Action RA|N', f"{env.action[0]:.2f} | {env.action[1]:.2f}")
+                'Action RA', f"{env.action[0]:.2f}")
 
         recorder.write_info_to_csv()
 

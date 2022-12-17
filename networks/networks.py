@@ -10,6 +10,7 @@ input_dims = NN input vector
 n_actions = NN output vector
 """
 
+
 class ActorNetwork(BaseNetwork):
     def __init__(self, experiment_dir, alpha, input_dims, max_action, fc1_dims=256, fc2_dims=256, n_actions=2, name="actor_network"):
         super().__init__(name, experiment_dir)
@@ -44,12 +45,13 @@ class ActorNetwork(BaseNetwork):
 
     def sample_normal(self, state, reparameterize=True):
         LOG_STD_MAX = 2
-        LOG_STD_MIN = -5 # https://github.com/vwxyzjn/cleanrl/blob/401a4bedf974d0a80b3dcf330c65195fe29cf6cf/cleanrl/sac_continuous_action.py#L107
+        LOG_STD_MIN = -5  # https://github.com/vwxyzjn/cleanrl/blob/401a4bedf974d0a80b3dcf330c65195fe29cf6cf/cleanrl/sac_continuous_action.py#L107
 
         mean, std = self.forward(state)
 
         log_std = T.tanh(std)
-        log_std = LOG_STD_MIN + 0.5 * (LOG_STD_MAX - LOG_STD_MIN) * (log_std + 1)
+        log_std = LOG_STD_MIN + 0.5 * \
+            (LOG_STD_MAX - LOG_STD_MIN) * (log_std + 1)
         std = log_std.exp()
 
         normal = T.distributions.Normal(mean, std)
@@ -65,6 +67,7 @@ class ActorNetwork(BaseNetwork):
         log_probs = log_probs.sum(1, keepdim=True)
 
         return action, log_probs
+
 
 class CriticNetwork(BaseNetwork):
     def __init__(self, experiment_dir, beta, input_dims, n_actions, fc1_dims=256, fc2_dims=256, name="critic_network"):
@@ -95,6 +98,7 @@ class CriticNetwork(BaseNetwork):
         q = self.q(action_value)
 
         return q
+
 
 class ValueNetwork(BaseNetwork):
     def __init__(self, experiment_dir, beta, input_dims, fc1_dims=256, fc2_dims=256, name="value_network"):

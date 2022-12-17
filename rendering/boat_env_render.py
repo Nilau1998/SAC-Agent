@@ -96,16 +96,16 @@ class BoatEnvironmentRenderer:
         env_data = self.replayer.episode_data
 
         self.plt_objects['text1'] = self.axb.text(
-            y=self.config.boat_env.track_width + 0.85,
+            y=self.config.boat_env.track_width + self.config.boat_env.track_width * 0.1,
             x=-5,
             s=f"dt: {dt}, "
             f"ship angle: {math.degrees(env_data.iloc[dt]['boat_angle']):.2f}, "
-            f"actor action: {env_data.iloc[dt]['action']:.2f}, ",
+            f"actor action: {env_data.iloc[dt]['action_rudder']:.2f}, ",
             fontsize=7
         )
 
         self.plt_objects['text2'] = self.axb.text(
-            y=self.config.boat_env.track_width + 0.1,
+            y=self.config.boat_env.track_width + self.config.boat_env.track_width * 0.2,
             x=-5,
             s=f"reward: {env_data.iloc[dt]['reward']:.2f}, ",
             fontsize=7
@@ -146,15 +146,15 @@ class BoatEnvironmentRenderer:
             color='red'
         )
 
-        self.plt_objects['action_vector'] = self.draw_arrow(
-            angle=((np.pi/2) * math.copysign(1, env_data.iloc[dt]['action'])),
-            position=[
-                env_data.iloc[dt]['boat_position_x'],
-                env_data.iloc[dt]['boat_position_y']
-            ],
-            length=2,
-            color='green'
-        )
+        # self.plt_objects['action_vector'] = self.draw_arrow(
+        #     angle=((np.pi/2) * math.copysign(1, env_data.iloc[dt]['action'])),
+        #     position=[
+        #         env_data.iloc[dt]['boat_position_x'],
+        #         env_data.iloc[dt]['boat_position_y']
+        #     ],
+        #     length=2,
+        #     color='green'
+        # )
 
         self.plt_objects['wind_vector'] = self.draw_arrow(
             angle=env_data.iloc[dt]['wind_angle'],

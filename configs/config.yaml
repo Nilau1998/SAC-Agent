@@ -1,6 +1,6 @@
 # General settings
 base_settings:
-  n_games: 1
+  n_games: 1000
   render_skip_size: 50
   avg_lookback: 50
   dt: 0.1
@@ -9,7 +9,7 @@ base_settings:
 # Agent settings
 agent:
   alpha: 0.0005
-  beta: 0.0003
+  beta: 0.002
   gamma: 0.99
   tau: 0.005
   max_size: 1_000_000
