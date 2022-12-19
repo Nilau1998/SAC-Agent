@@ -29,8 +29,8 @@ class BoatEnv(Env):
         # Following actions can be choosen:
         # rad rudder
         self.action_space = Box(
-            low=-0.1,
-            high=0.1,
+            low=-1,
+            high=1,
             dtype=np.float32
         )
 
@@ -54,7 +54,7 @@ class BoatEnv(Env):
         self.boat.t += self.boat.dt
         self.boat.fuel -= 1
 
-        self.boat.rudder_angle += action[0]
+        self.boat.rudder_angle += action[0]/10
 
         self.boat.run_model_step()
 
@@ -88,7 +88,7 @@ class BoatEnv(Env):
             self.info['rudder_broken'] += 1
 
         if self.boat.rudder_angle > np.pi/4 or self.boat.rudder_angle < -np.pi/4:
-            self.reward = 0
+            self.reward -= 2
         else:
             self.reward += 0.1
 
@@ -267,10 +267,14 @@ class Boat:
 
     def return_state(self):
         state = np.array([
-            self.s_x,
-            self.s_y,
-            self.s_r,
-            self.rudder_angle,
-            self.fuel
+            self.normalize(self.s_x, 0, self.config.boat_env.goal_line),
+            self.normalize(self.s_y, -self.config.boat_env.track_width,
+                           self.config.boat_env.track_width),
+            self.normalize(self.s_r, 0, 2*np.pi),
+            self.normalize(self.rudder_angle, -np.pi/3, np.pi/3),
+            self.normalize(self.fuel, 0, self.config.boat.fuel)
         ])
         return state
+
+    def normalize(self, value, min_value, max_value):
+        return (value - min_value) / (max_value - min_value)
