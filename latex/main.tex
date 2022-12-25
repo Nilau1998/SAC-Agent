@@ -16,7 +16,7 @@
 \renewcommand{\subject}{Lösungsansätze für die Regelung von dynamischen Systemen mittels
 Reinforcement Learning Algorithmen}
 %Schlagwörter / Keywords
-\providecommand{\keywords}{Fernwärmenetz, Projektarbeit, Projekt, Maschinelles Lernen}
+\providecommand{\keywords}{}
 %Literaturliste *.bib / Bibliography
 \providecommand{\bibfile}{literature}
 %Matrikelnummer / Student ID
@@ -62,18 +62,40 @@ Reinforcement Learning Algorithmen}
 \newpage
 
 \chapter{Einleitung}
-\section{Einleitung und Motivation}
-\section{Zielsetzung}
-\section{Aufbau der Arbeit}
 
-\chapter{Grundlagen des Deep Learnings}
-\section{Was ist Deep Learning?}
-\section{Grundkonzepte und Terminologie}
-\section{Artes des Deep Learnings}
+\section{Einleitung und Motivation}
+
+\section{Zielsetzung}
+Das Ziel dieser Arbeit soll es sein, mittels eines Reinforcement Learning Agentens ein Beispielhaftes dynamisches Modell zu simulieren. Gezeigt werden sollen unteranderem Methoden um dynamische Systeme mit Hilfe von bestehenden Methodiken zu erstellen und sie anschließend mit dem Agenten zu verbinden. Das dynamische Modell soll hierbei in eine Umgebung umtransformiert werden, das der Agent in ihr frei agieren und lernen kann, umso anschließend eine Regelung dieses Modells zu ermöglichen. Als Beispielhaftes dynamisches Modell soll hier ein Kräftemodell für ein Schiff verwendet werden, welches unteranderem durch Störgrößen wie dem Wind beeinflusst wird. Der Agent soll die möglichkeithaben dieses Modell zu regeln indem er mit dem Schiffantrieb und seinem Ruder interagieren darf.
+\section{Aufbau der Arbeit}
+Der Aufbau dieser Arbeit soll vermitteln wie ein Reinforcement Learning Agent zusammen mit einer Umgebung implementiert werden kann. Geschehen soll jenes durch eine kurze Einführung in den allgemeinen Begriff des Machine Leranings. Gefolgt auf diese Einweisung soll der Leser einen Einblick in die Grundkonzepte und die dazu gehörige Terminologie des Reinforcement Learnings erhalten. Innerhalb des Einblicks zu den Grundkonzepten sollen Begriffe geklärt werden, damit anschließend auf die möglichen Arten des Reinforcement Learnings eingegangen werden kann. Innerhalb dieses Teils werden einige Algorithmen anhang von Pseudocode und deren Anwendungsfälle vorgestellt. Nach dieser Übersicht folgt ein Einblick in das Herzstück dieser Arbeit, die verwendete Implementierung eines Soft Actor-Critic (SAC) Agenten. Im Unterkapitel zu dem SAC wird vorgestellt, wie dieser funktioniert,
+\chapter{Reinforcement Learning}
+Im Zeitalter der Information, in welchem wir uns heutzutage befinden, gibt es eine unbegreiflich große und stätig wachsende Menge an Daten. Dies erkannte bereits der Trend- und Zukunftsforscher John Naisbitt im Jahre 1982 in seinem Buch Megatrends.
+\begin{align*}
+	\text{Wir ertrinken in Informationen, aber hungern nach Wissen. - John Naisbitt}
+\end{align*}
+Aufgrund dieser riesigen Menge an Daten, gibt es eine große Nachfrage nach automatisierten Methoden, um diese Daten letztendlich auch auswerten und analysieren zu können. Abhilfe für diese Nachfrage, beziehungsweise für dieses Problem soll das Teilgebiet des maschinellen Lernens aus dem Oberbegriff der künstlichen Intelligenz bieten. Das maschinelle Lernen bietet hierbei eine Facette aus verschiedenen Algorithmen und Methoden um innerhalb der untersuchten Daten das zu finden, was der Benutzer braucht. Hierbei können die Daten nach bereits bekannten Mustern untersucht werden, oder es kann nach unbekannten Mustern gesucht werden, es können auch vorhersagen getroffen werden aus dem bestehenden Datensatz umso zum Beispiel Marktforschung betreiben zu können. Wie sich das maschinelle Lernen als Oberthema nun zusammensetzt, und wo genau der Schwerpunkt dieser Arbeit, dass Reinforcement Learning sich als Begriff wieder findet, soll in diesem Kapitel verständigt werden.
+
+\section{Maschinelles Lernen}
+Das maschinelle Lernen auch Machine Learning oder kurz ML, kann im ganzen in drei Kategorien unterteilt werden. Hierbei gibt es das überwachte Lernen, unüberwachte Lernen und das bestärkte Lernen wobei letzeres das in dieser Arbeit fokusierte Reinforcement Learning entspricht, wie es im großteil der Literatur genannt wird. Bevor die tatsächlichen Grundlagen des Reinforcement Learnings erklärt werden sollen, soll außerdem noch einmal auf die beiden anderen Algorithmenarten eingegangen werden, um für eine Übersicht und somit für ein besseres Verständnis zu sorgen.\\
+Machine Learning Konzepte welche sich innerhalb des Bereichs des Überwachten Lernens finden, sind mit an verbreitesten. Bei ihnen kann unterschieden werden zwischen Ansätzen, welche zur klassifizierung dienen, oder Ansätze welche Regressionsprobleme lösen sollen. Grundsätzlich kann gesagt werden das beide dieser Ansätze dennoch dem selben Prinzip folgen. Beim überwachten Lernen werden große Mengen an Daten verwendet um zum Beispiel neuronale Netzwerke zu trainieren. Hierbei bestehen die Datensätze aus einer Abbildung, in welcher die sogennanten Features die Labels abbilden.
+
+\section{Grundkonzept und Terminologie zum Reinforcement Learning}
+Im wesentlichen gibt es zwei Elemente, welche zusammen die Grundbasis setzen für alle Arten und Implementierungen im Bereich des Reinforcement Learnings. Diese zwei Elemente sind der Agent und die Umgebung. Die Umgebung, oft auch Environment genannt, ist das worin der Agent lebt und womit er interagieren kann. Innerhalb des Environments trifft der Agent seine Aktionen, welche Actions genannt werden, basierend darauf, was der Agent bereits weiß und was ihm am Ende die größte Belohnung gibt. Die Belohnung, oder auch der Reward, ist ein Wert welcher definiert wird durch eine Reward-Function. Wie die Reward-Function nun den Wert wirklich bestimmt ist abhängig vom aktuellen State des Environments und kann somit einen positiven, negativen oder neutralen Wert annehmen. Ein positiver Reward würde demnach dafür sprechen, dass die letzten Entscheidungen des Agents gut waren und er das Environment in einen guten State gebracht hat. Hingegen würde ein negativer Reward dafür sprechen das der Agent, keine guten Entscheidungen getroffen hat. Wichtig ist der Reward für den Agenten, da er immer das Hauptziel hat, diesen zu maximieren. Der Agent und sein Environment stehen somit immer in einem Zyklus worin es darum geht, dass der Agent eine solche Action ausführt, das dass Environment in einen State gebracht wird, womit der Agent seinen maximalen Reward bekommt.
+\begin{figure}[H]
+	\includegraphics[width=\textwidth]{graphics/agent_env_loop.pdf}
+	\centering
+	\caption{Visualiserung des Agent-Environment Zyklus}
+	\label{abb:agent_env_loop}
+\end{figure}
+Da nun das Grundprinzip beschrieben wurde, soll in dem folgenden Text der ganze Prozess detailierter beschrieben werden, damit dann anschließend die Implementierung des Soft Actor-Critic Agenten betrachtet werden kann.
+\section{Artes des Reinforcement Learnings}
 \section{Soft Actor-Critic (SAC) Agenten}
 
 \chapter{Methode und Umsetzung}
+
 \section{Verwendete Software und Bibliotheken}
+Der großteil der ganzen Arbeit wurde mithilfe der Programmiersprache Python umgesetzt. Python bietet den Vorteil an, dass es vergleichsweise eine recht einfache Sprache ist und außerdem eine ziemlich große Auswahl an Bibliotheken bietet im Bereich Machine Learning. Die verwendete Machine Learning Bibliothek in dieser Arbeit ist PyTorch. PyTorch bietet eine Umgebung an, mit welcher vor allem die neuronalen Netzwerke für den Agenten elegant definiert werden können. Graphen und die Videodateien für die visualisierung und auswertung einer Episode wurden erstellt mit Hilfe von Matplotlib. Da der Agent in dieser Arbeit eine Umgebung braucht, in welcher das dynamische Modell simuliert werden kann, wurde außerdem die Bibliothek Gym von OpenAI verwendet. Gym bietet ein Framework an, welches es dem Benutzer mit vordefinierten Methoden eine Umgebung zu erstellen. Es werden Methoden vorgegeben, welche unteranderm einen Schritt innerhalb einer Episode definieren, oder eine Methode um die ganze Umgebung wieder auf ihren Ursprung zurückzusetzten.
 \section{Implementierung des Agenten}
 \section{Umsetzung des Modells in Simulink}
 \section{Einbindung des Modells in Python}
