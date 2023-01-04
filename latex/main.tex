@@ -62,23 +62,25 @@ Reinforcement Learning Algorithmen}
 
 \newpage
 
-\chapter{Einleitung}
+\chapter{Einleitung} \label{sec:einleitung}
 
-\section{Einleitung und Motivation}
+\section{Einleitung und Motivation} \label{sec:einleitung_motivation}
 
-\section{Zielsetzung}
-Das Ziel dieser Arbeit soll es sein, mittels eines Reinforcement Learning Agentens ein Beispielhaftes dynamisches Modell zu regeln. Gezeigt werden sollen außerdem unteranderem Methoden um dynamische Systeme mit Hilfe von bestehenden Methodiken zu erstellen und sie anschließend mit dem Agenten zu verbinden. Das dynamische Modell soll hierbei in eine Umgebung umtransformiert werden, das der Agent in ihr frei agieren und lernen kann, umso anschließend eine Regelung dieses Modells zu ermöglichen. Als Beispielhaftes dynamisches Modell soll hier ein Kräftemodell für ein Schiff verwendet werden, welches durch Störgrößen wie dem Wind beeinflusst wird. Der Agent soll die möglichkeithaben dieses Modell zu regeln indem er mit dem Schiffantrieb und seinem Ruder interagieren darf.
-\section{Aufbau der Arbeit}
-Der Aufbau dieser Arbeit soll vermitteln wie ein Reinforcement Learning Agent zusammen mit einer Umgebung implementiert werden kann. Geschehen soll jenes durch eine kurze Einführung in den allgemeinen Begriff des Machine Leranings. Gefolgt auf diese Einweisung soll der Leser einen Einblick in die Grundkonzepte und die dazu gehörige Terminologie des Reinforcement Learnings erhalten. Innerhalb des Einblicks zu den Grundkonzepten sollen Begriffe geklärt werden, damit anschließend auf die möglichen Arten des Reinforcement Learnings eingegangen werden kann. Innerhalb dieses Teils werden einige Algorithmen anhang von Pseudocode und deren Anwendungsfälle vorgestellt. Nach dieser Übersicht folgt ein Einblick in das Herzstück dieser Arbeit, die verwendete Implementierung eines Soft Actor-Critic (SAC) Agenten. Im Unterkapitel zu dem SAC wird vorgestellt, wie dieser funktioniert,
+\section{Zielsetzung} \label{sec:zielsetzung}
+Das Ziel dieser Arbeit soll es sein, mittels eines Reinforcement Learning Agentens ein Beispielhaftes dynamisches Modell zu regeln. Gezeigt werden sollen außerdem Methoden um dynamische Systeme mit Hilfe von bestehenden Methodiken zu erstellen und sie anschließend mit dem Agenten zu verbinden. Die Methode um die Grundmodelle zu erstellen, soll Simulink von MatLab bieten. Der Grund hierfür ist, da bereits ein bestehendes Grundverständnis für das Toolkit exisiert und außerdem Simulink mit seinen zahlreichen Schaltblöcken eine elegante Methode anbietet, um eine Modellbildung durchzuführen. Das in Simulink erstellte Modell, soll dann anschließend in ein Python Modell transformiert werden, damit dadurch die Möglichekeit besteht die zahlreichen Bibliotheken für maschinelles Lernen zu verwenden, welche Python besitzt. Der Reinforcement Learning Agent, welcher mit dem Modell arbeiten soll und die Aufgabe hat es zu regeln, soll in Python mit den wie bereits erwähnten Bibliotheken aus dem Bereich des maschinellen Lernens implementiert werden. Als Beispielhaftes dynamisches Modell soll ein Kräftemodell für ein Schiff verwendet werden, welches durch Störgrößen wie dem Wind, oder dem treiben des Schifs beeinflusst wird. Der Agent soll die möglichkeithaben dieses Modell zu regeln indem er mit dem Schiffantrieb und seinem Ruder interagieren darf.
 
-\chapter{Reinforcement Learning}
+\section{Aufbau der Arbeit} \label{sec:aufbau_arbeit}
+Damit nun das dynamische Modell erstellt und anschließend in ein Environment umgewandelt werden kann, in welchem ein Reinforcement Learning Agent existieren kann, soll zuerst geklärt werden, woher der Begriff des Reinforcement Learnings überhaupt kommt. Eine Übersicht, in worein sich der Begriff eingelieder und was genau er wirklich bedeutet, findet sich in Kapitel \ref{sec:reinforcement_learning} und seinen Unterkapiteln. In diesem Kapitel wird damit angefangen zu erläutern, was genau maschinelles Lernen überhaupt ist und wie es sich grob aufspaltet in seine drei Arten. Diese drei Arten sollen erklärt werden, damit es dem Leser möglich ist, diese von einander trennen zu können und die Wichtigkeit der Reinforcement Learning Algorithmen zu erkennen. Es soll anschließend eine Übersicht geboten werden, in welcher die verschiedenen wichtigen Reinforcement Learning Algortihmen mit einander verglichen werden. Folgend auf die Übersicht, kommt dann auch schon die Einführung zum Thema der Soft Actor-Critic (SAC) Agenten beziehungsweise Algorithmen, welche für diese Arbeit verwendet wurden zu realisierung des Modell Reglers. Vor allem der Soft Actor-Critic soll detailreicher mit tieferem Verständnis erläutert werden, damit in einem späteren Kapitel der Arbeit die Implementierung innerhalb von Python verständlich ist. Hierzu soll unteranderem durch Pseudocode die Hauptkomponenten visualisert werden zusammen mit den dazugehörigen wichtigen Konzepten.\\
+Nach dem der Teil des maschinellen Lernens verdeutlicht wurde, folgen die Einblicke in die tatsächliche implementierung des Soft Actor-Critic Agenten in Python zusammen mit der PyTorch Bibliothek, welche für diese Arbeit als Framework für das maschinelle Lernen gewählt wurde. Es soll hier gezeigt werden, wie die Hauptkomponenten implementiert wurden, und wie diese dann vorab schon vor der Erläuterung des Modells in Python beziehungsweise des Environments, mit in den Schnittstellen des Environments eingebunden wurden. Anschließend folgt das Unterkapitel \ref{sec:imp_simulink}, in welchem die Modellbildung für das Schiffmodell in Simulink erläutert wird. Hierbei soll gezeigt werden, wie sich das gewählte Schiffmodell zusammensetzt und was für Kraftgleichungen aufgestellt wurden um diese zu realisieren. Damit soll dem Leser klar werden, welche Störgrößen nun exisieren, wo genau der Agent Kontrolle über das Schiff hat und wie dieses nun überhaupt im Environment später sich verhalten wird wenn dann die Simulationen anfangen. Da der Agent in Python nun zu disem Zeitpunkt bereits in Python implementiert wurde, folgt auf die Modellbildung in Simulink auch schon die Umsetzung des erstellten Modells in Python. Hierfür soll vorerst gezeigt werden Anhang eines einfacheren Modells, wie diese Umsetzung funktionieren wird. Es wird dabei auf die Implementierung der Integratoren aus Simulink innerhalb von Python eingegangen, da diese mit ein Kernstück bilden für die ganze Modellbildung und demnach unverzichtbar sind. Nach der Beispielumsetzung, folgt dann auch die tatsächliche Umsetzung des Schiffmodells in Python und wie dieses in ein Gym Environment von OpenAI eingebunden wurde, damit der Agent dann auch mit ihm interagieren kann. Als Finale werden dann die verschiedenen Ergebnisse dieser Arbeit präsentiert zusammen mit einer Diskussion wie diese zustande kommen und einer anschließenden Zusammenfassung jener und einem Ausblick wie es weiter gehen könnte in dieser Thematik.
+
+\chapter{Reinforcement Learning} \label{sec:reinforcement_learning}
 Im Zeitalter der Information, in welchem wir uns heutzutage befinden, gibt es eine unbegreiflich große und stätig wachsende Menge an Daten. Dies erkannte bereits der Trend- und Zukunftsforscher John Naisbitt im Jahre 1982 in seinem Buch Megatrends.
 \begin{align*}
     \text{Wir ertrinken in Informationen, aber hungern nach Wissen. - John Naisbitt}
 \end{align*}
 Aufgrund dieser riesigen Menge an Daten, gibt es eine große Nachfrage nach automatisierten Methoden, um diese Daten letztendlich auch auswerten und analysieren zu können. Abhilfe für diese Nachfrage, beziehungsweise für dieses Problem soll das Teilgebiet des maschinellen Lernens aus dem Oberbegriff der künstlichen Intelligenz bieten. Das maschinelle Lernen bietet hierbei eine Facette aus verschiedenen Algorithmen und Methoden um innerhalb der untersuchten Daten das zu finden, was der Benutzer braucht. Hierbei können die Daten nach bereits bekannten Mustern untersucht werden, oder es kann nach unbekannten Mustern gesucht werden, es können auch vorhersagen getroffen werden aus dem bestehenden Datensatz umso zum Beispiel Marktforschung betreiben zu können. Wie sich das maschinelle Lernen als Oberthema nun zusammensetzt, und wo genau der Schwerpunkt dieser Arbeit, dass Reinforcement Learning sich als Begriff wieder findet, soll in diesem Kapitel verständigt werden.
 
-\section{Maschinelles Lernen}
+\section{Maschinelles Lernen} \label{sec:machine_learning}
 Das maschinelle Lernen auch Machine Learning oder kurz ML, kann im ganzen in drei Kategorien unterteilt werden. Hierbei gibt es das überwachte Lernen, unüberwachte Lernen und das bestärkte Lernen wobei letzeres das in dieser Arbeit fokusierte Reinforcement Learning entspricht, wie es im großteil der Literatur genannt wird. Bevor die tatsächlichen Grundlagen des Reinforcement Learnings erklärt werden sollen, soll außerdem noch einmal auf die beiden anderen Algorithmenarten eingegangen werden, um für eine Übersicht und somit für ein besseres Verständnis zu sorgen.\\
 Machine Learning Konzepte welche sich innerhalb des Bereichs des Überwachten Lernens finden, sind mit an verbreitesten. Bei ihnen kann unterschieden werden zwischen Ansätzen, welche zur klassifizierung dienen, oder Ansätze welche Regressionsprobleme lösen sollen. Grundsätzlich kann gesagt werden das beide dieser Ansätze dennoch dem selben Prinzip folgen. Beim überwachten Lernen werden große Mengen an Daten verwendet um zum Beispiel neuronale Netzwerke zu trainieren. Die Datensätze entsprechen einer Abbildung, wobei hier die sogennanten Features auf die Labels abgebiltet werden. Wird nun ein neuronales Netzwerk mit diesem Ansatz trainiert, so werden dem neuronalen Netzwerk einfach gesagt am Eingang die Features gezeigt und am Ausgang die dazugehörigen Labels.
 \begin{figure}[H]
@@ -90,7 +92,7 @@ Machine Learning Konzepte welche sich innerhalb des Bereichs des Überwachten Le
 
 Im Detail ist das ganze Training deutlich komplizierter und hierbei werden sogennante Optimizer wie Adam, Nadam oder SGD verwendet, welche das Ziel haben die Kanten anzupassen und gegebenfalls andere Parameter anzupassen. Die Kanten zwischen den einzelnen Neuronen besitzen das komplette antrainierte Wissen, sie können dabei positiv, negativ oder neutral gewichtet sein. Ist eine Kante positiv Gewichtet, so hat sie einen erregenden Einfluss auf ein anknüpfendes Neuron. Eine negative Kante hingegen besitzt ein hemmendes Verhalten zum angebundenen Neuron. In einem neutralen Zustand besitzt die Kante keinen Einfluss auf das anschließende Neuron. Die Optimizer unterscheiden sich zueinander unteranderem dadurch, was für eine Implementierung eines Gradientenverfahrens sie verwenden. Dennoch sind die Gradientenverfahren der Kern eines jeden Optimizers und wird verwendet um den Trainingsprozess eines neuronalen Netzwerkes durchzuführen. Es wurde bereits beschrieben, wie im Grunde beim Training dem Eingang die Features gezeigt werden und gleichzeitig das dazugehörige Label dem Ausgang gezeigt wird. Was jedoch intern passiert, ist dass eine sogenannte Cost-Function durch die Optimizer untersucht wird. Das Ziel der Optimizer ist es dabei das lokale oder globale Minimum dieser Funktion zufinden, welche als variabeln alle Gewichtungen der Kanten und sonstige Parameter hat. Die Cost-Function beschreibt, wie gut ein neuronales Netzwerk seine Vorhersage für einen beliebigen Datensatz durchgeführt hat und gibt einen numerischen Wert dafür zurück. Mithilfe dieser Bewertung entscheiden die Optimizer dann, in wiefern die einzelnen Gewichtungen angepasst werden müssen um näher zum Minimum der Cost-Function zu rücken.
 
-\section{Grundkonzept und Terminologie zum Reinforcement Learning}
+\section{Grundkonzept und Terminologie zum Reinforcement Learning} \label{sec:grundkonzept_rf}
 Im wesentlichen g ibt es zwei Elemente, welche zusammen die Grundbasis setzen für alle Arten und Implementierungen im Bereich des Reinfocement Leranings. Diese zwei Elemente sind der Agent und die Umgebung. Die Umgebung, oft auch Environment genannt, ist das worin der Agent lebt und womit er interagieren kann. Ein Environment besitzt immer einen State $s$, welcher die kompletten aktuellen Informationen zu einem Environment trägt. Der Agent besitzt die möglichkeit das Environment und seinen State $s$ zu betrachten. Die Betrachtung des States aus perspektive des Agenten bekennt sich als die Observation $o$, welche im vergleich zu $s$, nicht alle Informationen zum Environment tragen muss, sondern auch nur eine Schnittmenge an Informationen zu $s$ besitzen kann. Wenn $o$ mit $s$ komplett übereinstimmt, wird von einer vollkommenden Oberservation gesprochen, ist es jedoch eine kleine Schnittmenge, so wird von einer partiellen Observation gesprochen. Wenn das Environment zum Beispiel ein Pendel beschreibt, dann würde $s$ hier allen Informationen entsprechen, welche ein Pendel beschreiben. Dies wären zum Beispiel die Fadenlänge, die Fläche vom Pendelkopf und der aktuelle Winkel des Pendels zu seiner Ruheposition. Hingegen könnte $o$ eine partielle Observation sein, welche lediglich den momentanen Winkel des Pendels zu seiner Ruheposition wiedergibt.
 
 
@@ -102,15 +104,17 @@ Im wesentlichen gibt es zwei Elemente, welche zusammen die Grundbasis setzen fü
     \label{abb:agent_env_loop}
 \end{figure}
 Da nun das Grundprinzip beschrieben wurde, soll in dem folgenden Text der ganze Prozess detailierter beschrieben werden, damit dann anschließend die Implementierung des Soft Actor-Critic Agenten betrachtet werden kann.
-\section{Artes des Reinforcement Learnings}
-\section{Soft Actor-Critic (SAC) Agenten}
+\section{Artes des Reinforcement Learnings} \label{sec:arten_rf}
+\section{Soft Actor-Critic (SAC) Agenten} \label{sec:howto_sac}
 
-\chapter{Methode und Umsetzung}
+\chapter{Methode und Umsetzung} \label{sec:methode_umsetzung}
 
-\section{Verwendete Software und Bibliotheken}
-Der großteil der ganzen Arbeit wurde mithilfe der Programmiersprache Python umgesetzt. Python bietet den Vorteil an, dass es vergleichsweise eine recht einfache Sprache ist und außerdem eine ziemlich große Auswahl an Bibliotheken bietet im Bereich Machine Learning. Die verwendete Machine Learning Bibliothek in dieser Arbeit ist PyTorch. PyTorch bietet eine Umgebung an, mit welcher die neuronalen Netzwerke für den Agenten einfach und mit viel Freiheit definiert werden können. Graphen und die Videodateien für die visualisierung und auswertung einer Episode wurden erstellt mit Hilfe von Matplotlib. Da der Agent in dieser Arbeit eine Umgebung braucht, in welcher das dynamische Modell simuliert werden kann, wurde außerdem die Bibliothek Gym von OpenAI verwendet. Gym bietet ein Framework an, welches es dem Benutzer mit vordefinierten Methoden eine Umgebung zu erstellen. Es werden Methoden vorgegeben, welche unteranderm einen Schritt innerhalb einer Episode definieren, oder eine Methode um die ganze Umgebung wieder auf ihren Ursprung zurückzusetzten.
-\section{Implementierung des Agenten}
-\section{Umsetzung des Modells in Simulink}
+\section{Verwendete Software und Bibliotheken} \label{sec:software_bibs}
+Der großteil der ganzen Arbeit wurde mithilfe der Programmiersprache Python umgesetzt. Python bietet den Vorteil an, dass es vergleichsweise eine recht einfache Sprache ist und außerdem eine ziemlich große Auswahl an Bibliotheken bietet im Bereich Machine Learning. Die verwendete Machine Learning Bibliothek in dieser Arbeit ist PyTorch. PyTorch bietet ein Framework an, mit welchem die neuronalen Netzwerke für den Agenten einfach und mit viel Freiheit definiert werden können. So können zum Beispiel die \textit{forward}-Function, oder die \textit{learn}-Function des neuronalen Netzwerks frei, und mit kompletter Kontrolle definiert werden. Grafiken und die Videodateien, welche für die visualisierung und auswertung einer Episode verwendet werden, wurden mit Hilfe der Matplotlib Bibliothek generiert. Da der Agent ein Environment zwingend benötigt, in welchem das dynamische Modell simuliert werden kann, wurde außerdem die Bibliothek Gym von OpenAI verwendet. Gym bietet ein Framework an, welches dem Benutzer mit vordefinierten Methoden die Möglichkeit bietet, Environment zu erstellen. So werden zum Beispiel die \textit{step}, oder \textit{reset}-Methode vorgebene, welche dazu verwendet werden um einen Zeitsprung innerhalb einere Episode durchzuführen. Im Falle der \textit{reset}-Methode würde das Environment wieder auf seinen Ursprungsstate zurückgesetzt werden. Dies bedeuetet, dass Eigenschaften des Environments, wie die Schiffsposition oder der momentane Reward, wieder auf den Ursprung des Koordinatensystems gesetzt wird beziehungsweise der Reward wieder 0 ist.
+\section{Implementierung des Agenten} \label{sec:imp_agent}
+Wie bereits erwähnt im vorherigen Untekapitel \ref{sec:software_bibs}, wurde für diese Arbeit PyTorch verwendet, um den Agenten zu implementieren. Wie genau diese Implementierung nun umgesetzt wurde, soll mit diesem Unterkapitel verdeutlicht werden.
+
+\section{Umsetzung des Modells in Simulink} \label{sec:imp_simulink}
 Das in dieser Arbeit verwendete dynamische Modell, soll wie bereits in der Zielsetzung erwähnt ein Kräftemodell sein, welches eine Schiffsfahrt modelliert. Die Grundidee des Modells ist es dabei, dass das Schiff im Ursprung eines koordinatensystems startet und dann das Ziel hat, innerhalb eines vordefinierten Bereichs nach rechts zu einer Ziellinie zu fahren. Hierbei gibt es das zweirängige Ziel für das Schiff, dass es bei seiner überfahrt so mittig im vordefinierten Bereich bleiben soll wie möglich. Die folgende Abbildung \ref*{abb:boat_frame_example_2} soll eine visualierung für das gewollte Modell bieten.
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{graphics/boat_frame_example_2.png}
@@ -127,13 +131,15 @@ Modelliert wird das Schiff durch drei Bewegungsgleichungen, welche die Kräfte i
     \caption{Die drei Bewegungsgleichungen des Schiffs.}
     \label{abb:ship_eoms}
 \end{figure}
+
+\subsection{Die erste Bewegungsgleichung des Modells} \label{sec:eom1}
 Die erste Bewegungsgleichung für die Bewegung in longitudinaler Richtung, setzt sich zusammen aus den folgenden Kräften.
 \begin{align}
-    F_{Lon} = F_{T} - F_{R} + F_{C} \label{eq:longitudinal_force}
+    F_{Lon} = F_{T} - F_{Rl} + F_{Cl} \label{eq:longitudinal_force}
 \end{align}
 Der Antrieb des Schiffs wird modelliert durch eine Gleichung, welche abhängig von der Drehgeschwindigkeit der Schiffsschreube einen Schub generiert.
 \begin{align}
-    F_T = K_T(J) \cdot \rho \cdot d^4 \cdot n^2 \cdot (1-t) \label{eq:thrust_force}
+    F_{T} = K_T(J) \cdot \rho \cdot d^4 \cdot n^2 \cdot (1-t) \label{eq:thrust_force}
 \end{align}
 wobei,
 \begin{enumerate}
@@ -153,17 +159,84 @@ wobei,
 \end{enumerate}
 Der Widerstand, welcher ausgehend vom Wasser auf das Schiff longitudinal wirkt und somit das Schiff auch ausbremst ist definiert als reguläre Widerstandsgleichung abhängig der momentanen Geschwindigkeit des Schiffs.
 \begin{align}
-    F_R = \frac{1}{2} \cdot v_l^2 \cdot \rho \cdot c_{SF} \cdot A_{SF} \label{eq:front_resistance}
+    F_{Rl} = \frac{1}{2} \cdot v_l^2 \cdot \rho \cdot c_{Sl} \cdot A_{Sl} \label{eq:front_resistance}
 \end{align}
 wobei,
 \begin{enumerate}
-    \item[] $c_{SF} = 0.31$, der Reibungskoeffient des Schiffs von Vorne
-    \item[] $A_{SF} = 20$, die Fläche des Schiffs von vorne
+    \item[] $c_{Sl} = 0.31$, der Reibungskoeffient des Schiffs von Vorne
+    \item[] $A_{Sl} = 20$, die Fläche des Schiffs von vorne
 \end{enumerate}
-entspricht.
+entspricht. Als weitere Kraftkomponente um das Schiff noch dynamischer zu machen während es eine Kurve zieht, wird außerdem eine Kraft für die Zentripedalkraft definiert innerhalb von $F_C$. Die stimmt nicht ganz mit der realen Definition für die Zentripedalkraft überein, liefert allerdings dennoch gute Ergebnisse und wird somit als annäherung verwendet.
+\begin{align}
+    F_C = v_t \cdot v_r \cdot (m_{s}+ m_{St})
+\end{align}
+wobei,
+\begin{enumerate}
+    \item[] $v_t$, die transversale Geschwindigkeit des Schiffs
+    \item[] $m_s$, die Masse des Schiffs
+    \item[] $m_{St}$, die Masse des Schiffs in transeversaler Richtung durch Trägheit
+    \item[] $v_r$, die Winkelgeschwindigkeit des Schiffs
+\end{enumerate}
+entsprechen.
+
+\subsection{Die zweite Bewegungsgleichung des Modells} \label{sec:eom2}
+Die zweite Bewegungsgleich für die Bewegung des Schiffs in transversaler Richtung, setzt sich zusammen aus den folgenden Kräften.
+\begin{align}
+    F_{Tra} = F_{Ru} - F_{Rt} + F_{Ct}
+\end{align}
+Im Vergleich zu der ersten Bewegungsgleichung, gibt es in der zweiten keine Kraft, welche direkt neue Kraft generiert. Die Kräfte, welche sich in in diesem Fall bilden, kommen aus indirekter Abhängigkeit zu dem Schub, welcher in der ersten Kraftgleichung gebildet wird. Die erste Kraft, welche Abhängig vom Schub in der zweiten Bewegungsgleichung gebildet wird, kommt vom Ruder des Schiffs, welches im Winkelbereich von $-\frac{\pi}{3} \leq \alpha \leq \frac{\pi}{3}$ vom Agenten bewegt werden kann. Das $F_{Ru}$ ergibt sich somit zu der folgenden Gleichung, welche auf die bereits verwendetet Widerstandsgleichung basiert. Der Unterschied liegt jedoch darin, dass die Fläche des Ruders als variabel angesehen wird und abhängig vom Rudderwinkel bestimmt wird und das Ruder in diesem Modell nur die Geschwindigkeit in longitudinaler Richtung als Abhängigkeit besitzt.
+\begin{align}
+    F_{Ru} = \frac{1}{2} \cdot v_l^2 \cdot \rho \cdot c_{Ru} \cdot A_{Ru} \cdot \sin(\alpha) \label{eq:rudder_resistance_long}
+\end{align}
+Wie bereits in der ersten Bewegungsgleichung wird auch in diesem Fall wieder eine weiterer Widerstandsgleichung verwendet um das Schiff selbst in der transversalen Richtung passiv abzubremsen. Diese Gleichung ist Analog zum longitudinalen Fall, nur das hier eine größere Fläche exisitiert und der Reibungskoeffient als ein Rechteckigefläche gewählt wird und somit gilt das $A_{St} = 90$ und $c_{St} = 2$ gilt.
+\begin{align}
+    F_{Rt} = \frac{1}{2} \cdot v_l^2 \cdot \rho \cdot c_{St} \cdot A_{St} \label{eq:side_resistance}
+\end{align}
+Auch die Zentripedalkraft $F_{Ct}$ ist erneut ähnlich wie bereits in der ersten Bewegungsgleichung, nur das in diesem Fall eine Abhängigkeit zur longitudinalen Richtung der Geschwindigkeit besteht. In diesem Fall wird außerdem die Masse ausgehend aus der Trägheit in longitudinaler Richtung verwendet, welche mit $m_{Sl} = 50$ gewählt wurde.
+\begin{align}
+    F_{Ct} = v_l \cdot v_r \cdot (m_{s}+ m_{Sl})
+\end{align}
+\subsection{Die dritte Bewegungsgleichung des Modells} \label{sec:eom3}
+Die dritte und letzte Bewegungsgleichung, welche in diesem Modell verwendet wird sorgt dafür, dass sich das Schiff drehen kann und verwendet hierfür das Drehmoment welches im Gleichgewicht stehen muss. Die Rotation entsteht dadurch das dass Ruder in einen Winkel gesteuert wird, welcher nicht 0 ist. Ausgebremst werden soll die Rotation durch die Hülle des Schiffs zusammen mit der Fläche des Ruders. Wie stark die Rotationsgeschwindigkeit nun ist, ist abhängig davon wie stark das Ruder eingelengt wird, und außerdem für wie lange es eingelenkt ist. Durch die ausbremsung der Rotationsgeschwindigkeit kommt diese irgendwann in eine equilibrium und das Schiff zieht Kreise. In diesem Fall sollen diese Kräfte auch erneut durch Widerstandsgleichungen approximiert werden.
+\begin{align}
+    M = M_{Rul} - M_S
+\end{align}
+Die bereits erwähnte Kraft $M_{Rul}$, welche abhängig von der momentanen longtudinalen Geschwindigkeit ein Drehmoment auf das Schiff durch das Ruder wirkt wird beschrieben durch die folgende Gleichung.
+\begin{align}
+    M_{Rul} = \frac{1}{2} \cdot v_l^2 \cdot \rho \cdot c_{Ru} \cdot A_{Ru} \cdot \sin(\alpha) \cdot \frac{b}{2}
+\end{align}
+Erkennbar ist die Widerstandsgleichung, welche durch einen Hebelarm bestehend aus der breite des Schiffs mit $b = 6$ erweitert wurde um einen Drehmoment zu bestimmen.
+Der größte Drehmoment, welcher nun ausgehend von der Schiffshülle kommt und gegen den Drehmoment des Ruders wirken soll als ausgleich, soll beschrieben werden durch.
+\begin{align}
+    M_S = \frac{1}{2} \cdot v_r^2 \cdot \rho \cdot c_{St} \cdot A_{St} \cdot l
+\end{align}
+Auch hier wurde erneut eine Widerstandsgleichung um einen Hebelarm erweitert, da nun allerdings die ganze Seite des Schiffs betrachtet wird, wurde hier auch die komplette länge des Schiffes verwendet. Wichtig ist an dieser Stelle, das die länge des Schiffs um einiges höher skaliert werden musste, als was sie eigentlich ist. In dieser Arbeit wurde bei dem Drehmoment zum Beispiel $10 \cdot l$ verwendet, da dass Schiff sonst nicht mehr in Ruhelage kommt.
+
+\subsection{Die Kinematik und Umrechnung der Modellinformationen} \label{sec:kinematik}
+Da dass Modell aus der Perspektive des Schiffs modelliert ist, wurde ein Subsystem implementiert, welches das Modell in ein neues Koordinatensystem transformiert umso eine einfachere Schnittstelle zum Agenten herzustellen. Die Kinematik dient zum Beispiel dazu, die aktuelle Position des Schiffs im gesamten Environment zu erhalten, oder in welche tatsächliche Richtung es überhaupt ausgerichtet ist. Damit soll es dem Agenten möglich sein ein besseren Oberservationspace bilden zu können.
+
+Der Betrag der Geschwindigkeit gibt sich aus dem Pythagoras der beiden Geschwindigkeitskomponenten $v_x$ und $v_y$.
+\begin{align}
+    v = \sqrt[2]{v_x^2 + v_y^2}
+\end{align}
+Die Winkel $\beta$, welcher Beschreibt in welche Richtung das Schiff treibt, wird bestimmt durch
+\begin{align}
+    \beta = \arccos \left( \frac{v_x}{v_y} \right)
+\end{align}
+Die tatsächliche Ausrichtung des Schiffs $s_r$ ist lediglich das Integral der momentanen Drehgeschwindigkeit $v_r$
+\begin{align}
+    s_r = \int_{t}^{t+\Delta t} v_r \, dt
+\end{align}
+Die nun umtransformierte Position des Schiffs in $x$ und $y$-Position ergibt sich aus
+\begin{align}
+    s_x = \int_{t}^{t+\Delta t} v \cdot \sin(\beta - s_r) \, dt
+\end{align}
+\begin{align}
+    s_y = \int_{t}^{t+\Delta t} v \cdot \cos(\beta - s_r) \, dt
+\end{align}
 
 
-\section{Einbindung des Modells in Python}
+\section{Einbindung des Modells in Python} \label{sec:simulink_to_py}
 Das funktionierende Simulink Modell muss für die verwendung zusammen mit dem Agenten, in Python umgesetzt werden. Damit dies gelingen kann, wurde festgelegt, dass das Ziel sein soll einige Blöcke aus Simulink nachzuahmen umso eine fast identische Funktionalität zuhaben wie sie in Simulink vorliegt. Da innerhalb von Simulink Blöcke verwendet werden, welche verbunden werden durch Kanten und dies in Python nicht möglich ist. Werden innerhalb von Python stattdesen Klassenattribute verwendet um zum Beispiel die gesamt Beschleunigung eines Modells zu definieren. Ein solches Klassenattribute kann damit nun zum Beispiel verwendet werden um einen Feedback-Loop zu modellieren, wie es in Simulink mithilfe von zurücklaufenden Kanten gemacht wird. Die Integratoren welche in Simulink mit das Kernstück und eine der wichtigesten Blockarten ist, wurde in Python nachgebaut innerhalb einer Integrator Klasse. Die Klasse wurde so implementiert, dass für jeden Integratorblock, welcher aus einem Simulink Modell übernommen werden soll, ein Integrator Object definiert wird. Dies könnte dann folgend aussehen in einem Quellcode Beispiel.
 \begin{lstlisting}[language=Python]
 a_integrator = Integrator()
@@ -176,7 +249,7 @@ Die Integratoren selbst funktionieren nun so, dass sie eine eigene Klassenmethod
 \end{align*}
 Die Signal $s$ wird gesehen als eine Konstante, welche integriert wird vom Zeitschritt $t$ bis $t + dt$, wobei das $dt$ hier vorschreibt wie groß der Integrationschritt letztendlich sein soll. Innerhalb dieser Arbeit wurde $dt = 0.1$ gewählt, da es die ausreichende größe bietet um das gewählte Modell zu simulieren ohne großem Genauigkeitsverlust.
 \newpage
-\subsection{Testen des Integrators anhand eines einfachen Beispiels}
+\subsection{Testen des Integrators anhand eines einfachen Beispiels} \label{sec:integrator_test}
 Um die Integrator Klasse in Python zu testen bevor sie für das richtige Schiffmodell verwendet wird, wurde ein einfaches Modell erstellt, in welchem ein Fallschirmspringer in einer bestimmten Höhe abspringt und irgendwann den Fallschirm öffnet und verlangsamt auf dem Boden ankommt. In diesem Fallschirm Modell wurde der Fallschirm so modelliert, das er ab eine Höhe von 1500 aufgeht und damit seine Fläche deutlich größer wird. Diese größere Fläche spiegelt sich dann wieder in der reduzierten Fallgeschwindigkeit des Fallschirmspringers. Beschrieben werden kann das Fallschirmmodell durch die folgende Kraftgleichung.
 \begin{align*}
     F = -F_G + F_W
@@ -242,7 +315,7 @@ if __name__ == '__main__':
 
 \end{lstlisting}
 
-Zusehen ist, dass das Modell in Python angetrieben wird durch eine $while$-Schleife, welche terminiert sobald das $t_{max}$ erreicht ist. Innerhalb der $while$-Schleife wird dafür die Laufvariabel $t$ inkrementiert durch ein zuvor festgelegtes $dt$, welches gleichzeitig auch als die Integrationsschrittgröße dient bei den Integratoren. Konstanten wurden außerhalb der $while$-Schleife definiert zusammen mit einem $total\_a$, welches die gesamt Beschleunigung des Modells beschreibt. Die Integratoren werden nun innerhalb der $while$-Schleife verwendet um die gesamt Beschleunigung in eine Geschwindigkeit und anschließend in die Höhe des Fallschirmspringers zu integrieren. Basierend auf diesen Methodenrückgaben können dann veränderungen an den Signalen vorgenommen werden um zum Beispiel das $F_W$ abhängig von der Höhe zu bestimmen.\\
+Zusehen ist, dass das Modell in Python angetrieben wird durch eine $while$-Schleife, welche terminiert sobald das $t_{max}$ erreicht ist. Innerhalb der $while$-Schleife wird dafür die Laufvariabel $t$ inkrementiert durch ein zuvor festgelegtes $dt$, welches in den zuvor definierten Integralen dem $\Delta t$ und somit der Integrationsschrittgröße entspricht. Konstanten wurden außerhalb der $while$-Schleife definiert zusammen mit einem $total\_a$, welches die gesamt Beschleunigung des Modells beschreibt. Die Integratoren werden nun innerhalb der $while$-Schleife verwendet um die gesamt Beschleunigung in eine Geschwindigkeit und anschließend in die Höhe des Fallschirmspringers zu integrieren. Basierend auf diesen Methodenrückgaben können dann veränderungen an den Signalen vorgenommen werden um zum Beispiel das $F_W$ abhängig von der Höhe zu bestimmen.\\
 Ein direkter Vergleich der Ergebnisse unter verwendung der gleichen konstanten bei den beiden Modellvarianten in Python und Simulink zeigt dann auch gleich, dass die Integratoren und der Ansatz für die Modellierung in Python korrekt sind. Anzumerken ist jedoch, dass die Zeitaxen sich bei den beiden Plots ein wenig unterscheiden, dies ist jedoch darauf zurückzuführen, wie Simulink die Zeitschritte definiert und wie sie im Python Modell definiert sind. In diesem Fall ist es einfach nur eine unterschiedliche Skalierung.
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{graphics/python_parachute_s_plot.png}
@@ -259,12 +332,12 @@ Ein direkter Vergleich der Ergebnisse unter verwendung der gleichen konstanten b
 \end{figure}
 
 \newpage
-\subsection{Aufbau des Schiffmodells}
+\subsection{Aufbau des Schiffmodells} \label{sec:aufbau_schiffsmodell}
 
-\chapter{Ergebnisse}
+\chapter{Ergebnisse} \label{sec:ergebnisse}
 
-\chapter{Diskussion}
+\chapter{Diskussion} \label{sec:diskussion}
 
-\chapter{Zusammenfassung und Ausblick}
+\chapter{Zusammenfassung und Ausblick} \label{sec:zsmfassung_ausblick}
 
 \end{document}
