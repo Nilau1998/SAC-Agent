@@ -166,3 +166,4 @@ notes
 out.profile
 .gitlab-ci.yml
 rsync_exclude.txt
+configs/config.yaml

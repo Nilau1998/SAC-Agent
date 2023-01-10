@@ -1,73 +1,48 @@
-# General settings
-base_settings:
-  n_games: 100
-  render_skip_size: 50
-  avg_lookback: 50
-  dt: 0.1
-  t_max: 2500
-
-# Agent settings
 agent:
-  alpha: 0.005
-  beta: 0.00025
-  gamma: 0.99
-  tau: 0.005
-  max_size: 1_000_000
+  batch_size: 256
+  gamma: 0.9502
   layer1_size: 256
   layer2_size: 256
-  batch_size: 256
+  learning_rate_alpha: 0.0063
+  learning_rate_beta: 0.0004
+  max_size: 1000000
   reward_scale: 2
-
-# Env settings
-boat_env:
-  track_width: 500
-  boat_out_of_bounds_offset: 0
-  wind_force: 1 # How many degrees per step the wind turns the ship
-  goal_line: 3900
-
-# Boat modelling settings
+  tvn_parameter_modulation_tau: 0.0058
+base_settings:
+  avg_lookback: 50
+  dt: 0.1
+  n_games: 5
+  render_skip_size: 50
+  t_max: 2500
 boat:
-  n_max: 20
-  fuel: 10000 # Also t_max
-
-  w: 0.3
+  a: 4.252
+  aspect_ratio: 2
+  b: 0.262
+  boat_I: 6000000
+  boat_Iz: 10
+  boat_area_front: 20
+  boat_area_side: 90
+  boat_b: 6
+  boat_l: 15
   boat_m: 600
   boat_m_x: 50
   boat_m_y: 100
-
-  boat_I: 6_000_000
-  boat_Iz: 10
-
-  propeller_diameter: 1
-  wake_friction: 0.3
-
   c_r_front: 0.31
   c_r_side: 2
-  thrust_deduction: 0.3
-
+  fuel: 10000
+  n_max: 20
+  propeller_diameter: 1
   rho: 1
-
-  boat_area_front: 20
-  boat_area_side: 90
-  boat_l: 15
-  boat_b: 6
-
   rudder_area: 10
-  aspect_ratio: 2
-  a: 4.252
-  b: 0.262
-
-# Wind settings
+  thrust_deduction: 0.3
+  w: 0.3
+  wake_friction: 0.3
+boat_env:
+  boat_out_of_bounds_offset: 0
+  goal_line: 3900
+  track_width: 600
+  wind_force: 1
 wind:
-  range_length: 10000
   fixed_points: 4
   max_force: 1
-
-# Permanent settings for testing
-test:
-  track_width: 5
-  nested_test: 5
-  boat_velocity: 1
-  boat_angle_scale: 1
-  wind_events: 3
-  wind_force: 5
+  range_length: 10000

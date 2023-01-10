@@ -11,14 +11,14 @@ class ContinuousAgent(BaseAgent):
         super().__init__(env)
         self.config = config
         self.gamma = config.agent.gamma
-        self.tau = config.agent.tau
+        self.tau = config.agent.tvn_parameter_modulation_tau
         self.memory = ReplayBuffer(
             config.agent.max_size, input_dims, self.get_n_actions())
         self.batch_size = config.agent.batch_size
 
         self.actor = ActorNetwork(
             experiment_dir=experiment_dir,
-            alpha=config.agent.alpha,
+            alpha=config.agent.learning_rate_alpha,
             input_dims=input_dims,
             max_action=self.get_max_actions(),
             n_actions=self.get_n_actions(),
@@ -26,27 +26,27 @@ class ContinuousAgent(BaseAgent):
         )
         self.critic_1 = CriticNetwork(
             experiment_dir=experiment_dir,
-            beta=config.agent.beta,
+            beta=config.agent.learning_rate_beta,
             input_dims=input_dims,
             n_actions=self.get_n_actions(),
             name='critic_network_1'
         )
         self.critic_2 = CriticNetwork(
             experiment_dir=experiment_dir,
-            beta=config.agent.beta,
+            beta=config.agent.learning_rate_beta,
             input_dims=input_dims,
             n_actions=self.get_n_actions(),
             name='critic_network_2'
         )
         self.value = ValueNetwork(
             experiment_dir=experiment_dir,
-            beta=config.agent.beta,
+            beta=config.agent.learning_rate_beta,
             input_dims=input_dims,
             name='value_network'
         )
         self.target_value = ValueNetwork(
             experiment_dir=experiment_dir,
-            beta=config.agent.beta,
+            beta=config.agent.learning_rate_beta,
             input_dims=input_dims,
             name='target_value_network'
         )
@@ -55,7 +55,7 @@ class ContinuousAgent(BaseAgent):
         self.update_network_parameters(tau=1)
 
     def choose_action(self, observation):
-        state = T.Tensor([observation]).to(self.actor.device)
+        state = T.Tensor(np.array([observation])).to(self.actor.device)
         actions, _ = self.actor.sample_normal(state, reparameterize=False)
 
         return actions.cpu().detach().numpy()[0]

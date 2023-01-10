@@ -4,47 +4,40 @@ from environment.boat_env import BoatEnv
 from utils.config_reader import get_config, get_experiment_config
 from utils.build_experiment import Experiment
 from utils.plotting import plot_learning_curve
+from utils.hyperparameter_tuner import HPTuner
 from agent.continuous_agent import ContinuousAgent
+import csv
 import os
 import numpy as np
 import argparse
 from progress_table import ProgressTable
 import warnings
 
-warnings.filterwarnings("ignore")
+# Complains about tensors being transformed wrong and it being slow, it can be ignored after profiling showed it being only 6.47% of the total time
+warnings.filterwarnings('ignore')
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-t',
-        action='store_true',
-        help='train new model'
-    )
-    parser.add_argument(
-        '-r',
-        action='store_true',
-        help='render trainged model or parsed previous experiment dir'
-    )
-    parser.add_argument(
-        'dir',
-        nargs='?'
-    )
-    args = parser.parse_args()
+class ControlCenter:
+    def __init__(self, subdir=None):
+        self.config = get_config(os.path.join('original_config.yaml'))
+        self.tuner = HPTuner('hp_configs.yaml')
+        self.experiment_overview_file = os.path.join(
+            'experiments', subdir, 'overview.csv')
+        self.experiment = None
+        self.subdir = subdir
 
-    if args.t:
-        experiment = Experiment()
-        experiment.save_configs()
-        config = get_config(os.path.join('config.yaml'))
+    def train_model(self):
+        self.experiment = Experiment(subdir=self.subdir)
+        self.experiment.save_configs()
 
-        env = BoatEnv(config, experiment)
+        env = BoatEnv(self.config, self.experiment)
 
         recorder = Recorder(env)
         recorder.write_winds_to_csv()
 
         agent = ContinuousAgent(
-            config=config,
-            experiment_dir=experiment.experiment_dir,
+            config=self.config,
+            experiment_dir=self.experiment.experiment_dir,
             input_dims=env.observation_space.shape,
             env=env
         )
@@ -64,14 +57,14 @@ if __name__ == '__main__':
         if load_checkpoint:
             agent.load_models()
 
-        for i in range(config.base_settings.n_games):
+        for i in range(self.config.base_settings.n_games):
             table_training['Episode'] = i
-            observation = env.reset()[0]
+            observation = env.reset()
             done = False
             score = 0
 
             recorder.create_csvs(i)
-            table_training(config.boat.fuel)
+            table_training(self.config.boat.fuel)
             while not done:
                 recorder.write_data_to_csv()
                 action = agent.choose_action(observation)
@@ -91,7 +84,7 @@ if __name__ == '__main__':
 
             score_history.append(score)
             avg_score = np.mean(
-                score_history[-config.base_settings.avg_lookback:])
+                score_history[-self.config.base_settings.avg_lookback:])
 
             if score > best_score:
                 best_score = score
@@ -107,20 +100,26 @@ if __name__ == '__main__':
             table_training.next_row()
         table_training.close()
 
+        if not os.path.exists(self.experiment_overview_file):
+            with open(self.experiment_overview_file, 'x') as csv_file:
+                writer = csv.writer(csv_file, delimiter=';')
+                writer.writerow([self.experiment.experiment_name, best_score])
+        else:
+            with open(self.experiment_overview_file, 'a') as csv_file:
+                writer = csv.writer(csv_file, delimiter=';')
+                writer.writerow([self.experiment.experiment_name, best_score])
+
         if not load_checkpoint:
-            x = [i+1 for i in range(config.base_settings.n_games)]
+            x = [i+1 for i in range(self.config.base_settings.n_games)]
             figure_file = os.path.join(
-                experiment.experiment_dir, 'plots', 'boat_env')
+                self.experiment.experiment_dir, 'plots', 'boat_env')
             plot_learning_curve(x, score_history, figure_file)
 
-    if args.r:
-        if args.dir != None:
-            experiment_dir = args.dir
-            config = get_experiment_config(experiment_dir, 'config.yaml')
-
+    def render_model(self, experiment_dir):
+        if args.t:
+            experiment_dir = self.experiment.experiment_dir
         else:
-            experiment_dir = experiment.experiment_dir
-
+            experiment_dir = experiment_dir
         print(f"Starting rendering...")
         table_rendering = ProgressTable(
             columns=['Episode', 'Episodes left to render'],
@@ -138,7 +137,7 @@ if __name__ == '__main__':
             renderer.replayer.read_data_csv(episode_index)
             for dt in table_rendering(range(renderer.replayer.total_dt)):
                 table_rendering.next_row()
-                if dt % config.base_settings.render_skip_size == 0 or dt == renderer.replayer.total_dt:
+                if dt % self.config.base_settings.render_skip_size == 0 or dt == renderer.replayer.total_dt:
                     renderer.update_objects_on_image(episode_index, dt)
                     renderer.draw_image_to_buffer()
             renderer.create_gif_from_buffer(f"episode_{episode_index}")
@@ -146,3 +145,47 @@ if __name__ == '__main__':
             episode_left -= 1
             table_rendering.next_row()
         table_rendering.close()
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-t',
+        action='store_true',
+        help='train new model'
+    )
+    parser.add_argument(
+        '-r',
+        action='store_true',
+        help='render trained model or parsed previous experiment dir'
+    )
+    parser.add_argument(
+        'dir',
+        nargs='?'
+    )
+    parser.add_argument(
+        '-p',
+        action='store_true',
+        help='use hp tuner for model_generation'
+    )
+    parser.add_argument(
+        'n_models',
+        nargs='?'
+    )
+    args = parser.parse_args()
+
+    control_center = ControlCenter(subdir='no_wind')
+    if args.p:
+        for _ in range(int(args.n_models)):
+            control_center.tuner.set_config_file(control_center.config)
+            control_center.train_model()
+            if args.r:
+                control_center.render_model()
+
+    if args.t:
+        control_center.train_model()
+        if args.r:
+            control_center.render_model()
+
+    if args.r:
+        control_center.render_model(args.dir)

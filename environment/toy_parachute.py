@@ -19,7 +19,6 @@ if __name__ == '__main__':
     v_integrator = Integrator(initial_value=h_0)
 
     total_a = 0
-    tmp = 0
     while t <= t_max:
         total_a -= g
         v = a_integrator.integrate_signal(total_a)
@@ -38,5 +37,3 @@ if __name__ == '__main__':
         total_a = F_w / m
 
         t += dt
-    v_integrator.scope('s_plot')
-    a_integrator.scope('v_plot')

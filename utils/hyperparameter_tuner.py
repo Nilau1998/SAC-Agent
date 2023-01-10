@@ -1,60 +1,64 @@
+from dataclasses import dataclass
 from pathlib import Path
 import yaml
 from dotmap import DotMap
-import numpy as np
+import random
+
 
 class HPTuner:
     def __init__(self, base_config_file):
-        self.base_config = yaml.safe_load(Path("configs", base_config_file).read_text())
+        self.base_config = yaml.safe_load(
+            Path('configs', base_config_file).read_text())
         self.base_config_dotmap = DotMap(self.base_config)
-        self.hpset = HPSet()
-
-    def build_hpset(self):
-        self.set_layer_count()
-        self.set_layer_sizes()
-        self.set_learn_rates()
-
-    def set_layer_count(self):
-        self.hpset.layer_count = np.random.choice(
-            list(
-                range(
-                    self.base_config_dotmap.hp.layer_count_min,
-                    self.base_config_dotmap.hp.layer_count_max + 1,
-                )
-            )
+        self.hpset = HPSet(
+            alpha=self.alpha(),
+            beta=self.beta(),
+            gamma=self.gamma(),
+            tau=self.tau()
         )
 
-    def set_layer_sizes(self):
-        if self.hpset.layer_count is None:
-            raise ValueError(f"Layer count not set yet!")
-        layer_sizes = np.empty((self.hpset.layer_count))
-        for i, element in enumerate(layer_sizes):
-            layer_sizes[i] = np.random.choice(
-                [self.base_config_dotmap.hp.layer_size_min,
-                self.base_config_dotmap.hp.layer_size_max + 1]
-            )
-        self.hpset.layer_sizes = layer_sizes
+    def alpha(self):
+        return round(random.uniform(
+            self.base_config_dotmap.agent.alpha_min,
+            self.base_config_dotmap.agent.alpha_max
+        ), 4)
 
-    def set_learn_rates(self):
-        self.hpset.lr_alpha = np.random.choice(
-            [self.base_config_dotmap.hp.alpha_min,
-            self.base_config_dotmap.hp.alpha_max],
-            0.0001
-        )
+    def beta(self):
+        return round(random.uniform(
+            self.base_config_dotmap.agent.beta_min,
+            self.base_config_dotmap.agent.beta_max
+        ), 4)
+
+    def gamma(self):
+        self.base_config_dotmap.agent.test = 5
+        return round(random.uniform(
+            self.base_config_dotmap.agent.gamma_min,
+            self.base_config_dotmap.agent.gamma_max
+        ), 4)
+
+    def tau(self):
+        return round(random.uniform(
+            self.base_config_dotmap.agent.tau_min,
+            self.base_config_dotmap.agent.tau_max
+        ), 4)
+
+    def set_config_file(self, config):
+        config.agent.learning_rate_alpha = self.hpset.alpha
+        config.agent.learning_rate_beta = self.hpset.beta
+        config.agent.gamma = self.hpset.gamma
+        config.agent.tvn_parameter_modulation_tau = self.hpset.tau
+        config_dict = config.toDict()
+        with open(Path('configs', 'config.yaml'), 'w') as outfile:
+            yaml.dump(config_dict, outfile, default_flow_style=False)
 
 
-
-
+@dataclass
 class HPSet:
-    def __init__(self):
-        self.layer_count = None
-        self.layer_sizes = None
-        self.lr_alpha = None
-        self.lr_beta = None
-
+    alpha: float
+    beta: float
+    gamma: float
+    tau: float
 
 
 if __name__ == '__main__':
-    hptuner = HPTuner("base_config.yaml")
-    hptuner.build_hpset()
-    print(hptuner.hpset.lr_alpha)
+    hptuner = HPTuner('hp_configs.yaml')

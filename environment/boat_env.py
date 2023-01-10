@@ -54,7 +54,7 @@ class BoatEnv(Env):
         self.boat.t += self.boat.dt
         self.boat.fuel -= 1
 
-        self.boat.rudder_angle += action[0]/10
+        # self.boat.rudder_angle += action[0]/10
 
         self.boat.run_model_step()
 
@@ -104,8 +104,8 @@ class BoatEnv(Env):
         self.info['episode_reward'] = 0
 
         self.state = self.boat.return_state()
-        info = {}
-        return self.state, info
+
+        return self.state
 
     def return_all_data(self):
         data = {
@@ -256,13 +256,11 @@ class Boat:
 
         # s_x in new coordinate system
         direction = self.drift_angle - self.s_r
-        v_x_new = np.sin(direction) * \
-            (np.square(self.v_x) + np.square(self.v_y))
+        v_x_new = np.sin(direction) * self.v
         self.s_x = self.v_x_integrator.integrate_signal(v_x_new)
 
         # s_y in new coordinate system
-        v_y_new = np.cos(direction) * \
-            (np.square(self.v_x) + np.square(self.v_y))
+        v_y_new = np.cos(direction) * self.v
         self.s_y = self.v_y_integrator.integrate_signal(v_y_new)
 
     def return_state(self):

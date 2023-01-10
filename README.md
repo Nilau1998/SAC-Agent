@@ -18,6 +18,7 @@ This repository is the implementation of a Soft-Actor-Critic Agent that is used 
 ## Running the Python code
 The Python code can be run in several ways. You can start the training, training with rendering or just render a previously trained experiment.\\
 Use the following commandos:
-- python3 main.py -t, this trains a new model and saves all it's data in the dedicated experiment directory
-- python3 main.py -tr, this trains and renders a new experiment/model
-- python3 main.py -r [path], this renders a previously trained experiment. Note, the experiment path has to look like `experiments/experiment_12-19_16-57-47` if you are already in the directory where main.py is located.
+- python3 main.py -t, this trains a new model with default config and saves all it's data in the dedicated experiment directory
+- python3 main.py -tr, this trains and renders a new experiment/model with default config
+- python3 main.py -r [path], this renders a previously trained experiment. Note, the experiment path has to look like `experiments/foo/experiment_12-19...` if you are already in the directory where main.py is located.
+- python3 main.py -p None [n_models], this trains n models with random hp defined in the hp tuner. Set it to -pr to also render the experiments. Or just checkout the overview.csv in the corresponding experiment directory do see what the best model is and render just that as described in point 3.

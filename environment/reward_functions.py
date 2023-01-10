@@ -12,18 +12,14 @@ class RewardFunction:
         self.track_length = config.boat_env.goal_line
         self.a = a
         self.b = b
-        self.buffer = 0
 
     def linear_reward(self, position):
         x = position[0]
-        if x > self.buffer:
-            self.buffer = x
-            y = np.abs(position[1])
-            linear_function = y * self.a
-            norm_linear_function = linear_function / self.track_width
-            return norm_linear_function
-        else:
-            return 0
+        y = np.abs(position[1])
+        linear_function = y * self.a
+        norm_linear_function = linear_function / self.track_width
+        x_norm = x / self.track_length
+        return norm_linear_function + x_norm
 
     def quadratic_reward(self, position):
         x = position[0]
