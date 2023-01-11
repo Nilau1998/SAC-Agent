@@ -13,7 +13,7 @@ import argparse
 from progress_table import ProgressTable
 import warnings
 
-# Complains about tensors being transformed wrong and it being slow, it can be ignored after profiling showed it being only 6.47% of the total time
+# Complains about tensors being transformed wrong and it being slow, it can be ignored after profiling showed it how insignificant it is
 warnings.filterwarnings('ignore')
 
 
@@ -99,6 +99,9 @@ class ControlCenter:
             table_training['Average Score'] = avg_score
             table_training.next_row()
         table_training.close()
+        with open(os.path.join(self.experiment.experiment_dir, 'console.csv'), 'x') as csv_file:
+            writer = csv.writer(csv_file, delimiter=';')
+            writer.writerows(table_training.to_list())
 
         if not os.path.exists(self.experiment_overview_file):
             with open(self.experiment_overview_file, 'x') as csv_file:
@@ -185,7 +188,8 @@ if __name__ == '__main__':
     if args.t:
         control_center.train_model()
         if args.r:
-            control_center.render_model()
+            control_center.render_model(
+                control_center.experiment.experiment_dir)
 
     if args.r:
         control_center.render_model(args.dir)

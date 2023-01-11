@@ -1,19 +1,20 @@
 agent:
   batch_size: 256
-  gamma: 0.9502
+  gamma: 0.9751
   layer1_size: 256
   layer2_size: 256
-  learning_rate_alpha: 0.0063
+  learning_rate_alpha: 0.0187
   learning_rate_beta: 0.0004
   max_size: 1000000
   reward_scale: 2
-  tvn_parameter_modulation_tau: 0.0058
+  tvn_parameter_modulation_tau: 0.0052
 base_settings:
   avg_lookback: 50
-  dt: 0.1
-  n_games: 5
+  dt: 0.25
+  n_games: 1
   render_skip_size: 50
   t_max: 2500
+  test_mode: 0
 boat:
   a: 4.252
   aspect_ratio: 2
@@ -29,8 +30,8 @@ boat:
   boat_m_y: 100
   c_r_front: 0.31
   c_r_side: 2
-  fuel: 10000
-  n_max: 20
+  fuel: 15000
+  n_max: 30
   propeller_diameter: 1
   rho: 1
   rudder_area: 10

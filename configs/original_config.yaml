@@ -1,17 +1,18 @@
 # General settings
 base_settings:
+  test_mode: 1
   n_games: 1
   render_skip_size: 50
   avg_lookback: 50
-  dt: 0.1
+  dt: 0.25
   t_max: 2500
 
 # Agent settings
 agent:
-  learning_rate_alpha: 0.005
-  learning_rate_beta: 0.0003
+  learning_rate_alpha: 0.005 # Actor lr
+  learning_rate_beta: 0.0003 # Critic lr
   gamma: 0.99
-  tvn_parameter_modulation_tau: 0.005
+  tvn_parameter_modulation_tau: 0.005 # target smoothing coefficient
   max_size: 1_000_000
   layer1_size: 256
   layer2_size: 256
@@ -23,7 +24,7 @@ boat_env:
   track_width: 600
   boat_out_of_bounds_offset: 0
   wind_force: 1 # How many degrees per step the wind turns the ship
-  goal_line: 390
+  goal_line: 3900
 
 # Boat modelling settings
 boat:

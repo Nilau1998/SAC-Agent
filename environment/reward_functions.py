@@ -17,18 +17,15 @@ class RewardFunction:
         x = position[0]
         y = np.abs(position[1])
         linear_function = y * self.a
-        norm_linear_function = linear_function / self.track_width
+        norm_function = 1 - (linear_function / self.track_width)
         x_norm = x / self.track_length
-        return norm_linear_function + x_norm
-
-    def quadratic_reward(self, position):
-        x = position[0]
-        y = np.abs(position[1])
-        quadratic_function = math.pow(y, 2) * self.a + y * self.b
-        return (self.track_width - quadratic_function + x) / (self.track_width + self.track_length)
+        return norm_function + x_norm
 
     def exponential_reward(self, position):
+        # Used desmos graphing to get the track_width / 6 parameter.
         x = position[0]
         y = np.abs(position[1])
-        exponential_function = self.a * math.exp(y) + x
-        return (self.track_width - exponential_function) / (self.track_width + self.track_length)
+        exponential_function = math.exp((-self.a * y) / (self.track_width / 6))
+        norm_function = exponential_function
+        x_norm = x / self.track_length
+        return norm_function + x_norm

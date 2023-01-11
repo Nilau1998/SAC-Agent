@@ -36,12 +36,21 @@ class BoatEnv(Env):
 
         # Define obeservation space
         # Following states are observed:
-        # x_pos, y_pos, boat_angle, rudder angle, fuel
+        # s_x, v_x, a_x
+        # s_y, v_y, a_y
+        # s_r, v_r, a_r
+        # rudder_angle, fuel
         self.low_state = np.array(
-            [0, -self.config.boat_env.track_width, 0, -np.pi/4, self.config.boat.fuel], dtype=np.float32
+            [0, 0, 0,
+             0, 0, 0,
+             0, 0, 0,
+             0, 1], dtype=np.float32
         )
         self.high_state = np.array(
-            [self.config.boat_env.goal_line, self.config.boat_env.track_width, 2*np.pi, np.pi/4, 0], dtype=np.float32
+            [1, 1, 1,
+             1, 1, 1,
+             1, 1, 1,
+             1, 0], dtype=np.float32
         )
         self.observation_space = Box(
             low=self.low_state,
@@ -54,15 +63,16 @@ class BoatEnv(Env):
         self.boat.t += self.boat.dt
         self.boat.fuel -= 1
 
-        # self.boat.rudder_angle += action[0]/10
+        if self.config.base_settings.test_mode == 0:
+            self.boat.rudder_angle += action[0]/10
 
         self.boat.run_model_step()
 
         self.state = self.boat.return_state()
 
         # Reward calculation
-        self.reward = self.reward_function.linear_reward(
-            position=[self.boat.s_x, self.boat.s_y])
+        self.reward = self.reward_function.exponential_reward(
+            position=[self.boat.s_x, self.boat.s_y],)
 
         # Termination logic
         done = False
@@ -132,14 +142,14 @@ class Boat:
         self.index = 0  # Used to access arrays since dt is a float not an int
         self.wind = Wind(config)
 
-        self.a_x_integrator = Integrator(initial_value=0.1)
+        self.a_x_integrator = Integrator(initial_value=3)
         self.a_x_integrator.dt = self.dt
         self.v_x_integrator = Integrator()
         self.v_x_integrator.dt = self.dt
 
         self.a_y_integrator = Integrator()
         self.a_y_integrator.dt = self.dt
-        self.v_y_integrator = Integrator()
+        self.v_y_integrator = Integrator(initial_value=-300)
         self.v_y_integrator.dt = self.dt
 
         self.a_r_integrator = Integrator()
@@ -266,9 +276,15 @@ class Boat:
     def return_state(self):
         state = np.array([
             self.normalize(self.s_x, 0, self.config.boat_env.goal_line),
+            self.normalize(self.v_x, 0, 5),
+            self.normalize(self.a_x, 0, 0.025),
             self.normalize(self.s_y, -self.config.boat_env.track_width,
                            self.config.boat_env.track_width),
+            self.normalize(self.v_y, 0, 2),
+            self.normalize(self.a_y, 0, 0.37),
             self.normalize(self.s_r, 0, 2*np.pi),
+            self.normalize(self.v_r, 0, 8.5e-3),
+            self.normalize(self.a_r, 0, 1.4e-5),
             self.normalize(self.rudder_angle, -np.pi/3, np.pi/3),
             self.normalize(self.fuel, 0, self.config.boat.fuel)
         ])
