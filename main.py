@@ -138,6 +138,10 @@ class ControlCenter:
             table_rendering['Episode'] = episode_index
             table_rendering['Episodes left to render'] = episode_left
             renderer.replayer.read_data_csv(episode_index)
+            if episode_index in best_episodes:
+                renderer.previous_best_tmp = episode_index
+            else:
+                renderer.previous_best_tmp = -1
             for dt in table_rendering(range(renderer.replayer.total_dt)):
                 table_rendering.next_row()
                 if dt % self.config.base_settings.render_skip_size == 0 or dt == renderer.replayer.total_dt:
@@ -190,6 +194,7 @@ if __name__ == '__main__':
         if args.r:
             control_center.render_model(
                 control_center.experiment.experiment_dir)
+            args.r = False
 
     if args.r:
         control_center.render_model(args.dir)

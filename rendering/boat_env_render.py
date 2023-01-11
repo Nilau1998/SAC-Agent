@@ -28,6 +28,7 @@ class BoatEnvironmentRenderer:
         self.plt_objects = {}
 
         self.current_path = [[], []]
+        self.previous_best_index = -1
         self.previous_best_path = [[], []]
 
         self.episode_index_memory = None
@@ -94,6 +95,9 @@ class BoatEnvironmentRenderer:
         """
         self.create_base_image()
         env_data = self.replayer.episode_data
+
+        self.expand_current_path(env_data, dt)
+        self.set_previous_best_path(env_data)
 
         self.plt_objects['text1'] = self.axb.text(
             y=self.config.boat_env.track_width + self.config.boat_env.track_width * 0.1,
@@ -247,6 +251,17 @@ class BoatEnvironmentRenderer:
             position[1]),
             arrowprops=prop
         )
+
+    def expand_current_path(self, env_data, dt):
+        x, y = (env_data.iloc[dt]['boat_position_x'],
+                env_data.iloc[dt]['boat_position_y'])
+        self.current_path[0].append(x)
+        self.current_path[1].append(y)
+
+    def set_previous_best_path(self, env_data):
+        if self.previous_best_tmp != -1:
+            self.previous_best_path = [env_data.iloc[:]['boat_position_x'],
+                                       env_data.iloc[:]['boat_position_y']]
 
     class CustomPltObject:
         """

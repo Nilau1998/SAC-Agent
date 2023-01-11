@@ -45,8 +45,7 @@ class Replayer:
     def analyse_experiment(self):
         relevant_episodes = []
         best_episodes = []
-        score = 0
-        best_score = 0
+        best_score = float('-inf')
         for episode_index in range(self.total_episodes):
             score = self.info_data.iloc[episode_index]['episode_reward']
             avg_score = np.average(
@@ -58,8 +57,9 @@ class Replayer:
             if score > avg_score and relevant_episodes[-1] != episode_index:
                 relevant_episodes.append(episode_index)
 
-            if score > best_score and relevant_episodes[-1] != episode_index:
+            if score > best_score and episode_index != 0:
                 best_score = score
-                relevant_episodes.append(episode_index)
+                if episode_index not in relevant_episodes:
+                    relevant_episodes.append(episode_index)
                 best_episodes.append(episode_index)
         return relevant_episodes, best_episodes
