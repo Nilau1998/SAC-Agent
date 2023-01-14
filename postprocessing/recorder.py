@@ -35,7 +35,9 @@ class Recorder:
             writer = csv.writer(csv_file, delimiter=";")
             writer.writerow(self.env.return_all_data().values())
 
-    def write_info_to_csv(self):
+    def write_info_to_csv(self, extra_info=None):
+        if extra_info != None:
+            self.env.info['extra_info'] = extra_info
         with open(self.info_file, 'a') as csv_file:
             writer = csv.writer(csv_file, delimiter=';')
             writer.writerow(self.env.info.values())
@@ -46,8 +48,9 @@ class Recorder:
         )
         self.wind_file = os.path.join(
             self.experiment_dir, 'episodes', 'wind.csv')
-        with open(self.wind_file, 'x') as csv_file:
-            writer = csv.writer(csv_file, delimiter=';')
-            writer.writerow(['wind_force', 'wind_angle'])
-            for _ in wind:
-                writer.writerow(_)
+        if not os.path.exists(self.wind_file):
+            with open(self.wind_file, 'x') as csv_file:
+                writer = csv.writer(csv_file, delimiter=';')
+                writer.writerow(['wind_force', 'wind_angle'])
+                for _ in wind:
+                    writer.writerow(_)

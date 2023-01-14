@@ -23,9 +23,11 @@ class RewardFunction:
 
     def exponential_reward(self, position):
         # Used desmos graphing to get the track_width / 6 parameter.
+        # https://www.desmos.com/calculator/jcptj08fee
         x = position[0]
         y = np.abs(position[1])
-        exponential_function = math.exp((-self.a * y) / (self.track_width / 6))
+        exponential_function = - \
+            (1-math.exp((-self.a * y) / (self.track_width / 6)))
         norm_function = exponential_function
         x_norm = x / self.track_length
         return norm_function + x_norm

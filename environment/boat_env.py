@@ -80,6 +80,7 @@ class BoatEnv(Env):
             done = True
             self.info['termination'] = 'reached_goal'
             self.info['reached_goal'] += 1
+            self.reward += 100
         elif abs(self.boat.s_y) > self.boat.out_of_bounds or self.boat.s_x < 0:
             done = True
             self.info['termination'] = 'out_of_bounds'
@@ -98,9 +99,10 @@ class BoatEnv(Env):
             self.info['rudder_broken'] += 1
 
         if self.boat.rudder_angle > np.pi/4 or self.boat.rudder_angle < -np.pi/4:
-            self.reward -= 2
-        else:
-            self.reward += 0.1
+            self.reward -= 1
+
+        if np.abs(self.boat.s_r) > np.pi/2:
+            self.reward -= 1
 
         self.info['episode_reward'] += self.reward
 
@@ -149,7 +151,7 @@ class Boat:
 
         self.a_y_integrator = Integrator()
         self.a_y_integrator.dt = self.dt
-        self.v_y_integrator = Integrator(initial_value=-300)
+        self.v_y_integrator = Integrator()
         self.v_y_integrator.dt = self.dt
 
         self.a_r_integrator = Integrator()

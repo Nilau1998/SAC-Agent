@@ -1,11 +1,12 @@
 from rendering.boat_env_render import BoatEnvironmentRenderer
 from postprocessing.recorder import Recorder
 from environment.boat_env import BoatEnv
-from utils.config_reader import get_config, get_experiment_config
+from utils.config_reader import get_config
 from utils.build_experiment import Experiment
-from utils.plotting import plot_learning_curve
 from utils.hyperparameter_tuner import HPTuner
 from agent.continuous_agent import ContinuousAgent
+from multiprocessing import Process
+import time
 import csv
 import os
 import numpy as np
@@ -18,7 +19,8 @@ warnings.filterwarnings('ignore')
 
 
 class ControlCenter:
-    def __init__(self, subdir=None):
+    def __init__(self, cc_id=0, subdir=None):
+        self.cc_id = cc_id
         self.config = get_config(os.path.join('original_config.yaml'))
         self.tuner = HPTuner('hp_configs.yaml')
         self.experiment_overview_file = os.path.join(
@@ -33,7 +35,6 @@ class ControlCenter:
         env = BoatEnv(self.config, self.experiment)
 
         recorder = Recorder(env)
-        recorder.write_winds_to_csv()
 
         agent = ContinuousAgent(
             config=self.config,
@@ -41,16 +42,16 @@ class ControlCenter:
             input_dims=env.observation_space.shape,
             env=env
         )
-
+        columns = ['CCID Episode', 'Termination', 'Score',
+                   'Best Score', 'Average Score', 'RA', 'Action RA']
         table_training = ProgressTable(
-            columns=['Episode', 'Termination', 'Score',
-                     'Best Score', 'Average Score', 'RA', 'Action RA'],
+            columns=columns,
             num_decimal_places=2,
             default_column_width=14,
             reprint_header_every_n_rows=0,
         )
 
-        best_score = 0
+        best_score = float('-inf')
         score_history = []
         load_checkpoint = False
 
@@ -58,7 +59,7 @@ class ControlCenter:
             agent.load_models()
 
         for i in range(self.config.base_settings.n_games):
-            table_training['Episode'] = i
+            table_training['CCID Episode'] = (self.cc_id, i)
             observation = env.reset()
             done = False
             score = 0
@@ -70,7 +71,12 @@ class ControlCenter:
                 action = agent.choose_action(observation)
                 observation_, reward, done, info = env.step(action)
                 score += reward
-                agent.remember(observation, action, reward, observation_, done)
+                if info['termination'] == 'reached_goal':
+                    agent.remember(observation, action,
+                                   reward, observation_, True)
+                else:
+                    agent.remember(observation, action,
+                                   reward, observation_, False)
                 if not load_checkpoint:
                     agent.learn()
                 observation = observation_
@@ -79,9 +85,8 @@ class ControlCenter:
                     'RA', f"{env.boat.rudder_angle:.2f}")
                 table_training.update(
                     'Action RA', f"{env.action[0]:.2f}")
-
             recorder.write_info_to_csv()
-
+            recorder.write_winds_to_csv()
             score_history.append(score)
             avg_score = np.mean(
                 score_history[-self.config.base_settings.avg_lookback:])
@@ -101,6 +106,7 @@ class ControlCenter:
         table_training.close()
         with open(os.path.join(self.experiment.experiment_dir, 'console.csv'), 'x') as csv_file:
             writer = csv.writer(csv_file, delimiter=';')
+            writer.writerow(columns)
             writer.writerows(table_training.to_list())
 
         if not os.path.exists(self.experiment_overview_file):
@@ -111,12 +117,7 @@ class ControlCenter:
             with open(self.experiment_overview_file, 'a') as csv_file:
                 writer = csv.writer(csv_file, delimiter=';')
                 writer.writerow([self.experiment.experiment_name, best_score])
-
-        if not load_checkpoint:
-            x = [i+1 for i in range(self.config.base_settings.n_games)]
-            figure_file = os.path.join(
-                self.experiment.experiment_dir, 'plots', 'boat_env')
-            plot_learning_curve(x, score_history, figure_file)
+        print(f"Process {self.cc_id} finished the training!")
 
     def render_model(self, experiment_dir):
         if args.t:
@@ -153,6 +154,10 @@ class ControlCenter:
             table_rendering.next_row()
         table_rendering.close()
 
+    def train_hp_model(self):
+        self.tuner.set_config_file(control_center.config)
+        self.train_model()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -181,15 +186,28 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
 
-    control_center = ControlCenter(subdir='no_wind')
     if args.p:
-        for _ in range(int(args.n_models)):
-            control_center.tuner.set_config_file(control_center.config)
-            control_center.train_model()
-            if args.r:
-                control_center.render_model()
+        processes = []
+        start = time.time()
+        model_batch_size = 5
+        num_models = list(range(int(args.n_models)))
+        model_batches = np.array_split(
+            num_models, np.arange(model_batch_size, len(num_models), model_batch_size))
+        for batch in model_batches:
+            for model_index in batch:
+                control_center = ControlCenter(
+                    cc_id=model_index, subdir='no_wind')
+                proc = Process(target=control_center.train_hp_model)
+                time.sleep(1)
+                proc.start()
+                processes.append(proc)
+            for p in processes:
+                p.join()
+        end = time.time()
+        print(f"Tuning took {end - start} seconds.")
 
     if args.t:
+        control_center = ControlCenter(subdir='no_wind')
         control_center.train_model()
         if args.r:
             control_center.render_model(
@@ -197,4 +215,5 @@ if __name__ == '__main__':
             args.r = False
 
     if args.r:
+        control_center = ControlCenter(subdir='no_wind')
         control_center.render_model(args.dir)
