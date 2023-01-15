@@ -1,17 +1,17 @@
 agent:
   batch_size: 512
-  gamma: 0.9462
+  gamma: 0.9082
   layer1_size: 256
   layer2_size: 256
-  learning_rate_alpha: 0.0073
-  learning_rate_beta: 0.0009
+  learning_rate_alpha: 0.006
+  learning_rate_beta: 0.0028
   max_size: 1000000
   reward_scale: 10
-  tvn_parameter_modulation_tau: 0.0035
+  tvn_parameter_modulation_tau: 0.0084
 base_settings:
   avg_lookback: 50
   dt: 0.25
-  n_games: 250
+  n_games: 500
   render_skip_size: 50
   t_max: 2500
   test_mode: 0

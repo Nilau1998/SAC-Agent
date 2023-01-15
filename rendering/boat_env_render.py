@@ -8,6 +8,7 @@ from scipy import ndimage
 import imageio
 from postprocessing.replayer import Replayer
 from utils.config_reader import get_experiment_config
+from utils.plotting import plot_learning_curve
 import math
 import os
 import matplotlib.pyplot as plt
@@ -23,6 +24,12 @@ class BoatEnvironmentRenderer:
         self.config = get_experiment_config(experiment_dir, "config.yaml")
         self.image_buffer = []
         self.replayer = Replayer(experiment_dir)
+
+        plot_learning_curve(
+            self.replayer.info_data.loc[:, 'episode_reward'].to_numpy(),
+            self.config.base_settings.avg_lookback,
+            os.path.join(self.experiment_dir, 'plots', 'reward.png'))
+
         self.fig, (self.axb, self.axwa, self.axwf) = plt.subplots(
             3, 1, height_ratios=[3, 1, 1])
         self.plt_objects = {}
@@ -204,9 +211,9 @@ class BoatEnvironmentRenderer:
         self.image_buffer = []
         self.current_path = [[], []]
 
-    def create_gif_from_buffer(self, file_name):
+    def create_gif_from_buffer(self, episode_index):
         rendering_dir = os.path.join(
-            self.experiment_dir, "rendering", file_name + ".gif")
+            self.experiment_dir, "rendering", f"episode_{episode_index}" + ".gif")
         with imageio.get_writer(rendering_dir, mode="I") as writer:
             for image in self.image_buffer:
                 writer.append_data(image)

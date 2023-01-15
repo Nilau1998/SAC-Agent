@@ -19,9 +19,9 @@ warnings.filterwarnings('ignore')
 
 
 class ControlCenter:
-    def __init__(self, cc_id=0, subdir=None):
+    def __init__(self, cc_id=0, subdir=None, config='original_config.yaml'):
         self.cc_id = cc_id
-        self.config = get_config(os.path.join('original_config.yaml'))
+        self.config = get_config(os.path.join(config))
         self.tuner = HPTuner('hp_configs.yaml')
         self.experiment_overview_file = os.path.join(
             'experiments', subdir, 'overview.csv')
@@ -148,7 +148,7 @@ class ControlCenter:
                 if dt % self.config.base_settings.render_skip_size == 0 or dt == renderer.replayer.total_dt:
                     renderer.update_objects_on_image(episode_index, dt)
                     renderer.draw_image_to_buffer()
-            renderer.create_gif_from_buffer(f"episode_{episode_index}")
+            renderer.create_gif_from_buffer(episode_index)
             renderer.reset_renderer()
             episode_left -= 1
             table_rendering.next_row()
@@ -196,7 +196,7 @@ if __name__ == '__main__':
         for batch in model_batches:
             for model_index in batch:
                 control_center = ControlCenter(
-                    cc_id=model_index, subdir='no_wind')
+                    cc_id=model_index, subdir='no_wind_changed_y')
                 proc = Process(target=control_center.train_hp_model)
                 time.sleep(1)
                 proc.start()
@@ -207,7 +207,8 @@ if __name__ == '__main__':
         print(f"Tuning took {end - start} seconds.")
 
     if args.t:
-        control_center = ControlCenter(subdir='no_wind')
+        control_center = ControlCenter(
+            subdir='no_wind')
         control_center.train_model()
         if args.r:
             control_center.render_model(
