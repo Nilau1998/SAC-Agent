@@ -18,7 +18,15 @@ This repository is the implementation of a Soft-Actor-Critic Agent that is used 
 ## Running the Python code
 The Python code can be run in several ways. You can start the training, training with rendering or just render a previously trained experiment.\\
 Use the following commandos:
-- python3 main.py -t, this trains a new model with default config and saves all it's data in the dedicated experiment directory
+- python3 main.py -t, this trains a new model with default config and saves all it's data in the dedicated experiment directory, parse a config file to train a specific model
 - python3 main.py -tr, this trains and renders a new experiment/model with default config
 - python3 main.py -r [path], this renders a previously trained experiment. Note, the experiment path has to look like `experiments/foo/experiment_12-19...` if you are already in the directory where main.py is located.
-- python3 main.py -p None [n_models], this trains n models with random hp defined in the hp tuner. Set it to -pr to also render the experiments. Or just checkout the overview.csv in the corresponding experiment directory do see what the best model is and render just that as described in point 3.
+- python3 main.py -p [n_models], this trains n models with random hp defined in the hp tuner. Set it to -pr to also render the experiments. Or just checkout the overview.csv in the corresponding experiment directory do see what the best model is and render just that as described in point 3.
+
+Usage: main.py [-h] [-t [TRAIN]] [-r [RENDER]] [-p [PARAMSTUNE]]:
+
+options:\\
+- h, --help            show this help message and exit
+- t [TRAIN], --train [TRAIN] train new model with default or parsed config file
+- r [RENDER], --render [RENDER] render trained model or parsed previous experiment dir
+- p [PARAMSTUNE], --paramstune [PARAMSTUNE] use hp tuner for model_generation

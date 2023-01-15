@@ -120,7 +120,7 @@ class ControlCenter:
         print(f"Process {self.cc_id} finished the training!")
 
     def render_model(self, experiment_dir):
-        if args.t:
+        if args['train']:
             experiment_dir = self.experiment.experiment_dir
         else:
             experiment_dir = experiment_dir
@@ -160,43 +160,42 @@ class ControlCenter:
 
 
 if __name__ == '__main__':
+    subdir = 'no_wind_changed_y'
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-t',
-        action='store_true',
-        help='train new model'
+        '-t', '--train',
+        nargs='?',
+        const='original_config.yaml',
+        type=str,
+        help='train new model with default or parsed config file'
     )
     parser.add_argument(
-        '-r',
-        action='store_true',
+        '-r', '--render',
+        nargs='?',
+        const='',
+        type=str,
         help='render trained model or parsed previous experiment dir'
     )
     parser.add_argument(
-        'dir',
-        nargs='?'
-    )
-    parser.add_argument(
-        '-p',
-        action='store_true',
+        '-p', '--paramstune',
+        nargs='?',
+        const=1,
+        type=int,
         help='use hp tuner for model_generation'
     )
-    parser.add_argument(
-        'n_models',
-        nargs='?'
-    )
-    args = parser.parse_args()
+    args = vars(parser.parse_args())
 
-    if args.p:
+    if args['paramstune']:
         processes = []
         start = time.time()
         model_batch_size = 5
-        num_models = list(range(int(args.n_models)))
+        num_models = list(range(int(args['paramstune'])))
         model_batches = np.array_split(
             num_models, np.arange(model_batch_size, len(num_models), model_batch_size))
         for batch in model_batches:
             for model_index in batch:
                 control_center = ControlCenter(
-                    cc_id=model_index, subdir='no_wind_changed_y')
+                    cc_id=model_index, subdir=subdir)
                 proc = Process(target=control_center.train_hp_model)
                 time.sleep(1)
                 proc.start()
@@ -206,15 +205,15 @@ if __name__ == '__main__':
         end = time.time()
         print(f"Tuning took {end - start} seconds.")
 
-    if args.t:
+    if args['train']:
         control_center = ControlCenter(
-            subdir='no_wind')
+            subdir=subdir)
         control_center.train_model()
-        if args.r:
+        if args['render']:
             control_center.render_model(
                 control_center.experiment.experiment_dir)
-            args.r = False
+            args['render'] = False
 
-    if args.r:
-        control_center = ControlCenter(subdir='no_wind')
-        control_center.render_model(args.dir)
+    if args['render']:
+        control_center = ControlCenter(subdir=subdir)
+        control_center.render_model(args['render'])
