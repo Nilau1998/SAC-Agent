@@ -4,6 +4,7 @@ from environment.boat_env import BoatEnv
 from utils.config_reader import get_config
 from utils.build_experiment import Experiment
 from utils.hyperparameter_tuner import HPTuner
+from utils.color_selector import ColorSelector
 from agent.continuous_agent import ContinuousAgent
 from multiprocessing import Process
 import time
@@ -19,18 +20,23 @@ warnings.filterwarnings('ignore')
 
 
 class ControlCenter:
-    def __init__(self, cc_id=0, subdir=None, config='original_config.yaml'):
+    def __init__(self, cc_id=0, color='\x1b[37m', subdir=None, config='original_config.yaml'):
         self.cc_id = cc_id
+        self.color = color
         self.config = get_config(os.path.join(config))
         self.tuner = HPTuner('hp_configs.yaml')
         self.experiment_overview_file = os.path.join(
             'experiments', subdir, 'overview.csv')
+        self.terminations_file = None
+        self.info = None
         self.experiment = None
         self.subdir = subdir
 
     def train_model(self):
         self.experiment = Experiment(subdir=self.subdir)
         self.experiment.save_configs()
+        self.terminations_file = os.path.join(
+            self.experiment.experiment_dir, 'terminations.csv')
 
         env = BoatEnv(self.config, self.experiment)
 
@@ -50,7 +56,8 @@ class ControlCenter:
             default_column_width=14,
             reprint_header_every_n_rows=0,
         )
-
+        for column in table_training.columns:
+            table_training._colors[column] = self.color
         best_score = float('-inf')
         score_history = []
         load_checkpoint = False
@@ -69,9 +76,9 @@ class ControlCenter:
             while not done:
                 recorder.write_data_to_csv()
                 action = agent.choose_action(observation)
-                observation_, reward, done, info = env.step(action)
+                observation_, reward, done, self.info = env.step(action)
                 score += reward
-                if info['termination'] == 'reached_goal':
+                if self.info['termination'] == 'reached_goal':
                     agent.remember(observation, action,
                                    reward, observation_, True)
                 else:
@@ -98,7 +105,7 @@ class ControlCenter:
                 if not load_checkpoint:
                     agent.save_models()
 
-            table_training['Termination'] = f"{info['termination']}-{info[info['termination']]}"
+            table_training['Termination'] = f"{self.info['termination']}-{self.info[self.info['termination']]}"
             table_training['Score'] = score
             table_training['Best Score'] = best_score
             table_training['Average Score'] = avg_score
@@ -117,6 +124,12 @@ class ControlCenter:
             with open(self.experiment_overview_file, 'a') as csv_file:
                 writer = csv.writer(csv_file, delimiter=';')
                 writer.writerow([self.experiment.experiment_name, best_score])
+
+        with open(self.terminations_file, 'x') as csv_file:
+            writer = csv.writer(csv_file, delimiter=';')
+            writer.writerow(self.info.keys())
+            writer.writerow(self.info.values())
+
         print(f"Process {self.cc_id} finished the training!")
 
     def render_model(self, experiment_dir):
@@ -158,6 +171,12 @@ class ControlCenter:
         self.tuner.set_config_file(control_center.config)
         self.train_model()
 
+    def creates_avg_plots(self, directory):
+        list_experiment_dirs = [
+            f.path for f in os.scandir(directory) if f.is_dir()]
+        for experiment_dir in list_experiment_dirs:
+            BoatEnvironmentRenderer(experiment_dir)
+
 
 if __name__ == '__main__':
     subdir = 'no_wind_changed_y'
@@ -183,6 +202,13 @@ if __name__ == '__main__':
         type=int,
         help='use hp tuner for model_generation'
     )
+    parser.add_argument(
+        '-a', '--avgplot',
+        nargs='?',
+        const='',
+        type=str,
+        help='Iterate through given experiment parent directory and create avg plots in each experiment'
+    )
     args = vars(parser.parse_args())
 
     if args['paramstune']:
@@ -192,10 +218,11 @@ if __name__ == '__main__':
         num_models = list(range(int(args['paramstune'])))
         model_batches = np.array_split(
             num_models, np.arange(model_batch_size, len(num_models), model_batch_size))
+        color_selector = ColorSelector()
         for batch in model_batches:
             for model_index in batch:
                 control_center = ControlCenter(
-                    cc_id=model_index, subdir=subdir)
+                    cc_id=model_index, color=color_selector.get_color(), subdir=subdir)
                 proc = Process(target=control_center.train_hp_model)
                 time.sleep(1)
                 proc.start()
@@ -217,3 +244,7 @@ if __name__ == '__main__':
     if args['render']:
         control_center = ControlCenter(subdir=subdir)
         control_center.render_model(args['render'])
+
+    if args['avgplot']:
+        control_center = ControlCenter(subdir=subdir)
+        control_center.creates_avg_plots(args['avgplot'])

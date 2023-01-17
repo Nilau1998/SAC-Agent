@@ -13,7 +13,7 @@ class BoatEnv(Env):
         self.action = [0]
         self.reward = 0
         self.boat = Boat(self.config)
-        self.reward_function = RewardFunction(config=config)
+        self.reward_function = RewardFunction(config=config, b=2)
 
         self.info = {
             'termination': '',
@@ -80,7 +80,7 @@ class BoatEnv(Env):
             done = True
             self.info['termination'] = 'reached_goal'
             self.info['reached_goal'] += 1
-            self.reward += 100
+            self.reward += 1000
         elif abs(self.boat.s_y) > self.boat.out_of_bounds or self.boat.s_x < 0:
             done = True
             self.info['termination'] = 'out_of_bounds'
@@ -138,6 +138,11 @@ class Boat:
     def __init__(self, config):
         self.config = config
 
+        self.s_y_start = np.random.randint(
+            -int(self.config.boat_env.track_width * 0.8),
+            int(self.config.boat_env.track_width * 0.8)
+        )
+
         self.t = 0
         self.dt = config.base_settings.dt
         self.t_max = config.base_settings.t_max
@@ -151,7 +156,7 @@ class Boat:
 
         self.a_y_integrator = Integrator()
         self.a_y_integrator.dt = self.dt
-        self.v_y_integrator = Integrator()
+        self.v_y_integrator = Integrator(initial_value=self.s_y_start)
         self.v_y_integrator.dt = self.dt
 
         self.a_r_integrator = Integrator()

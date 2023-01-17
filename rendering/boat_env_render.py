@@ -29,6 +29,7 @@ class BoatEnvironmentRenderer:
             self.replayer.info_data.loc[:, 'episode_reward'].to_numpy(),
             self.config.base_settings.avg_lookback,
             os.path.join(self.experiment_dir, 'plots', 'reward.png'))
+        plt.close('all')
 
         self.fig, (self.axb, self.axwa, self.axwf) = plt.subplots(
             3, 1, height_ratios=[3, 1, 1])

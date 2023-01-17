@@ -29,5 +29,5 @@ class RewardFunction:
         exponential_function = - \
             (1-math.exp((-self.a * y) / (self.track_width / 6)))
         norm_function = exponential_function
-        x_norm = x / self.track_length
+        x_norm = self.b * (x / self.track_length)
         return norm_function + x_norm
