@@ -162,7 +162,7 @@ class Boat:
 
         self.a_y_integrator = Integrator()
         self.a_y_integrator.dt = self.dt
-        self.v_y_integrator = Integrator(initial_value=self.s_y_start)
+        self.v_y_integrator = Integrator()
         self.v_y_integrator.dt = self.dt
 
         self.a_r_integrator = Integrator()
@@ -225,7 +225,14 @@ class Boat:
         # Centrifugal force F_C
         F_C = self.v_y * (params.boat_m + params.boat_m_y) * self.v_r
 
-        self.a_x = (-F_R + F_T + F_C) / (params.boat_m + params.boat_m_x)
+        # Wind
+        wind_v_sign = np.sign(self.wind.get_wind(self.index)[0])
+        F_W_unangled = np.square(
+            self.wind.get_wind(self.index)[0]) * wind_v_sign * params.c_r_front * 0.5 * params.rho * params.boat_area_front
+
+        F_W = F_W_unangled * np.cos(self.wind.get_wind(self.index)[1])
+
+        self.a_x = (-F_R + F_T + F_C + F_W) / (params.boat_m + params.boat_m_x)
 
     def eom_transverse(self):
         params = self.config.boat
@@ -243,7 +250,15 @@ class Boat:
         # Centrifugal force F_C
         F_C = self.v_x * (params.boat_m + params.boat_m_x) * self.v_r
 
-        self.a_y = (-F_R + F_RU + F_C) / (params.boat_m + params.boat_m_y)
+        # Wind
+        wind_v_sign = np.sign(self.wind.get_wind(self.index)[0])
+        F_W_unangled = np.square(
+            self.wind.get_wind(self.index)[0]) * wind_v_sign * params.c_r_side * 0.5 * params.rho * params.boat_area_side
+
+        F_W = F_W_unangled * np.sin(self.wind.get_wind(self.index)[1])
+
+        self.a_y = (-F_R + F_RU + F_C + F_W) / \
+            (params.boat_m + params.boat_m_y)
 
     def eom_yawning(self):
         params = self.config.boat

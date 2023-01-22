@@ -179,7 +179,7 @@ class ControlCenter:
 
 
 if __name__ == '__main__':
-    subdir = 'no_wind_changed_y'
+    subdir = 'constant_wind_upwards'
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-t', '--train',

@@ -26,47 +26,55 @@ class Wind:
         """
         Generates a range that defines the wind force that can be used to affect the boat.
         """
-        if self.config.wind.fixed_points < 4:
-            raise ValueError(
-                "Please select at least 4 fixed_points in your config. The interpolation doesn't work otherwise!")
-        fixed_points = np.linspace(
-            0, self.wind_range_length, num=self.config.wind.fixed_points)
-        fixed_point_values = np.random.sample(
-            self.config.wind.fixed_points) * self.config.wind.max_force
+        if self.config.wind.constant_angle_force == 1:
+            force = float(self.config.wind.max_force)
+            wind_force = np.full(self.wind_range_length,
+                                 force)
+            return wind_force
+        else:
+            if self.config.wind.fixed_points < 4:
+                raise ValueError(
+                    "Please select at least 4 fixed_points in your config. The interpolation doesn't work otherwise!")
+            fixed_points = np.linspace(
+                0, self.wind_range_length, num=self.config.wind.fixed_points)
+            fixed_point_values = np.random.sample(
+                self.config.wind.fixed_points) * self.config.wind.max_force
 
-        complete_range = np.linspace(0, self.wind_range_length,
-                                     num=self.wind_range_length + 1, endpoint=True)
-        interpolation = interp1d(
-            fixed_points, fixed_point_values, kind='cubic', fill_value='extrapolate')
-        interpolated_range = interpolation(complete_range)
+            complete_range = np.linspace(0, self.wind_range_length,
+                                         num=self.wind_range_length + 1, endpoint=True)
+            interpolation = interp1d(
+                fixed_points, fixed_point_values, kind='cubic', fill_value='extrapolate')
+            interpolated_range = interpolation(complete_range)
 
-        # Normalize incase interpolation exceeds 0-1 range.
-        if np.any((interpolated_range < 0) | (interpolated_range > 1)):
-            interpolated_range = (interpolated_range - np.min(interpolated_range)) / (
-                np.max(interpolated_range) - np.min(interpolated_range))
-        return interpolated_range
+            # Normalize incase interpolation exceeds 0-1 range.
+            if np.any((interpolated_range < 0) | (interpolated_range > 1)):
+                interpolated_range = (interpolated_range - np.min(interpolated_range)) / (
+                    np.max(interpolated_range) - np.min(interpolated_range))
+            return interpolated_range
 
     def generate_wind_angle(self):
-        """
-        Generates a range that defines the wind angle that can be used with the wind force to affect the boat.
-        Angle is defined in rad!
-        """
-        if self.config.wind.fixed_points < 4:
-            raise ValueError(
-                "Please select at least 4 fixed_points in your config. The interpolation doesn't work otherwise!")
-        fixed_points = np.linspace(
-            0, self.wind_range_length, num=self.config.wind.fixed_points)
-        fixed_point_values = np.random.sample(
-            self.config.wind.fixed_points)
+        if self.config.wind.constant_angle_force == 1:
+            angle = float(self.config.wind.direction) * (np.pi/180)
+            wind_angles = np.full(self.wind_range_length,
+                                  angle)
+            return wind_angles
+        else:
+            if self.config.wind.fixed_points < 4:
+                raise ValueError(
+                    "Please select at least 4 fixed_points in your config. The interpolation doesn't work otherwise!")
+            fixed_points = np.linspace(
+                0, self.wind_range_length, num=self.config.wind.fixed_points)
+            fixed_point_values = np.random.sample(
+                self.config.wind.fixed_points)
 
-        complete_range = np.linspace(0, self.wind_range_length,
-                                     num=self.wind_range_length + 1, endpoint=True)
-        interpolation = interp1d(
-            fixed_points, fixed_point_values, kind='cubic', fill_value='extrapolate')
-        interpolated_range = interpolation(complete_range)
+            complete_range = np.linspace(0, self.wind_range_length,
+                                         num=self.wind_range_length + 1, endpoint=True)
+            interpolation = interp1d(
+                fixed_points, fixed_point_values, kind='cubic', fill_value='extrapolate')
+            interpolated_range = interpolation(complete_range)
 
-        # Normalize incase interpolation exceeds 0-1 range.
-        if np.any((interpolated_range < 0) | (interpolated_range > 1)):
-            interpolated_range = (interpolated_range - np.min(interpolated_range)) / (
-                np.max(interpolated_range) - np.min(interpolated_range))
-        return interpolated_range
+            # Normalize incase interpolation exceeds 0-1 range.
+            if np.any((interpolated_range < 0) | (interpolated_range > 1)):
+                interpolated_range = (interpolated_range - np.min(interpolated_range)) / (
+                    np.max(interpolated_range) - np.min(interpolated_range))
+            return interpolated_range * np.pi * 2

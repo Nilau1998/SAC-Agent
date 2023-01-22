@@ -62,4 +62,7 @@ boat:
 wind:
   range_length: 10000
   fixed_points: 8
-  max_force: 1
+  max_force: 0.5
+  constant_angle_force: 1
+  changing_force: 0
+  direction: 90 # 0 forward, 90 upward, 180 backwards, 270 downwards
