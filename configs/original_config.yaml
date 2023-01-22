@@ -16,7 +16,7 @@ agent:
   max_size: 1_000_000
   layer1_size: 256
   layer2_size: 256
-  batch_size: 512
+  batch_size: 1024
   reward_scale: 10
 
 # Env settings

@@ -13,7 +13,13 @@ class BoatEnv(Env):
         self.action = [0]
         self.reward = 0
         self.boat = Boat(self.config)
-        self.reward_function = RewardFunction(config=config, b=2)
+        self.reward_function = RewardFunction(
+            config=config,
+            experiment_dir=self.experiment_dir,
+            x_a=1,
+            x_b=0.4,
+            y_a=0.03,
+            y_b=3.4)
 
         self.info = {
             'termination': '',
