@@ -250,7 +250,7 @@ und
     Q^*(s,a) = \underset{s' \backsim P}{E}\left[r(s,a)+\gamma \max_{a'}Q^*(s', a')\right]. \label{eq:bellman_opq_on_policy}
 \end{align} \cite[]{SpinningUp2018}
 
-\section{Artes des Reinforcement Learnings} \label{sec:arten_rf}
+\section{Arten des Reinforcement Learnings TODO} \label{sec:arten_rf}
 Im Reinforcement Learning gibt es eine ganze Reihe an verschiedenen Arten und Implementationen von Algorithmen. Im groben kann jedoch schon dadurch entschieden werden, ob es sich um Model-Free oder Model-Based Reinforcement Learning handelt. Eine allgemeine Übersicht soll Abbildung \ref{abb:rl_overview} bieten. Hier sind die Model-Free Algorithmen auf der linken Seite zu erkennen, während die Model-Based Algortihmen auf der rechten Seite liegen.
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{graphics/rl_overview.png}
@@ -261,9 +261,7 @@ Im Reinforcement Learning gibt es eine ganze Reihe an verschiedenen Arten und Im
 Wird ein Agent in einem Modell oder Environment implementiert wie es in dieser Arbeit zum Beispiel der Fall mit dem Schiffsmodell ist, so sagt dieses nicht aus, dass nun ein Model-Based Algorithmus verwendet wird. Es sagt auch nicht direkt aus, ob nun ein Model-Free Algortihmus verwendet wurde. Beide Begriffe deuten auf die Art des Lernens und eine gewisse Eigenschaft, welche jedes Environment, oder zum Beispiel Kräftemodell aus der Regelungstechnik anbieten kann. Beide Begriffe sollen somit nicht verwechselt werden mit den Modellen aus der Regelungstechnik, beziehungsweise dem Environments, in welchen der Agent lebt.
 
 Grundsätzlich sagen die Begriffe Model-Free und Model-Based aus, wie ein jeweiliger Algorithmus seine Entscheidung trifft. Ein Algorithmus welcher auf einem Model-Based Ansatz implementiert ist, besitzt die Möglichkeit mehr oder weniger ein Modell beziehungsweise eine Funktion zu befragen, was passieren würde, wenn nun Action $a$ ausgeführt wird. Die Antwort auf eine solche Frage, kann dann Informationen sein, wie der potenzielle Reward, wenn Action $a$ auch wirklich ausgeführt wird. Model-Based Algorithmen verfügen somit also über die besondere Funktion, vorraus zu planen und genau zu wissen was passiert, wenn verschiedene Actions ausgeführt werden. Ausgewählt werden kann dann die Action, welche letztendlich den besten gesamt Reward liefert.
-\textbf{TODO}
-\section{Soft Actor-Critic (SAC) Agenten} \label{sec:howto_sac}
-\textbf{TODO}
+\section{Soft Actor-Critic (SAC) Agenten TODO} \label{sec:howto_sac}
 \begin{algorithm}
     \caption{Soft Actor-Critic Algortihmus}\label{pse:sac_pseudo}
     \begin{algorithmic}[1]
@@ -285,9 +283,8 @@ Grundsätzlich sagen die Begriffe Model-Free und Model-Based aus, wie ein jeweil
 
 \section{Verwendete Software und Bibliotheken} \label{sec:software_bibs}
 Der Großteil der ganzen Arbeit wurde mithilfe der Programmiersprache Python \cite[]{python} umgesetzt. Python bietet den Vorteil an, dass es vergleichsweise eine recht einfache Sprache ist und außerdem eine ziemlich große Auswahl an Bibliotheken bietet im Bereich Machine Learning. Die verwendete Machine Learning Bibliothek in dieser Arbeit ist PyTorch \cite[]{pytorch}. PyTorch bietet ein Framework an, mit welchem die neuronalen Netzwerke für den Agenten einfach und mit viel Freiheit definiert werden können. So können zum Beispiel die Forward Function, oder die Learn Function des neuronalen Netzwerks frei, und mit kompletter Kontrolle definiert werden. Grafiken und die Videodateien, welche für die Visualisierung und Auswertung einer Episode verwendet werden, wurden mithilfe der Matplotlib \cite[]{matpltlib} Bibliothek generiert. Da der Agent ein Environment zwingend benötigt, in welchem das dynamische Modell simuliert werden kann, wurde zusätzlich die Bibliothek Gym von OpenAI \cite[]{brockman2016openai} verwendet. Gym bietet ein Framework an, welches dem Benutzer mit vordefinierten Functions die Möglichkeit bietet, Environment zu erstellen. So werden zum Beispiel die Step, oder Reset Function vorgegebene, welche dazu verwendet werden, um einen Zeitsprung innerhalb einer Episode durchzuführen. Im Falle der Reset Function würde das Environment wieder auf seinen Ursprungsstate zurückgesetzt werden. Dies bedeutet, dass Eigenschaften des Environments, wie die Schiffsposition oder der momentane Reward, wieder auf den Ursprung des Koordinatensystems gesetzt wird beziehungsweise der Reward wieder 0 ist.
-\section{Implementierung des Agenten} \label{sec:imp_agent}
+\section{Implementierung des Agenten TODO} \label{sec:imp_agent}
 Wie bereits erwähnt im vorherigen Untekapitel \ref{sec:software_bibs}, wurde für diese Arbeit PyTorch verwendet, um den Agenten zu implementieren. Wie genau diese Implementierung nun umgesetzt wurde, soll mit diesem Unterkapitel verdeutlicht werden.
-\textbf{TODO}
 
 \section{Umsetzung des Modells in Simulink} \label{sec:imp_simulink}
 Das in dieser Arbeit verwendete dynamische Modell, soll wie bereits in der Zielsetzung erwähnt ein Kräftemodell sein, welches eine Schiffsfahrt modelliert. Die Grundidee des Modells ist es dabei, dass das Schiff im Ursprung eines Koordinatensystems startet und dann das Ziel hat, innerhalb eines vordefinierten Bereichs nach rechts zu einer Ziellinie zu fahren. Hierbei gibt es das zweitrangige Ziel für das Schiff, dass es bei seiner Überfahrt so mittig im vordefinierten Bereich bleiben soll wie möglich. Die folgende Abbildung \ref*{abb:boat_frame_example_2} soll eine Visualisierung für das gewollte Modell bieten.
@@ -320,7 +317,7 @@ Die verwendeten Konstanten und Koeffizienten finden sich in der folgenden Tabell
         $t = 0.3$                        & Leistungsabzug der Schraube \cite[]{Zelazny_2014} \cite[]{Kulczyk_Tabaczek_2014_2} \\ \hline
         $w = 0.3$                        & Nachlaufströmungs Koeffizient [E] \cite[]{Zelazny_2014}                            \\ \hline
         $c_{Sl} = 0.31$                  & Reibungskoeffizient Bug [E]                                                        \\ \hline
-        $c_{St} = 0.31$                  & Reibungskoeffient Backbord/Steuerbord [E]                                          \\ \hline
+        $c_{St} = 2$                     & Reibungskoeffient Backbord/Steuerbord [E]                                          \\ \hline
         $A_{Sl} = \SI{20}{\m\squared}$   & Fläche Bug [E]                                                                     \\ \hline
         $A_{St} = \SI{90}{\m\squared}$   & Fläche Backbord/Steuerbord [E]                                                     \\ \hline
         $A_{Ru} = \SI{10}{\m\squared}$   & Fläche Ruder [E]                                                                   \\ \hline
@@ -356,136 +353,130 @@ Desweiteren wurden folgende Variabeln verwendet,
     \label{tab:variables}
 \end{table}
 \subsection{Die erste Bewegungsgleichung des Modells} \label{sec:eom1}
-Die erste Bewegungsgleichung für die Bewegung in longitudinaler Richtung, setzt sich zusammen aus den vier folgenden vier Kräften,
+Die erste Bewegungsgleichung für die Bewegung in longitudinaler Richtung, wird definiert durch die folgenden vier Kräfte,
 \begin{align}
-    F_{Lon} = F_{T} - F_{Rl} + F_{Cl} + F_{W}. \label{eq:longitudinal_force}
+    F_{Lon} = F_{T} - F_{Rl} + F_{Cl} + F_{Wl}. \label{eq:longitudinal_force}
 \end{align}
-Der Antrieb des Schiffs wird modelliert durch eine Gleichung, welche abhängig von der Drehgeschwindigkeit der Schiffsschreube einen Schub generiert.
+Der Antrieb des Schiffs $F_T$ wird modelliert durch eine Gleichung, welche abhängig von der Drehgeschwindigkeit der Schiffsschraube einen Schub generiert. Definiert wird sie durch die folgende Gleichung,
 \begin{align}
-    F_{T} = K_T(J) \cdot \rho \cdot d^4 \cdot n^2 \cdot (1-t) \label{eq:thrust_force}
+    F_{T} = K_T(J) \cdot \rho \cdot d^4 \cdot n^2 \cdot (1-t). \label{eq:thrust_force}
 \end{align}
-wobei,
-\begin{enumerate}
-    \item[] $\rho = 1$, die Wasserdichte
-    \item[] $d = 1$, der Schraubendurchmesser
-    \item[] $n$, die Drehzahl des Schaube mit $0 \leq n \leq 30$
-    \item[] $t = 0.3$, der Leistungsabzug für die Schraube
-\end{enumerate}
-das $K_T(J)$ entspricht einer Kennlinie welche individuel für einen gegebenen Schaube per Experimenteller Messung bestimmt wird. \cite[]{hydrodynamicsNinova} Da dies für diese Arbeit jedoch nicht möglich ist, wurde dieses Kurve stattdesen mit einer Sinus-Kurve approximiert. Das $J$ in Gleichung \ref*{eq:thrust_force} der Gleichung, entspricht dem Vorschubsquotient, dieser Wert beschreibt wieviel tatsächlicher Schub von der Schaube aus generiert werden kann abhängig von der momentanen longtiudinalen Geschwindigkeit des Schiffs zur Drehgeschwindigkeit der Schiffschraube.
+Das $K_T(J)$ entspricht einer Kennlinie, welche individuell für eine gegebene Schraube per experimenteller Messung bestimmt wird. \cite[]{hydrodynamicsNinova} Da dies für diese Arbeit jedoch nicht möglich ist, wurde diese Kurve stattdessen mit einer Sinus-Kurve approximiert. Das $J$ in Gleichung \ref*{eq:thrust_force}, entspricht dem Vorschubsquotienten. \cite[]{Benedict2007ExplainingSD} Dieser Wert beschreibt wie viel tatsächlicher Schub von der Schraube aus generiert werden kann, abhängig von der momentanen longitudinalen Geschwindigkeit des Schiffs zur Drehgeschwindigkeit der Schiffsschraube. Der Vorschubsquotient ist definiert durch,
 \begin{align}
     J = \frac{v_l \cdot (1-w)}{n \cdot d} \label{eq:thrust_coeffcient}
 \end{align}
-wobei,
-\begin{enumerate}
-    \item[] $v_l$, die longitudinale Geschwindigkeit des Schiffs
-    \item[] $w$ = 0.3, Nachlaufströmungs Koeffizient
-\end{enumerate}
-Der Widerstand, welcher ausgehend vom Wasser auf das Schiff longitudinal wirkt und somit das Schiff auch ausbremst ist definiert als reguläre Widerstandsgleichung abhängig der momentanen Geschwindigkeit des Schiffs.
+Der Widerstand $F_{Rl}$, welcher ausgehend vom Wasser auf das Schiff longitudinal wirkt und somit das Schiff auch ausbremst, ist definiert als reguläre Widerstandsgleichung abhängig der momentanen Geschwindigkeit des Schiffs.
 \begin{align}
     F_{Rl} = \frac{1}{2} \cdot v_l^2 \cdot \rho \cdot c_{Sl} \cdot A_{Sl} \label{eq:front_resistance}
 \end{align}
-wobei,
-\begin{enumerate}
-    \item[] $c_{Sl} = 0.31$, der Reibungskoeffient des Schiffs von Vorne
-    \item[] $A_{Sl} = 20$, die Fläche des Schiffs von vorne
-\end{enumerate}
-entspricht. Als weitere Kraftkomponente um das Schiff noch dynamischer zu machen während es eine Kurve zieht, wird außerdem eine Kraft für die Zentripedalkraft definiert innerhalb von $F_C$. Die stimmt nicht ganz mit der realen Definition für die Zentripedalkraft überein, liefert allerdings dennoch gute Ergebnisse und wird somit als annäherung verwendet.
+Als weitere Kraftkomponente, um das Schiff noch dynamischer zu machen, während es eine Kurve zieht, wird außerdem eine Kraft für die Zentripetalkraft $F_{Cl}$ definiert. Die Gleichung stimmt nicht ganz mit der realen Definition für die Zentripetalkraft überein, welche definiert ist als,
 \begin{align}
-    F_C = v_t \cdot v_r \cdot (m_{s}+ m_{St})
+    F_{Cl} = \frac{mv^2}{r}.
 \end{align}
-wobei,
-\begin{enumerate}
-    \item[] $v_t$, die transversale Geschwindigkeit des Schiffs
-    \item[] $m_s$, die Masse des Schiffs
-    \item[] $m_{St}$, die Masse des Schiffs in transeversaler Richtung durch Trägheit
-    \item[] $v_r$, die Winkelgeschwindigkeit des Schiffs
-\end{enumerate}
-entsprechen.
+Da sie jedoch auch so im Referenzmodell von \cite[Knud Benedict \& Matthias Kirchhoff]{Benedict2007ExplainingSD} verwendet wird und während Experimenten innerhalb von Simulink gute Ergebnisse geliefert hat, trotzdem verwendet. In diesem Modell ist sie folgendermaßen implementiert,
+\begin{align}
+    F_{Cl} = v_t \cdot v_r \cdot (m_{s}+ m_{St}).
+\end{align}
+Die letzte Kraft, welche longitudinal auf das Schiff wirkt und in Gleichung \ref{eq:longitudinal_force} durch $F_{Wl}$ markiert ist, ist die Kraft ausgehend vom Wind, welcher aus verschiedenen Richtungen wehen kann. Der Wind wirkt innerhalb dieses Modells als die Störgröße, welcher der Agent ausgleichen soll. Um den Wind zu modellieren wurde auch hier wieder eine Widerstandsgleichung verwendet, allerdings im umgekehrten Sinn, da diese nun nicht das Schiff ausbremst, sondern es von der Stelle bewegen soll. Abhängig von der Windrichtung wurde hier außerdem ein $\cos(s_{rw})$ eingeführt, um für eine Komponentenzerlegung bei der Windgeschwindigkeit zu sorgen und hier nur die Windgeschwindigkeit in longitudinaler Richtung zu bekommen. Definiert wird der Wind $F_{Wl}$ durch die folgende Gleichung,
+\begin{align}
+    F_{Wl} \frac{1}{2} \cdot v_w^2 \cdot \rho \cdot c_{Sl} \cdot A_{Sl} \cdot \cos(s_{rw}). \label{eq:wind_wl}
+\end{align}
 
 \subsection{Die zweite Bewegungsgleichung des Modells} \label{sec:eom2}
-Die zweite Bewegungsgleich für die Bewegung des Schiffs in transversaler Richtung, setzt sich zusammen aus den folgenden Kräften.
+Die zweite Bewegungsgleich für die Bewegung des Schiffs in transversaler Richtung, setzt sich zusammen aus den folgenden Kräften,
 \begin{align}
-    F_{Tra} = F_{Ru} - F_{Rt} + F_{Ct}
+    F_{Tra} = F_{Ru} - F_{Rt} + F_{Ct} + F_{Wt}
 \end{align}
-Im Vergleich zu der ersten Bewegungsgleichung, gibt es in der zweiten keine Kraft, welche direkt neue Kraft generiert. Die Kräfte, welche sich in in diesem Fall bilden, kommen aus indirekter Abhängigkeit zu dem Schub, welcher in der ersten Kraftgleichung gebildet wird. Die erste Kraft, welche Abhängig vom Schub in der zweiten Bewegungsgleichung gebildet wird, kommt vom Ruder des Schiffs, welches im Winkelbereich von $-\frac{\pi}{3} \leq \alpha \leq \frac{\pi}{3}$ vom Agenten bewegt werden kann. Das $F_{Ru}$ ergibt sich somit zu der folgenden Gleichung, welche auf die bereits verwendetet Widerstandsgleichung basiert. Der Unterschied liegt jedoch darin, dass die Fläche des Ruders als variabel angesehen wird und abhängig vom Rudderwinkel bestimmt wird und das Ruder in diesem Modell nur die Geschwindigkeit in longitudinaler Richtung als Abhängigkeit besitzt.
+Die zweite Bewegungsgleichung ist der ersten Bewegungsgleichung recht ähnlich, der große Unterschied ist lediglich, dass hier keine Schubkraft generiert wird durch einen Propeller. Stattdessen besitzt diese Bewegungsgleichung eine Komponente, welche dafür sorgt, dass indirekt durch die longitudinale Geschwindigkeit eine transversale Geschwindigkeit generiert wird. Die hier gemeinte Komponente ist $F_{Ru}$, welche ausgehend vom Ruder entsteht. Das Ruder ist der Teil am gesamten Schiff, welcher direkt vom Agenten kontrolliert werden kann, damit dieser dadurch das Schiff kurven ziehen lassen kann. Hierbei ist der Agent in der Lage, das Ruder in einem Bereich von $-\frac{\pi}{3} \leq \alpha \leq \frac{\pi}{3}$ zu steuern. Wird das Ruder übersteuert, verlässt es also seinen definierten Bereich, so verliert der Agent massiv an Reward, um ihn zu bestrafen und indirekt das Modell nicht zu zerstören. Die Kraftkomponente für das Ruder $F_{Ru}$, wird auch hier wieder durch eine etwas veränderte Widerstandsgleichung definiert \cite[]{Kulczyk_Tabaczek_2014_2}, außerdem wird erneut eine Komponentenzerlegung vorgenommen, um nur die Geschwindigkeit in transversaler Richtung zu bekommen. Es herrscht in gewissermaßen ein Ausbremsen durch das Ruder, dieses wurde in diesem Modell jedoch vernachlässigt.
 \begin{align}
-    F_{Ru} = \frac{1}{2} \cdot v_l^2 \cdot \rho \cdot c_{Ru} \cdot A_{Ru} \cdot \sin(\alpha) \label{eq:rudder_resistance_long}
+    F_{Ru} = r_a + \frac{1}{2} \cdot v_l^2 \cdot \rho \cdot \frac{6.13 \cdot r_A}{r_A + r_b} \cdot \sin(\alpha). \label{eq:rudder_resistance_long}
 \end{align}
-Wie bereits in der ersten Bewegungsgleichung wird auch in diesem Fall wieder eine weiterer Widerstandsgleichung verwendet um das Schiff selbst in der transversalen Richtung passiv abzubremsen. Diese Gleichung ist Analog zum longitudinalen Fall, nur das hier eine größere Fläche exisitiert und der Reibungskoeffient als ein Rechteckigefläche gewählt wird und somit gilt das $A_{St} = 90$ und $c_{St} = 2$ gilt.
+Wie auch schon in der ersten Bewegungsgleichung wird auch in diesem Fall wieder eine weitere Widerstandsgleichung verwendet, um das Schiff selbst in der transversalen Richtung passiv abzubremsen. Diese Gleichung ist analog zum longitudinalen Fall, nur dass hier eine größere Fläche existiert und der Reibungskoeffizient als eine Rechtecksfläche gewählt wird.
 \begin{align}
     F_{Rt} = \frac{1}{2} \cdot v_l^2 \cdot \rho \cdot c_{St} \cdot A_{St} \label{eq:side_resistance}
 \end{align}
-Auch die Zentripedalkraft $F_{Ct}$ ist erneut ähnlich wie bereits in der ersten Bewegungsgleichung, nur das in diesem Fall eine Abhängigkeit zur longitudinalen Richtung der Geschwindigkeit besteht. In diesem Fall wird außerdem die Masse ausgehend aus der Trägheit in longitudinaler Richtung verwendet, welche mit $m_{Sl} = 50$ gewählt wurde.
+Auch die Zentripetalkraft $F_{Ct}$ ist erneut ähnlich wie bereits in der ersten Bewegungsgleichung, nur dass in diesem Fall eine Abhängigkeit zur longitudinalen Richtung der Geschwindigkeit besteht. In diesem Fall wird zudem die Masse ausgehend aus der Trägheit in longitudinaler Richtung verwendet.
 \begin{align}
     F_{Ct} = v_l \cdot v_r \cdot (m_{s}+ m_{Sl})
 \end{align}
+Der Wind $F_{Wt}$, welcher auf das Schiff in transversaler Richtung wirkt, ist wie auch in der Bewegungsgleichung durch eine erneute Widerstandsgleichung definiert, mit einer Komponentenzerlegung der Geschwindigkeit in transversaler Richtung.
+\begin{align}
+    F_{Wl} = \frac{1}{2} \cdot v_w^2 \cdot \rho \cdot c_{St} \cdot A_{St} \cdot \sin(s_{rw}). \label{eq:wind_wt}
+\end{align}
 \subsection{Die dritte Bewegungsgleichung des Modells} \label{sec:eom3}
-Die dritte und letzte Bewegungsgleichung, welche in diesem Modell verwendet wird sorgt dafür, dass sich das Schiff drehen kann und verwendet hierfür das Drehmoment welches im Gleichgewicht stehen muss. Die Rotation entsteht dadurch das dass Ruder in einen Winkel gesteuert wird, welcher nicht 0 ist. Ausgebremst werden soll die Rotation durch die Hülle des Schiffs zusammen mit der Fläche des Ruders. Wie stark die Rotationsgeschwindigkeit nun ist, ist abhängig davon wie stark das Ruder eingelengt wird, und außerdem für wie lange es eingelenkt ist. Durch die ausbremsung der Rotationsgeschwindigkeit kommt diese irgendwann in eine equilibrium und das Schiff zieht Kreise. In diesem Fall sollen diese Kräfte auch erneut durch Widerstandsgleichungen approximiert werden.
+Die dritte und letzte Bewegungsgleichung, welche in diesem Modell verwendet wurde, sorgt
+dafür, dass sich das Schiff drehen kann und verwendet hierfür ein Gleichgewichtssystem. Der initiale Moment, welcher das Schiff in eine Rotation bringt, entsteht durch das Ruder, wenn es ausgelenkt wird und nicht auf 0° steht. Wird angenommen, dass das Ruder nun zum Beispiel in einen permanenten Winkel von 45° gesetzt wird, so würde dieses zur Folge haben, dass sich das Schiff immer schneller dreht. Der Grund hierfür ist, dass keine weitere Drehmoment quelle als Ausgleich dient. Damit dies nicht geschieht, wird außerdem das Moment der Schiffshülle selbst aus Ausgleich modelliert. Hierfür wird wie auch beim Ruder eine abgewandte Widerstandsgleichung verwendet, welche die Drehgeschwindigkeit des Schiffs als Geschwindigkeitskomponente verwendet. Je schneller sich das Schiff somit dreht, desto größer ist auch der Moment, welcher die Drehung wieder ausgleicht. Eine Visualisierung soll Abbildung \ref{abb:drehmomente} bieten. In dieser Abbildung sind die roten Pfeile, die Kräfte welche modelliert durch Widerstandsgleichungen auf das Schiff wirken. Da diese abweichend vom Masseschwerpunkt wirken, sorge diese durch die verschiedenen Hebelarme, wie die Länge des Schiffs, für ein Drehmoment. Der schwarze Strich soll das Ruder darstellen.
+\begin{figure}[H]
+    \includegraphics[width=0.5\textwidth]{graphics/drehmomente.pdf}
+    \centering
+    \caption{Visualisierung der Kräfte, welche auf das Schiff während der Fahrt wirken, wenn das Ruder ausgelenkt wird. Außerdem zu erkennen ist hier die Breite und Länge des Schiffs, welche als Hebelarme verwendet werden, um die Kräfte in Momente umzuwandeln.}
+    \label{abb:drehmomente}
+\end{figure}
+Das Gesamtdrehmoment definiert sich somit zu,
 \begin{align}
-    M = M_{Rul} - M_S
+    M = M_{Rul} - M_S.
 \end{align}
-Die bereits erwähnte Kraft $M_{Rul}$, welche abhängig von der momentanen longtudinalen Geschwindigkeit ein Drehmoment auf das Schiff durch das Ruder wirkt wird beschrieben durch die folgende Gleichung.
+Das Moment $M_{Rul}$, beschreibt den bereits erwähnten Moment, welcher ausgehend vom Ruder auf das Schiff wirkt und für die Drehung sorgt bei einer Auslenkung.
 \begin{align}
-    M_{Rul} = \frac{1}{2} \cdot v_l^2 \cdot \rho \cdot c_{Ru} \cdot A_{Ru} \cdot \sin(\alpha) \cdot \frac{b}{2}
+    M_{Rul} = \frac{1}{2} \cdot v_l^2 \cdot \rho \cdot c_{Ru} \cdot A_{Ru} \cdot \sin(\alpha) \cdot \frac{b}{2}.
 \end{align}
-Erkennbar ist die Widerstandsgleichung, welche durch einen Hebelarm bestehend aus der breite des Schiffs mit $b = 6$ erweitert wurde um einen Drehmoment zu bestimmen.
-Der größte Drehmoment, welcher nun ausgehend von der Schiffshülle kommt und gegen den Drehmoment des Ruders wirken soll als ausgleich, soll beschrieben werden durch.
+Erkennbar ist hier die Widerstandsgleichung, welche durch einen Hebelarm bestehend aus der Breite des Schiffs erweitert wurde, um ein Drehmoment zu bestimmen.
+
+Das größte Drehmoment, welcher nun ausgehend von der Schiffshülle kommt und gegen den Drehmoment des Ruders wirken soll als Ausgleich, soll beschrieben werden durch,
 \begin{align}
-    M_S = \frac{1}{2} \cdot v_r^2 \cdot \rho \cdot c_{St} \cdot A_{St} \cdot l
+    M_S = \frac{1}{2} \cdot v_r^2 \cdot \rho \cdot c_{St} \cdot A_{St} \cdot l.
 \end{align}
-Auch hier wurde erneut eine Widerstandsgleichung um einen Hebelarm erweitert, da nun allerdings die ganze Seite des Schiffs betrachtet wird, wurde hier auch die komplette länge des Schiffes verwendet. Wichtig ist an dieser Stelle, das die länge des Schiffs um einiges höher skaliert werden musste, als was sie eigentlich ist. In dieser Arbeit wurde bei dem Drehmoment zum Beispiel $10 \cdot l$ verwendet, da dass Schiff sonst nicht mehr in Ruhelage kommt.
+Auch hier wurde erneut eine Widerstandsgleichung um einen Hebelarm erweitert, da nun allerdings die ganze Seite des Schiffs betrachtet wird, wurde hier auch die komplette Länge des Schiffes verwendet. Wichtig ist an dieser Stelle, dass die Länge des Schiffs um einiges höher skaliert werden musste, als was sie eigentlich ist. In dieser Arbeit wurde bei dem Drehmoment zum Beispiel $10l$ verwendet, da das Schiff sonst nicht mehr in Ruhelage kommt. Leider konnte die genaue Ursache für dieses Problem nicht ganz ausfindig gemacht werden. Eine Annahme ist, dass eventuell die Widerstandsgleichungen nicht wirklich als gute Approximation funktionieren bei der Bestimmung des Drehmoments. Da das gesamte Modell jedoch dennoch ausreichend für diese Arbeit funktioniert hat, wurde das Problem nicht weiter verfolgt und die Skalierung wurde so hingenommen.
 
 \subsection{Die Kinematik und Umrechnung der Modellinformationen} \label{sec:kinematik}
-Da dass Modell aus der Perspektive des Schiffs modelliert ist, wurde ein Subsystem implementiert, welches das Modell in ein neues Koordinatensystem transformiert umso eine einfachere Schnittstelle zum Agenten herzustellen. Die Kinematik dient zum Beispiel dazu, die aktuelle Position des Schiffs im gesamten Environment zu erhalten, oder in welche tatsächliche Richtung es überhaupt ausgerichtet ist. Damit soll es dem Agenten möglich sein ein besseren Oberservationspace bilden zu können.
+Da das Modell aus der Perspektive des Schiffs modelliert ist, wurde ein Subsystem implementiert, welches das Modell in ein neues Koordinatensystem transformiert, umso eine einfachere Schnittstelle zum Agenten herzustellen. Die Kinematik dient zum Beispiel dazu, die aktuelle Position des Schiffs im gesamten Environment zu erhalten, oder in welche tatsächliche Richtung es überhaupt ausgerichtet ist.
 
-Der Betrag der Geschwindigkeit gibt sich aus dem Pythagoras der beiden Geschwindigkeitskomponenten $v_x$ und $v_y$.
+Der Betrag der Geschwindigkeit gibt sich aus dem Pythagoras der beiden Geschwindigkeitskomponenten $v_x$ und $v_y$,
 \begin{align}
-    v = \sqrt[2]{v_x^2 + v_y^2}
+    v = \sqrt[2]{v_x^2 + v_y^2}.
 \end{align}
-Die Winkel $\beta$, welcher Beschreibt in welche Richtung das Schiff treibt, wird bestimmt durch
+Der Winkel $\beta$, welcher beschreibt in welche Richtung das Schiff treibt, wird bestimmt durch,
 \begin{align}
     \beta = \arccos \left( \frac{v_x}{v_y} \right)
 \end{align}
-Die tatsächliche Ausrichtung des Schiffs $s_r$ ist lediglich das Integral der momentanen Drehgeschwindigkeit $v_r$
+Die tatsächliche Ausrichtung des Schiffs $s_r$ ist lediglich das Integral der momentanen Drehgeschwindigkeit $v_r$,
 \begin{align}
     s_r = \int_{t}^{t+\Delta t} v_r \, dt
 \end{align}
-Die nun umtransformierte Position des Schiffs in $x$ und $y$-Position ergibt sich aus
+Die nun um transformierte Position des Schiffs in $x$ und $y$-Position ergibt sich aus,
 \begin{align}
     s_x = \int_{t}^{t+\Delta t} v \cdot \sin(\beta - s_r) \, dt
 \end{align}
+und,
 \begin{align}
-    s_y = \int_{t}^{t+\Delta t} v \cdot \cos(\beta - s_r) \, dt
+    s_y = \int_{t}^{t+\Delta t} v \cdot \cos(\beta - s_r) \, dt.
 \end{align}
 
 
 \section{Einbindung des Modells in Python} \label{sec:simulink_to_py}
-Das funktionierende Simulink Modell muss für die verwendung zusammen mit dem Agenten, in Python umgesetzt werden. Damit dies gelingen kann, wurde festgelegt, dass das Ziel sein soll einige Blöcke aus Simulink nachzuahmen umso eine fast identische Funktionalität zuhaben wie sie in Simulink vorliegt. Da innerhalb von Simulink Blöcke verwendet werden, welche verbunden werden durch Kanten und dies in Python nicht möglich ist. Werden innerhalb von Python stattdesen Klassenattribute verwendet um zum Beispiel die gesamt Beschleunigung eines Modells zu definieren. Ein solches Klassenattribute kann damit nun zum Beispiel verwendet werden um einen Feedback-Loop zu modellieren, wie es in Simulink mithilfe von zurücklaufenden Kanten gemacht wird. Die Integratoren welche in Simulink mit das Kernstück und eine der wichtigesten Blockarten ist, wurde in Python nachgebaut innerhalb einer Integrator Klasse. Die Klasse wurde so implementiert, dass für jeden Integratorblock, welcher aus einem Simulink Modell übernommen werden soll, ein Integrator Object definiert wird. Dies könnte dann folgend aussehen in einem Quellcode Beispiel.
+Das funktionierende Simulink Modell muss für die Verwendung zusammen mit dem Agenten, in Python umgesetzt werden. Damit dies gelingen kann, wurde festgelegt, dass das Ziel sein soll einige Blöcke aus Simulink nachzuahmen, umso eine fast identische Funktionalität zuhaben wie sie in Simulink vorliegt. Da innerhalb von Simulink Blöcke verwendet werden, welche verbunden werden durch Kanten und dies in Python nicht möglich ist. Werden innerhalb von Python stattdessen Klassenattribute verwendet, um zum Beispiel die gesamte Beschleunigung eines Modells zu definieren. Ein solches Klassenattribut kann damit nun verwendet werden, um einen Feedback-Loop zu modellieren, wie es in Simulink mithilfe von zurücklaufenden Kanten gemacht wird. Die Integratoren, welche in Simulink mit das Kernstück und eine der wichtigsten Blockarten sind, wurden in Python nachgebaut innerhalb einer Integrator-Klasse. Die Klasse wurde so implementiert, dass für jeden Integratorblock, welcher aus einem Simulink Modell übernommen werden soll, ein Integrator Objekt definiert wird. Dies könnte dann folgend aussehen in einem Quellcode Beispiel.
 \begin{lstlisting}[language=Python]
 a_integrator = Integrator()
 v_integrator = Integrator(initial_value=h_0)
 \end{lstlisting}
-Hier in diesem Quellcode Ausschnitt ist zu sehen, dass ein Integrator für jeweils die Beschleunigung und Geschwindigkeit eines Modells definiert sind. Zudem kommt hinzu, dass für den Integrator von Geschwindigkeit auf Position ein Initialwert gesetzt wurde von $h_0$. Es wurde außerdem aus Simulink die Integrator Fuktion nachgebaut um ein oberes und unteres Limit für die Integration zu setzen, auch diese würde als Argument übergeben werden können bei einem jeweiligen Integrator.\\
-Die Integratoren selbst funktionieren nun so, dass sie eine eigene Klassenmethode besitzen, welche als Argument ein beliebiges Signal erwartet. Dieses Signal würde etwa der gesamt Beschleunigung oder Geschwindigkeit eines Modells entsprechen, hier in diesem Fall würden zum Beispiel also die Klassenattribute sein, welche bereits erwähnt wurden. Das eingehende Signal wird dann integriert nach folgender Formel.
-\begin{align*}
+Hier in diesem Quellcode Ausschnitt ist zu sehen, dass ein Integrator für jeweils die Beschleunigung und Geschwindigkeit eines Modells definiert ist. Zudem kommt hinzu, dass für den Integrator von Geschwindigkeit zur Position ein Initialwert gesetzt wurde von $h_0$. Es wurde außerdem aus Simulink die Integrator-Funktion nachgebaut, um ein oberes und unteres Limit für die Integration zu setzen, auch diese würde als Argument übergeben werden können bei einem jeweiligen Integrator. Die Integratoren selbst funktionieren nun so, dass sie eine eigene Klassenmethode besitzen, welche als Argument ein beliebiges Signal erwartet. Dieses Signal würde etwa der gesamten Beschleunigung oder Geschwindigkeit eines Modells entsprechen. Das eingehende Signal wird dann integriert nach folgender Methodik,
+\begin{align}
     s' = \int_{t}^{t+dt} s \, dx
-\end{align*}
-Die Signal $s$ wird gesehen als eine Konstante, welche integriert wird vom Zeitschritt $t$ bis $t + dt$, wobei das $dt$ hier vorschreibt wie groß der Integrationschritt letztendlich sein soll. Innerhalb dieser Arbeit wurde $dt = 0.1$ gewählt, da es die ausreichende größe bietet um das gewählte Modell zu simulieren ohne großem Genauigkeitsverlust.
-\newpage
-\subsection{Testen des Integrators anhand eines einfachen Beispiels} \label{sec:integrator_test}
-Um die Integrator Klasse in Python zu testen bevor sie für das richtige Schiffmodell verwendet wird, wurde ein einfaches Modell erstellt, in welchem ein Fallschirmspringer in einer bestimmten Höhe abspringt und irgendwann den Fallschirm öffnet und verlangsamt auf dem Boden ankommt. In diesem Fallschirm Modell wurde der Fallschirm so modelliert, das er ab eine Höhe von 1500 aufgeht und damit seine Fläche deutlich größer wird. Diese größere Fläche spiegelt sich dann wieder in der reduzierten Fallgeschwindigkeit des Fallschirmspringers. Beschrieben werden kann das Fallschirmmodell durch die folgende Kraftgleichung.
-\begin{align*}
+\end{align}
+Die Signal $s$ wird gesehen als eine Konstante, welche integriert wird vom Zeitschritt $t$ bis $t + dt$, wobei das $dt$ hier vorschreibt, wie groß der Integrationsschritt letztendlich sein soll. Innerhalb dieser Arbeit wurde $dt = 0.25$ gewählt, da es die ausreichende Größe bietet, um das gewählte Modell zu simulieren ohne großen Genauigkeitsverlust.
+
+\subsection{Testen der Python Integratoren anhand eines einfachen Beispiels} \label{sec:integrator_test}
+Um die Integrator-Klasse in Python zu testen, bevor sie für das richtige Schiffsmodell verwendet wird, wurde ein einfaches Modell erstellt. In diesem Beispielmodell springt ein Fallschirmspringer in einer bestimmten Höhe ab und öffnet irgendwann den Fallschirm. Das Öffnen des Fallschirms hat zufolge, dass er deutlich verlangsamt wird und somit nach einiger Zeit ohne großen Schaden auf dem Boden aufkommt. Das Abbremsen des Fallschirms ist modelliert durch eine herkömmliche Widerstandsgleichung, welche eine variable Fläche verwendet. Der Fallschirmspringer selbst springt in einer Höhe von $\SI{3000}{\m}$ ab, sein Fallschirm öffnet sich recht früh dann ab $\SI{1500}{\m}$. Allgemein kann das Fallschirmspringer-Modell definiert werden durch das folgende Kraftsystem,
+\begin{align}
     F = -F_G + F_W
-\end{align*}
+\end{align}
+Das $F_G$ entspricht der Kraft, welche sich aus der Fallbeschleunigung $g$ und der Masse des Fallschirmspringers zusammensetzt. $F_W$ entspricht dem Windwiderstand, welcher abhängig von der Fläche des Fallschirmspringers beziehungsweise des Fallschirms sich ändert. Sie wird modelliert durch die folgende Gleichung für den Widerstand,
+\begin{align}
+    F_W = \frac{1}{2} \cdot v^2 \cdot \rho \cdot c \cdot A,
+\end{align}
+wobei hier $A$ die Fläche des Fallschirmspringers selbst oder des Fallschirmspringers mit Fallschirm ist. Selbes gilt auch für den Reibungskoeffizient $c$.
 
-Wobei das $F_G$ der Kraft entspricht, welche sich aus der Fallbeschleunigung $g$ und der Masse des Fallschirmspringers zusammensetzt. $F_W$ entspricht dem Wind Widerstand, welcher abhängig von der Fläche des Fallschirmspringers beziehungsweise des Fallschirms sich ändert. Sie wird modelliert durch die folgende Gleichung für den Widerstand.
-
-\begin{align*}
-    F_W = \frac{1}{2} \cdot v^2 \cdot \rho \cdot c \cdot A
-\end{align*}
-wobei hier $A$ die Fläche des Fallschirmspringers selbst oder des Fallschirmspringers mit Fallschirm ist. Selbes gilt auch für den Reibungskoeffient $c$.
-
-In Simulink ergibt sich das gesamte Modell zu der folgenden Struktur, in welcher die einzelnen Kraftkomponenten und besonderen Funktionen wie das abbrechen des Modells sobald die Höhe 0 erreicht ist, Farblich hinterlegt sind.
+In Simulink ergibt sich das gesamte Modell zu der folgenden Struktur, in welcher die einzelnen Kraftkomponenten und besonderen Funktionen wie das Abbrechen des Modells, sobald die Höhe 0 erreicht ist, farblich hinterlegt sind.
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{graphics/parachute_simulink.png}
@@ -494,7 +485,7 @@ In Simulink ergibt sich das gesamte Modell zu der folgenden Struktur, in welcher
     \label{abb:parachute_simulink}
 \end{figure}
 
-Das gleiche Modell nun modelliert in Python ergibt sich zu folgenden Quellcode.
+Das gleiche Modell, nun modelliert in Python, ergibt sich zu folgenden Quellcode,
 
 \begin{lstlisting}[language=Python]
 from control_theory.control_blocks import Integrator
@@ -538,8 +529,7 @@ if __name__ == '__main__':
 
 \end{lstlisting}
 
-Zusehen ist, dass das Modell in Python angetrieben wird durch eine $while$-Schleife, welche terminiert sobald das $t_{max}$ erreicht ist. Innerhalb der $while$-Schleife wird dafür die Laufvariabel $t$ inkrementiert durch ein zuvor festgelegtes $dt$, welches in den zuvor definierten Integralen dem $\Delta t$ und somit der Integrationsschrittgröße entspricht. Konstanten wurden außerhalb der $while$-Schleife definiert zusammen mit einem $total\_a$, welches die gesamt Beschleunigung des Modells beschreibt. Die Integratoren werden nun innerhalb der $while$-Schleife verwendet um die gesamt Beschleunigung in eine Geschwindigkeit und anschließend in die Höhe des Fallschirmspringers zu integrieren. Basierend auf diesen Methodenrückgaben können dann veränderungen an den Signalen vorgenommen werden um zum Beispiel das $F_W$ abhängig von der Höhe zu bestimmen.\\
-Ein direkter Vergleich der Ergebnisse unter verwendung der gleichen konstanten bei den beiden Modellvarianten in Python und Simulink zeigt dann auch gleich, dass die Integratoren und der Ansatz für die Modellierung in Python korrekt sind. Anzumerken ist jedoch, dass die Zeitaxen sich bei den beiden Plots ein wenig unterscheiden, dies ist jedoch darauf zurückzuführen, wie Simulink die Zeitschritte definiert und wie sie im Python Modell definiert sind. In diesem Fall ist es einfach nur eine unterschiedliche Skalierung.
+Zusehen ist, dass das Modell in Python angetrieben wird durch eine $while$-Schleife, welche terminiert, sobald das $t_{max}$ erreicht ist. Innerhalb der $while$-Schleife wird dafür die Laufvariable $t$ inkrementiert durch ein zuvor festgelegtes $dt$, welches in den zuvor erwähnten Integralen dem $\Delta t$ und somit der Integrationsschrittgröße entspricht. Konstanten wurden außerhalb der $while$-Schleife definiert zusammen mit einem $total\_a$, welches die gesamte Beschleunigung des Modells beschreibt. Die Integratoren werden nun innerhalb der $while$-Schleife verwendet, um die gesamte Beschleunigung in eine Geschwindigkeit und anschließend in die Höhe des Fallschirmspringers zu integrieren. Basierend auf diesen Methodenrückgaben können dann Veränderungen an den Signalen vorgenommen werden, um zum Beispiel das $F_W$ abhängig von der Höhe zu bestimmen. Ein direkter Vergleich der Ergebnisse unter Verwendung der gleichen Konstanten bei den beiden Modellvarianten in Python und Simulink zeigt dann auch gleich, dass die Integratoren und der Ansatz für die Modellierung in Python korrekt sind. Anzumerken ist jedoch, dass die Zeitachsen sich bei den beiden Plots ein wenig unterscheiden, dies ist jedoch darauf zurückzuführen, wie Simulink die Zeitschritte definiert und wie sie im Python Modell definiert sind. In diesem Fall ist es einfach nur eine unterschiedliche Skalierung.
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{graphics/python_parachute_s_plot.png}
     \centering
@@ -554,29 +544,15 @@ Ein direkter Vergleich der Ergebnisse unter verwendung der gleichen konstanten b
     \label{fig:simulink_parachute_s_plot}
 \end{figure}
 
-\newpage
-\subsection{Aufbau des Schiffmodells} \label{sec:aufbau_schiffsmodell}
+\subsection{Aufbau des Schiffmodells TODO} \label{sec:aufbau_schiffsmodell}
 
-\chapter{Ergebnisse} \label{sec:ergebnisse}
+\chapter{Ergebnisse TODO} \label{sec:ergebnisse}
 
-\chapter{Diskussion} \label{sec:diskussion}
+\chapter{Diskussion TODO} \label{sec:diskussion}
 
-\chapter{Zusammenfassung und Ausblick} \label{sec:zsmfassung_ausblick}
+\chapter{Zusammenfassung und Ausblick TODO} \label{sec:zsmfassung_ausblick}
 
-% l\cite[]{SpinningUp2018}
-% m\cite[]{Sutton1998}
-% a\cite[]{andrychowicz2021what}
-% o\cite[]{sac}
-% o\cite[]{Zelazny_2014}
-% o\cite[]{Kulczyk_Tabaczek_2014_2}
-% o\cite[]{hydrodynamicsNinova}
-% o\cite[]{Benedict2007ExplainingSD}
-% o\cite[]{FrocMasc2021}
-% o\cite[]{KrusComp2015}
-% o\cite[]{RichStat2019}
-% o\cite[]{pytorch}
-% o\cite[]{matpltlib}
-% o\cite[]{brockman2016openai}
-% o\cite[]{graesser2020foundations}
+
 \printbibliography
+
 \end{document}
