@@ -1,0 +1,49 @@
+agent:
+  batch_size: 1024
+  gamma: 0.9728
+  layer1_size: 256
+  layer2_size: 256
+  learning_rate_alpha: 0.0051
+  learning_rate_beta: 0.0048
+  max_size: 1000000
+  reward_scale: 10
+  tvn_parameter_modulation_tau: 0.0061
+base_settings:
+  avg_lookback: 50
+  dt: 0.25
+  experiment: 6
+  n_games: 1
+  render_skip_size: 50
+  t_max: 2500
+  test_mode: 1
+boat:
+  a: 4.252
+  aspect_ratio: 2
+  b: 0.262
+  boat_I: 6000000
+  boat_Iz: 10
+  boat_area_front: 20
+  boat_area_side: 90
+  boat_b: 6
+  boat_l: 15
+  boat_m: 600
+  boat_m_x: 50
+  boat_m_y: 100
+  c_r_front: 0.31
+  c_r_side: 2
+  fuel: 15000
+  n_max: 30
+  propeller_diameter: 1
+  rho: 1
+  rudder_area: 10
+  thrust_deduction: 0.3
+  w: 0.3
+  wake_friction: 0.3
+boat_env:
+  boat_out_of_bounds_offset: 0
+  goal_line: 3900
+  track_width: 800
+wind:
+  direction: 90
+  fixed_points: 8
+  max_velocity: 0.5

@@ -1,0 +1,2 @@
+termination;reached_goal;out_of_bounds;out_of_fuel;rudder_broken;timeout;episode_reward
+reached_goal;1;0;0;0;0;387.6382866476415
