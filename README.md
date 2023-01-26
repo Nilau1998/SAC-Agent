@@ -15,6 +15,16 @@ If you however use conda, like the IAT server does *sigh*, then run the followin
 ## SAC implementation for dynamic systems
 This repository is the implementation of a Soft-Actor-Critic Agent that is used to control a dynamic system via deep learning.
 
+## Settings/Configs
+There are several experiments that can be run. Within the original_config.yaml settings file you will find a line under base_settings that states the experiment. Enter a value between 1-6 here to choose the experiment that shall be run when training new models. Additonally the max velocity of the wind can be set under the wind settings within this file.\\
+The following settings can be used:
+- 1: No wind, just drive left to right and stay in the middle
+- 2: Changing starting y value, no wind
+- 3: Constant wind velocity, wind direction bottom to top
+- 4: Changing wind velocity, wind direction bottom to top
+- 5: Constant wind velocity, swap between b to t or t to b
+- 6: Changing wind velocity, all wind directions random
+
 ## Running the Python code
 The Python code can be run in several ways. You can start the training, training with rendering or just render a previously trained experiment.\\
 Use the following commandos:
