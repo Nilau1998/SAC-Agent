@@ -21,7 +21,8 @@ class BoatEnvironmentRenderer:
 
     def __init__(self, experiment_dir):
         self.experiment_dir = experiment_dir
-        self.config = get_experiment_config(experiment_dir, "config.yaml")
+        self.config = get_experiment_config(
+            experiment_dir, 'tuned_configs.yaml')
         self.image_buffer = []
         self.replayer = Replayer(experiment_dir)
 
@@ -79,17 +80,17 @@ class BoatEnvironmentRenderer:
         # Wind image settings and plots
         env_data = self.replayer.episode_data
         wind_xmax = self.replayer.total_dt
-
         self.axwf.set_xlim([0, wind_xmax])
-        self.axwf.set_ylim([0, 1])
-        self.axwf.set_yticks([0, 1])
-        self.axwf.set_yticklabels([0, 1])
+        self.axwf.set_ylim([0, float(self.config.wind.max_velocity) + 0.01])
+        self.axwf.set_yticks([0, float(self.config.wind.max_velocity)])
+        self.axwf.set_yticklabels(
+            [0, float(self.config.wind.max_velocity)])
         self.axwf.plot(np.arange(0, wind_xmax),
-                       env_data.loc[:, 'wind_force'].head(wind_xmax),
+                       env_data.loc[:, 'wind_velocity'].head(wind_xmax),
                        color='blue')
 
         self.axwa.set_xlim([0, wind_xmax])
-        self.axwa.set_ylim([0, np.pi * 2])
+        self.axwa.set_ylim([0, np.pi * 2 + 0.01])
         self.axwa.set_yticks([0, np.pi, np.pi * 2])
         self.axwa.set_yticklabels([0, 'π', '2π'])
         self.axwa.get_xaxis().set_visible(False)
@@ -193,18 +194,18 @@ class BoatEnvironmentRenderer:
             fontsize=7
         )
 
-        self.plt_objects['wind_force_line_indicator'] = self.axwf.axvline(
+        self.plt_objects['wind_velocity_line_indicator'] = self.axwf.axvline(
             dt, color='black'
         )
 
         # Calculate y pos for text
-        wf_text_y = 1 * 0.08
-        if env_data.iloc[dt]['wind_force'] < 0.5:
-            wf_text_y = 1 * 0.85
-        self.plt_objects['wind_force_line_indicator_text'] = self.axwf.text(
+        wf_text_y = self.config.wind.max_velocity * 0.08
+        if env_data.iloc[dt]['wind_velocity'] < self.config.wind.max_velocity/2:
+            wf_text_y = self.config.wind.max_velocity * 0.85
+        self.plt_objects['wind_velocity_line_indicator_text'] = self.axwf.text(
             y=wf_text_y,
             x=dt + 2,
-            s=f"w_force {env_data.iloc[dt]['wind_force']:.2f}",
+            s=f"w_velocity {env_data.iloc[dt]['wind_velocity']:.2f}",
             fontsize=7
         )
 

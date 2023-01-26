@@ -44,13 +44,13 @@ class Recorder:
 
     def write_winds_to_csv(self):
         wind = np.column_stack(
-            (self.env.boat.wind.wind_force, self.env.boat.wind.wind_angle)
+            (self.env.boat.wind.wind_velocity, self.env.boat.wind.wind_angle)
         )
         self.wind_file = os.path.join(
             self.experiment_dir, 'episodes', 'wind.csv')
         if not os.path.exists(self.wind_file):
             with open(self.wind_file, 'x') as csv_file:
                 writer = csv.writer(csv_file, delimiter=';')
-                writer.writerow(['wind_force', 'wind_angle'])
+                writer.writerow(['wind_velocity', 'wind_angle'])
                 for _ in wind:
                     writer.writerow(_)

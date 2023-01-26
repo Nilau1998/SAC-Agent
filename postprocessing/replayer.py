@@ -12,7 +12,7 @@ class Replayer:
     def __init__(self, experiment_dir):
         self.experiment_dir = experiment_dir
         self.experiment_config = get_experiment_config(
-            experiment_dir, os.path.join('config.yaml'))
+            experiment_dir, os.path.join('tuned_configs.yaml'))
 
         self.info_data = self.read_info_csv()
         self.wind_data = self.read_wind_csv()

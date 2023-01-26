@@ -105,7 +105,7 @@ class BoatEnv(Env):
             self.info['rudder_broken'] += 1
 
         if self.boat.rudder_angle > np.pi/4 or self.boat.rudder_angle < -np.pi/4:
-            self.reward -= 1
+            self.reward -= 100
 
         if np.abs(self.boat.s_r) > np.pi/2:
             self.reward -= 1
@@ -162,7 +162,11 @@ class Boat:
 
         self.a_y_integrator = Integrator()
         self.a_y_integrator.dt = self.dt
-        self.v_y_integrator = Integrator()
+
+        if int(self.config.base_settings.experiment) == 2:
+            self.v_y_integrator = Integrator(initial_value=self.s_y_start)
+        else:
+            self.v_y_integrator = Integrator()
         self.v_y_integrator.dt = self.dt
 
         self.a_r_integrator = Integrator()

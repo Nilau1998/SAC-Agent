@@ -47,7 +47,7 @@ class RewardFunction:
 
         def f_y(y):
             return (np.abs(y)/self.track_width) / \
-                (1+np.exp((-self.y_a/self.y_b)*(np.abs(y)-(self.track_width * 0.2))))
+                (1+np.exp((-self.y_a/self.y_b)*(np.abs(y)-(self.track_width * 0.2))))-0.1
 
         def f_x(x):
             return 0

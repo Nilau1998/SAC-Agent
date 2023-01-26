@@ -1,9 +1,8 @@
 from rendering.boat_env_render import BoatEnvironmentRenderer
 from postprocessing.recorder import Recorder
 from environment.boat_env import BoatEnv
-from utils.config_reader import get_config
+from utils.config_reader import get_config, get_experiment_config
 from utils.build_experiment import Experiment
-from utils.hyperparameter_tuner import HPTuner
 from utils.color_selector import ColorSelector
 from agent.continuous_agent import ContinuousAgent
 from multiprocessing import Process
@@ -20,11 +19,10 @@ warnings.filterwarnings('ignore')
 
 
 class ControlCenter:
-    def __init__(self, cc_id=0, color='\x1b[37m', subdir=None, config='original_config.yaml'):
+    def __init__(self, cc_id=0, color='\x1b[37m', subdir=None):
         self.cc_id = cc_id
         self.color = color
-        self.config = get_config(os.path.join(config))
-        self.tuner = HPTuner('hp_configs.yaml')
+        self.config = get_config('original_config.yaml')
         self.experiment_overview_file = os.path.join(
             'experiments', subdir, 'overview.csv')
         self.terminations_file = None
@@ -32,11 +30,15 @@ class ControlCenter:
         self.experiment = None
         self.subdir = subdir
 
-    def train_model(self):
+    def train_model(self, tuner=False):
         self.experiment = Experiment(subdir=self.subdir)
         self.experiment.save_configs()
         self.terminations_file = os.path.join(
             self.experiment.experiment_dir, 'terminations.csv')
+
+        if tuner:
+            self.config = get_experiment_config(
+                self.experiment.experiment_dir, 'tuned_configs.yaml')
 
         env = BoatEnv(self.config, self.experiment)
 
@@ -167,10 +169,6 @@ class ControlCenter:
             table_rendering.next_row()
         table_rendering.close()
 
-    def train_hp_model(self):
-        self.tuner.set_config_file(control_center.config)
-        self.train_model()
-
     def creates_avg_plots(self, directory):
         list_experiment_dirs = [
             f.path for f in os.scandir(directory) if f.is_dir()]
@@ -179,7 +177,7 @@ class ControlCenter:
 
 
 if __name__ == '__main__':
-    subdir = 'constant_wind_upwards'
+    subdir = 'testing'
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-t', '--train',
@@ -223,7 +221,8 @@ if __name__ == '__main__':
             for model_index in batch:
                 control_center = ControlCenter(
                     cc_id=model_index, color=color_selector.get_color(), subdir=subdir)
-                proc = Process(target=control_center.train_hp_model)
+                proc = Process(
+                    target=control_center.train_model, args=(True,))
                 time.sleep(1)
                 proc.start()
                 processes.append(proc)

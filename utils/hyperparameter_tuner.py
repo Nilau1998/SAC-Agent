@@ -6,10 +6,10 @@ import random
 
 
 class HPTuner:
-    def __init__(self, base_config_file):
+    def __init__(self):
         self.base_config = yaml.safe_load(
-            Path('configs', base_config_file).read_text())
-        self.base_config_dotmap = DotMap(self.base_config)
+            Path('configs', 'hp_configs.yaml').read_text())
+        self.hp_configs_dotmap = DotMap(self.base_config)
         self.hpset = HPSet(
             alpha=self.alpha(),
             beta=self.beta(),
@@ -19,36 +19,36 @@ class HPTuner:
 
     def alpha(self):
         return round(random.uniform(
-            self.base_config_dotmap.agent.alpha_min,
-            self.base_config_dotmap.agent.alpha_max
+            self.hp_configs_dotmap.agent.alpha_min,
+            self.hp_configs_dotmap.agent.alpha_max
         ), 4)
 
     def beta(self):
         return round(random.uniform(
-            self.base_config_dotmap.agent.beta_min,
-            self.base_config_dotmap.agent.beta_max
+            self.hp_configs_dotmap.agent.beta_min,
+            self.hp_configs_dotmap.agent.beta_max
         ), 4)
 
     def gamma(self):
-        self.base_config_dotmap.agent.test = 5
+        self.hp_configs_dotmap.agent.test = 5
         return round(random.uniform(
-            self.base_config_dotmap.agent.gamma_min,
-            self.base_config_dotmap.agent.gamma_max
+            self.hp_configs_dotmap.agent.gamma_min,
+            self.hp_configs_dotmap.agent.gamma_max
         ), 4)
 
     def tau(self):
         return round(random.uniform(
-            self.base_config_dotmap.agent.tau_min,
-            self.base_config_dotmap.agent.tau_max
+            self.hp_configs_dotmap.agent.tau_min,
+            self.hp_configs_dotmap.agent.tau_max
         ), 4)
 
-    def set_config_file(self, config):
-        config.agent.learning_rate_alpha = self.hpset.alpha
-        config.agent.learning_rate_beta = self.hpset.beta
-        config.agent.gamma = self.hpset.gamma
-        config.agent.tvn_parameter_modulation_tau = self.hpset.tau
-        config_dict = config.toDict()
-        with open(Path('configs', 'config.yaml'), 'w') as outfile:
+    def generate_tuned_config_file(self, original_config, experiment_dir):
+        original_config.agent.learning_rate_alpha = self.hpset.alpha
+        original_config.agent.learning_rate_beta = self.hpset.beta
+        original_config.agent.gamma = self.hpset.gamma
+        original_config.agent.tvn_parameter_modulation_tau = self.hpset.tau
+        config_dict = original_config.toDict()
+        with open(Path(experiment_dir, 'configs', 'tuned_configs.yaml'), 'w') as outfile:
             yaml.dump(config_dict, outfile, default_flow_style=False)
 
 
