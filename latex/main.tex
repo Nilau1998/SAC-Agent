@@ -78,7 +78,7 @@ Die dynamischen Systeme oder auch Regelstrecken, welche es heutzutage überall a
 Das Ziel dieser Arbeit soll sein, mittels eines Reinforcement Learning Agenten ein beispielhaftes dynamisches Modell zu regeln. \textbf{Gezeigt werden sollen außerdem Methoden, um dynamische Systeme mithilfe von bestehenden Methodiken zu erstellen und sie anschließend mit dem Agenten zu verbinden.} Um die Modelle für diesen Ansatz zu erstellen, wird die Software Simulink/MATLAB von Mathworks eingesetzt. \cite[]{simulink} Der Grund hierfür ist, da bereits ein bestehendes Grundverständnis für das Toolkit existiert und Simulink mit seinen zahlreichen Schaltblöcken eine elegante und bewährte Methode anbietet, um Modellbildung durchzuführen. Das in Simulink erstellte Modell, soll anschließend in ein Python-Modell transformiert werden. Für das Training des RL-Agenten eignet sich Python \cite[]{python} besonders, da es viele vorimplementierte Algorithmen gibt, die verhältnismäßig einfach an die Problematik angepasst werden können. Als beispielhaftes dynamisches Modell soll ein Kräftemodell eines Schiffes verwendet werden, welches Störgrößen wie einem Wind besitzt, welcher aus allen möglichen Richtungen mit verschiedener Geschwindigkeit wehen kann. Des Weiteren werden indirekte Störgrößen, wie die Trägheit des Schiffes modelliert, um eine Regelung für den Agenten durch Verzögerungseffekte komplizierter zu machen. Der Agent soll lernen das Modell korrekt zu regeln, in dem er mit dem Ruder des Schiffes interagieren darf.
 
 \section{Aufbau der Arbeit} \label{sec:aufbau_arbeit}
-Bevor das dynamische Modell erstellt und anschließend in ein Environment umgewandelt werden kann, soll zuerst geklärt werden, woher der Begriff des Reinforcement Learnings überhaupt kommt. In Kapitel \ref{sec:reinforcement_learning} wird das Reinforcement Learning vorgestellt und in die drei Arten des maschinellen Lernens eingeordnet. Anschließend wird eine Übersicht gegeben, in welcher die verschiedenen wichtigen Reinforcement Learning Algorithmen miteinander verglichen werden. Da für die Problemstellung in dieser Arbeit, der Soft Actor-Critic (SAC) \cite[]{sac} Algorithmus sich an besten eignet, soll für diesem folgend auf die allgemeine Übersicht der Algorithmen, ein tieferes Verständnis für diesen aufgebaut werden.\\
+Bevor das dynamische Modell erstellt und anschließend in ein Environment umgewandelt werden kann, soll zuerst geklärt werden, woher der Begriff des Reinforcement Learnings überhaupt kommt. In Kapitel \ref{sec:reinforcement_learning} wird das Reinforcement Learning vorgestellt und in die drei Arten des maschinellen Lernens eingeordnet. Anschließend wird eine Übersicht gegeben, in welcher die verschiedenen wichtigen Reinforcement Learning Algorithmen miteinander verglichen werden. Da für die Problemstellung in dieser Arbeit, der Soft Actor-Critic (SAC) \cite[]{sacv2} Algorithmus sich an besten eignet, soll für diesem folgend auf die allgemeine Übersicht der Algorithmen, ein tieferes Verständnis für diesen aufgebaut werden.\\
 Nachdem der Teil des maschinellen Lernens verdeutlicht wurde, folgen Einblicke in die tatsächliche Implementierung des SAC Agenten in Python der PyTorch Bibliothek \cite[]{pytorch}, welche für diese Arbeit als Framework für das maschinelle Lernen gewählt wurde. Es soll gezeigt werden, wie die Hauptkomponenten implementiert wurden, und wie die Schnittstellen mit dem Environment in Python aufgebaut sind. Anschließend folgt das Unterkapitel \ref{sec:imp_simulink}, in welchem die Modellbildung für das Schiffmodell in Simulink erläutert wird. Hierbei soll gezeigt werden, wie sich das gewählte Schiffmodell zusammensetzt und was für Kraftgleichungen aufgestellt wurden, um diese zu realisieren. Damit soll dem Leser klar werden, welche Störgrößen existieren, wo genau der Agent Kontrolle über das Schiff hat und wie das Verhalten des Schiffes in den Simulationen ist. Da der Agent in Python bereits implementiert wurde, folgt auf die Modellbildung in Simulink die Umsetzung des erstellten Modells in Python. Hierfür soll vorerst, Anhand eines einfacheren Modells gezeigt werden, wie diese Umsetzung funktioniert. Es wird dabei auf die Implementierung der Integratoren aus Simulink innerhalb von Python eingegangen, da diese mit ein Kernstück bilden, für die ganze Modellbildung und demnach unverzichtbar sind. Nach der Beispielumsetzung, folgt die Umsetzung des Schiffmodells in Python und wie dieses in ein Gym Environment von OpenAI \cite[]{brockman2016openai} eingebunden wurde. Abschließend werden dann die verschiedenen Ergebnisse dieser Arbeit präsentiert, zusammen mit einer Diskussion wie diese zustande kommen und einer anschließenden Zusammenfassung mit einem Ausblick auf weiterführenden Arbeiten.
 
 \chapter{Reinforcement Learning} \label{sec:reinforcement_learning}
@@ -262,14 +262,14 @@ Wird ein Agent in einem Modell oder Environment implementiert wie es in dieser A
 
 Grundsätzlich sagen die Begriffe Model-Free und Model-Based aus, wie ein jeweiliger Algorithmus seine Entscheidung trifft. Ein Algorithmus welcher auf einem Model-Based Ansatz implementiert ist, besitzt die Möglichkeit mehr oder weniger ein Modell beziehungsweise eine Funktion zu befragen, was passieren würde, wenn nun Action $a$ ausgeführt wird. Die Antwort auf eine solche Frage, kann dann Informationen sein, wie der potenzielle Reward, wenn Action $a$ auch wirklich ausgeführt wird. Model-Based Algorithmen verfügen somit also über die besondere Funktion, vorraus zu planen und genau zu wissen was passiert, wenn verschiedene Actions ausgeführt werden. Ausgewählt werden kann dann die Action, welche letztendlich den besten gesamt Reward liefert.
 
-\section{Soft Actor-Critic (SAC) Agenten TODO} \label{sec:howto_sac}
-Der Soft Actor-Critic (SAC) Algorithmus ist jener, welcher für das Regeln beziehungsweise Kontrollieren des dynamischen Modells in dieser Arbeit verwendet wurde. Er findet sich in der Gruppe der Model-Free RL Algorithmen wieder und basiert zum Teil auf Ideen aus früheren Algorithmen wie DDPG und soll eine Kombinationen aus den Vorteilen dieser darstellen.
+\section{Soft Actor-Critic (SAC) Agenten} \label{sec:howto_sac}
+Der Soft Actor-Critic (SAC) Algorithmus ist jener, welcher für das Regeln beziehungsweise Kontrollieren des dynamischen Modells in dieser Arbeit verwendet wurde. Er findet sich in der Gruppe der Model-Free RL Algorithmen wieder und basiert zum Teil auf Ideen aus früheren Algorithmen wie DDPG und soll eine Kombination aus den Vorteilen dieser darstellen.
 
-Model-Free RL Algorithmen haben immer mit zwei großen Herausforderungen gekämpft, welche ihre Performanz deutlich reduziert haben. Die erste der beiden Herausforderungen, ist die Sample Komplexität. So hatten sogar kleine Aufgaben das Problem, das sie bereits Millionen von Datenpunkten brauchen. Die zweite große Herausforderungen ist die Instabilität, welche bisherige Algorithmen mit sich gebracht haben. So konnten Probleme durchaus mit RL Algorithmen gelöst werden, änderte sich das Problem jedoch minimal, so versagten die RL Algorithmen bereits. \cite[]{sac}
+Model-Free RL Algorithmen haben immer mit zwei großen Herausforderungen gekämpft, welche ihre Performanz deutlich reduziert haben. Die erste der beiden Herausforderungen ist die Sample Komplexität. So hatten sogar kleine Aufgaben das Problem, dass sie bereits Millionen von Datenpunkten brauchen. Die zweiten große Herausforderungen ist die Instabilität, welche bisherige Algorithmen mit sich gebracht haben. So konnten Probleme durchaus mit RL Algorithmen gelöst werden, änderte sich das Problem jedoch minimal, so versagten die RL Algorithmen bereits. \cite[]{sacv2}
 
-SAC löst diese Herausforderungen, in dem es Konzepte aus anderen Algorithmen verwendet und diese kombiniert um eine Brücke zwischen Stochastischen Policy Optimierungen und DDPG Algorithmen herzustellen. Außerdem werden die Vorteile aus anderen Algorithmen verwendet, wie der Replay Buffer um auf vergangende Transitions zugreifen zu können, oder die Verwendung des dualen Critic-Netzwerk Tricks. \cite[]{brockman2016openai}
+SAC löst diese Herausforderungen, in dem es Konzepte aus anderen Algorithmen verwendet und diese kombiniert, um eine Brücke zwischen Stochastischen Policy Optimierungen und DDPG Algorithmen herzustellen. Außerdem werden die Vorteile aus anderen Algorithmen verwendet, wie der Replay Buffer, um auf vergangene Transitions zugreifen zu können, oder die Verwendung des dualen Critic-Netzwerk Tricks. \cite[]{brockman2016openai}
 
-Das Zentrale neue Konzept, welcher den SAC definiert und auch für die Namensgebung sorgt, ist die Idee der Entropy Regularization. Während reguläre RL Algorithmen lediglich das Ziel haben, zu versuchen den Reward beziehungsweise den erwarteten Reward zu maximieren, hat der SAC außerdem einen Entropy Anteil neben dem Reward. Das Ziel des SAC ist es somit, sowohl den Reward als auch die Entropy zu maximieren. So wird die Entropy $\mathcal{H}(\pi(\cdot | s_t))$ hier definiert durch,
+Das zentrale neue Konzept, welcher den SAC definiert und auch für die Namensgebung sorgt, ist die Idee der Entropy Regularization. Während reguläre RL Algorithmen oft lediglich das Ziel haben, zu versuchen den Reward beziehungsweise den erwarteten Reward zu maximieren, hat der SAC außerdem einen Entropy Anteil neben dem Reward. Das Ziel des SAC ist es somit, sowohl den Reward als auch die Entropy zu maximieren. So wird die Entropy $\mathcal{H}(\pi(\cdot | s_t))$ hier definiert durch,
 \begin{align}
     \mathcal{H}(\pi(\cdot | s_t)) = \mathbb{E}_{a\backsim \pi(\cdot | s)}[-\log(\pi(a|s))],
 \end{align}
@@ -277,7 +277,7 @@ und erweitert die Optimale Stochastische Policy dementsprechend im Reward Anteil
 \begin{align}
     \pi^* = \arg \max_{\pi} \underset{\tau \backsim \pi}{E} \left[\sum_{t=0}^{\infty} \gamma^t\left(R(s_t, a_t, s_{t+1}) + \alpha \mathcal{H}(\pi(\cdot | s_t))\right)  \right].
 \end{align}
-Der Temperatur Parameter $\alpha > 0$, kontrolliert die relative Gewichtung der Entropy $\mathcal{H}$ im Vergleich zum herkömmlichen Reward $r$ und wird somit als einer der Hyperparameter betrachtet, welcher beim Trainieren der Modelle angepasst und optimiert werden muss.
+Der Temperatur Parameter $\alpha > 0$, kontrolliert die relative Gewichtung der Entropy $\mathcal{H}$ im Vergleich zum herkömmlichen Reward $r$ und wird somit als einer der Hyperparameter betrachtet, welcher beim Trainieren der Modelle angepasst und optimiert werden muss. Eine Optimierung der Größe ist daher wichtig, da jedes Environment sich voneinander unterscheidet. Der Temperatur Parameter dient gleichzeitig auch als der Parameter, welcher kontrolliert, ob der SAC versucht das bisherige Wissen mehr auszunutzen, oder ob er versucht neue Wege versucht zu finden, um seinen erwarteten Reward zu erhöhen. So bedeutet ein hoher Wert für $\alpha$, dass der SAC mehr Erkundung nach neuen Wegen durchführt, hingegen sorgt ein niedriger Wert dazu, dass der SAC eher auf bereits bekanntes Wissen setzt.
 
 Durch die Einführung der Entropy in die Policy, verändert sich auch die Value Function und wird erweitert durch dem Entropy Term,
 \begin{align}
@@ -287,9 +287,9 @@ Abschließend wird auch die Q-Function erweitert um den Entropy Term zusammen mi
 \begin{align}
     Q^{\pi}(s, a) = \underset{\tau \backsim \pi}{E}\left[\sum_{t = 0}^{\infty} \gamma^t R(s_t, a_t, s_{t+1}) + \alpha \sum_{t = 1}^{\infty} \gamma^t \mathcal{H}(\pi(\cdot | s_t)) \vert s_0 = s, a_0 = a \right].
 \end{align}
-Diese neuen Definitionen für die Value Function und Q-Function können nun vereint werden und letztendlich verwendet werden, um die Bellman Gleichung \ref{eq:bellmansac} für den SAC aufzustellen. \cite[]{sac} \cite[]{brockman2016openai}
+Die neuen Definitionen für die Value Function und Q-Function können nun vereint werden und letztendlich verwendet werden, um die Bellman Gleichung \ref{eq:bellmansac} für den SAC aufzustellen. \cite[]{sacv2} \cite[]{brockman2016openai}
 \begin{align}
-    V^{\pi}(s) = \underset{a \backsim a}{E} \left[Q^{\pi}(s, a)\right] + \alpha \mathcal{H}(\pi(\cdot | s))
+    V^{\pi}(s) = \underset{a \backsim \pi}{E} \left[Q^{\pi}(s, a)\right] + \alpha \mathcal{H}(\pi(\cdot | s)) \label{eq:value_sac}
 \end{align}
 
 \begin{align}
@@ -297,20 +297,60 @@ Diese neuen Definitionen für die Value Function und Q-Function können nun vere
                  & = \underset{s' \backsim P}{E} \left[R(s,a,s') + \gamma V^{\pi}(s')\right]. \label{eq:bellmansac}
 \end{align}
 
+Beim Lernprozess des SAC, werden sowohl die Policy $\pi_{\theta}$, als auch die beiden Critic-Netzwerke beziehungsweise Q-Functions $Q_{\phi_1}$ und $Q_{\phi_2}$ optimiert. Je nachdem, welche Version vom SAC verwendet wird, unterscheidet sich der Lernprozess ein wenig. Fokussiert werden soll hier jedoch auf die 2. Version, welche bereits den dualen Critic-Netzwerk Trick verwendet und außerdem noch das Value Function Netzwerk besitzt, um einen State zu bewerten. Die neuste Version des SAC besitzt dieses Value Function Netzwerk nicht mehr, da Erfahrungen gezeigt haben, dass dieses nicht wirklich relevant für die Erzeugung von Ergebnissen ist. \cite[]{sacv3}
 
-\begin{algorithm}
-    \caption{Soft Actor-Critic Algortihmus}\label{pse:sac_pseudo}
+Der Lernprozess selbst ist hierbei ziemlich ähnlich zu dem des TD3 Algorithmus, welcher im Grunde einem SAC Algorithmus entspricht, wenn alle Stochastischen Eigenschaften entfernt werden. Die beiden Q-Functions werden optimiert, beziehungsweise lernen durch die Mean-Squared Bellman Error (MSBE) Minimierung des Losses $L(\phi_i, \mathcal{D})$ mit einem Targetnetzwerk $y(r, s', d)$,
+\begin{align}
+    L(\phi_i, \mathcal{D}) = \underset{(s, a, r, s', d) \backsim \mathcal{D}}{E}\left[\left(Q_{\phi_i}(s,a) - y(r, s', d)\right)^2 \right]
+\end{align}
+wobei das Targetnetzwerk gegeben ist durch,
+\begin{align}
+    y(r,s', d) = r+\gamma(1-d)\left(\min_{j=1,2}Q_{targ,j}(s', \widetilde{a}')-\alpha \log \phi_{\theta}(\widetilde{a}' | s')\right), \widetilde{a}'\backsim \pi_{\theta}(\cdot |s').
+\end{align} \label{eq:target}
+Es wird am Ende die Q-Function vom SAC Algorithmus verwendet, welche den kleineren Loss $L(\phi_i, \mathcal{D})$ besitzt.
+
+Die Policy $\pi_{\theta}$ des SAC hat das Ziel, für jeden State den erwarteten Reward und die erwartete Entropy zu maximieren, somit hat sie das Ziel die Value Function $V^{\pi}(s)$ zu maximieren, wie sie bereits zuvor in Gleichung \ref{eq:value_sac} definiert wurde. Diese wird nun umgeschrieben zu,
+\begin{align}
+    V^{\pi}(s) = \underset{a \backsim \pi}{E} \left[Q^{\pi}(s, a)\right] - \alpha \log(\pi(a | s)) \label{eq:value_sac2}
+\end{align}
+diese Umwandlung der Value Function $V^{\pi}(s)$ hat den Zweck, das nun ein sogenannter Reparameterisation Trick angewendet werden kann. Das Ziel des Tricks ist es die Möglichkeit zu besitzen, nun nicht mehr Abhängig von den Parametern $\theta$ zu sein. Durch diesen Trick werden die Action $a$ nun gesampled durch eine Squashed Guassian Policy,
+\begin{align}
+    \widetilde{a}_\theta(s, \zeta) = \tanh(\mu_\theta(s) + \sigma_\theta(s) \odot \zeta), \zeta \backsim \mathcal{N} (0, I)
+\end{align}
+was zur Folge hat, das auch in $V^{\pi}(s)$ unabhängig von $\theta$ die Action $\widetilde{a}_\theta(s, \zeta)$ gesampled wird,
+\begin{align}
+    V^{\pi}(s) = \underset{\zeta \backsim \mathcal{N} }{E} \left[Q^{\pi\theta}(s, \widetilde{a}_\theta(s, \zeta)) - \alpha \log\pi_\theta(\widetilde{a}_\theta(s, \zeta) | s)\right]
+\end{align}
+Abschließend, damit nun auch der tatsächliche Policy Loss bestimmt werden kann, muss nur noch das $Q^{\pi\theta}$ substituiert werden durch einen Approximierer,
+\begin{align}
+    \max_\theta \underset{\underset{\zeta \backsim \mathcal{N} }{s \backsim \mathcal{D} }}{E} \left[\min_{j=1,2}Q_{\phi_j}(s,\widetilde{a}_\theta(s, \zeta)) - \alpha \log \pi_\theta(\widetilde{a}_\theta(s, \zeta)|s)\right].
+\end{align}
+\cite[]{sacv2} \cite[]{brockman2016openai}
+
+\newpage
+Eine Übersicht über den kompletten Lernprozess des SAC, soll noch einmal in dem folgenden Pseudocode gezeigt werden,
+\begin{algorithm}[H]
+    \caption{Soft Actor-Critic Algorithmus}\label{pse:sac_pseudo}
     \begin{algorithmic}[1]
-        \State Initialisiere Policy $\pi$ Parameters $\theta$, Q-Functions/ANN Parameter $\phi_1, \phi_2$ und den Replay Buffer $D$
+        \State Initialisiere Policy $\pi$ Parameters $\theta$, Q-Functions/ANN Parameter $\phi_1, \phi_2$ und den Replay Buffer $\mathcal{D}$
         \State Setze Targetnetzwerk Parameter gleich den Hauptparametern $\phi_{targ,1} \leftarrow \phi_1, \phi_{targ,2} \leftarrow \phi_2$
         \For{Iteration}
         \State Observiere State $s$ und wähle Action $a \backsim \pi_{\theta}(\cdot | s)$
         \State Führe Action $a$ aus und sorge für State Transition zu $s'$
         \State Observiere State $s'$, Reward $r$ und das Episoden Signal $d$
+        \State Speicher $(s, a, r, s', d)$ im Replay Buffer $\mathcal{D}$
         \If{$d = \text{True}$}
-        \State Beende frühzeitig da Episode zuende
+        \State Beende frühzeitig, da Episode zuende und setze Environment zurück
         \EndIf
-        \State Buil
+        \If{Zeit für Updates}
+        \For{$j$ in $n$-Updates}
+        \State Nehme ein Batch von Transitions $B = \left\{(s, a, r, s', d)\right\}$ aus $\mathcal{D}$
+        \State Bestimmte Targets $y$ für Q-Functions nach Gleichung \ref{eq:target}
+        \State Update die Q-Functions durch Gradientenverfahren um einen Schritt
+        \State Update die Policy durch Gradientenverfahren um einen Schritt
+        \State Update die Targetnetzwerke
+        \EndFor
+        \EndIf
         \EndFor
     \end{algorithmic}
 \end{algorithm}
