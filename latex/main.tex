@@ -74,7 +74,7 @@ Reinforcement Learning Algorithmen}
 \chapter{Einleitung} \label{sec:einleitung}
 \section{Motivation} \label{sec:motivation}
 Die dynamischen Systeme oder auch Regelstrecken, welche es heutzutage überall auf der Welt gibt, werden immer größer und komplexer. Sie finden sich als kleine, einfach zu regelnde Systeme, wie eine automatische Heizung, die per Zweipunktregler in ihrem Thermostat die Raumtemperatur konstant auf einem Wert halten soll. Allerdings finden sich auch als komplexe Regelkreise wieder, wie in Fabriken oder in Kraftwerken wie dem Bremer Müllheizkraftwerk wieder. Hier existieren auch zum Beispiel Messeinheiten, welche die momentanen Prozesstemperaturen aufnehmen, und verwendet werden, um einen Soll-/Istwert vergleich, als Eingang für einen Regler zu verwenden. Nur existieren viele Störgrößen, welche einen gezielten Reglerentwurf sehr schwierig machen. Störgrößen können unbekannt oder gar ungeplant sein. So kann im Falle des Bremer Müllheizkraftwerks auf die Menge, welche zu einem Zeitpunkt verbrannt wird, eingegangen werden. Wie heiß die nächste Ladung an Müll jedoch brennen wird, ist relativ unbekannt und stark variierend. Abhilfe für den Reglerentwurf für komplexe Regelkreise sollen Algorithmen bieten, welche selbstständig und autonom lernen können, den richtigen Stelleingriff in einem spezifischen Systemzustand vorzunehmen.
-\section{Zielsetzung} \label{sec:zielsetzung}
+\section{Zielsetzung EDIT} \label{sec:zielsetzung}
 Das Ziel dieser Arbeit soll sein, mittels eines Reinforcement Learning Agenten ein beispielhaftes dynamisches Modell zu regeln. \textbf{Gezeigt werden sollen außerdem Methoden, um dynamische Systeme mithilfe von bestehenden Methodiken zu erstellen und sie anschließend mit dem Agenten zu verbinden.} Um die Modelle für diesen Ansatz zu erstellen, wird die Software Simulink/MATLAB von Mathworks eingesetzt. \cite[]{simulink} Der Grund hierfür ist, da bereits ein bestehendes Grundverständnis für das Toolkit existiert und Simulink mit seinen zahlreichen Schaltblöcken eine elegante und bewährte Methode anbietet, um Modellbildung durchzuführen. Das in Simulink erstellte Modell, soll anschließend in ein Python-Modell transformiert werden. Für das Training des RL-Agenten eignet sich Python \cite[]{python} besonders, da es viele vorimplementierte Algorithmen gibt, die verhältnismäßig einfach an die Problematik angepasst werden können. Als beispielhaftes dynamisches Modell soll ein Kräftemodell eines Schiffes verwendet werden, welches Störgrößen wie einem Wind besitzt, welcher aus allen möglichen Richtungen mit verschiedener Geschwindigkeit wehen kann. Des Weiteren werden indirekte Störgrößen, wie die Trägheit des Schiffes modelliert, um eine Regelung für den Agenten durch Verzögerungseffekte komplizierter zu machen. Der Agent soll lernen das Modell korrekt zu regeln, in dem er mit dem Ruder des Schiffes interagieren darf.
 
 \section{Aufbau der Arbeit} \label{sec:aufbau_arbeit}
@@ -315,7 +315,7 @@ Die Policy $\pi_{\theta}$ des SAC hat das Ziel, für jeden State den erwarteten 
 \end{align}
 diese Umwandlung der Value Function $V^{\pi}(s)$ hat den Zweck, das nun ein sogenannter Reparameterisation Trick angewendet werden kann. Das Ziel des Tricks ist es die Möglichkeit zu besitzen, nun nicht mehr Abhängig von den Parametern $\theta$ zu sein. Durch diesen Trick werden die Action $a$ nun gesampled durch eine Squashed Guassian Policy,
 \begin{align}
-    \widetilde{a}_\theta(s, \zeta) = \tanh(\mu_\theta(s) + \sigma_\theta(s) \odot \zeta), \zeta \backsim \mathcal{N} (0, I)
+    \widetilde{a}_\theta(s, \zeta) = \tanh(\mu_\theta(s) + \sigma_\theta(s) \odot \zeta), \zeta \backsim \mathcal{N} (0, I) \label{eq:reparamtrick}
 \end{align}
 was zur Folge hat, das auch in $V^{\pi}(s)$ unabhängig von $\theta$ die Action $\widetilde{a}_\theta(s, \zeta)$ gesampled wird,
 \begin{align}
@@ -359,10 +359,53 @@ Eine Übersicht über den kompletten Lernprozess des SAC, soll noch einmal in de
 
 \section{Verwendete Software und Bibliotheken} \label{sec:software_bibs}
 Der Großteil der ganzen Arbeit wurde mithilfe der Programmiersprache Python \cite[]{python} umgesetzt. Python bietet den Vorteil an, dass es vergleichsweise eine recht einfache Sprache ist und außerdem eine ziemlich große Auswahl an Bibliotheken im Bereich Machine Learning bietet. Die verwendete Machine Learning Bibliothek in dieser Arbeit ist PyTorch \cite[]{pytorch}. PyTorch ist ein Framework, mit welchem die neuronalen Netzwerke für den Agenten einfach und mit viel Freiheit definiert werden können. So können zum Beispiel die Forward Function, oder die Learn Function des neuronalen Netzwerks frei, und mit kompletter Kontrolle definiert werden. Grafiken und die Videodateien, welche für die Visualisierung und Auswertung einer Episode verwendet werden, wurden mithilfe der Matplotlib \cite[]{matpltlib} Bibliothek generiert. Da der Agent zwingend ein Environment benötigt, in welchem das dynamische Modell simuliert werden kann, wurde zusätzlich die Bibliothek Gym von OpenAI \cite[]{brockman2016openai} verwendet. Gym bietet ein Framework an, welches dem Benutzer mit vordefinierten Functions die Möglichkeit bietet, Environment zu erstellen. So werden zum Beispiel die Step, oder Reset Function vorgegebene, welche dazu verwendet werden, um einen Zeitsprung innerhalb einer Episode durchzuführen. Im Falle der Reset Function würde das Environment wieder auf seinen Ursprungsstate zurückgesetzt werden. Dies bedeutet, dass Eigenschaften des Environments, wie die Schiffsposition oder der momentane Reward, wieder auf den Ursprung des Koordinatensystems gesetzt wird beziehungsweise der Reward wieder 0 ist.
-\section{Implementierung des Agenten TODO} \label{sec:imp_agent}
-Wie bereits erwähnt im vorherigen Untekapitel \ref{sec:software_bibs}, wurde für diese Arbeit PyTorch verwendet, um den Agenten zu implementieren. Wie genau diese Implementierung nun umgesetzt wurde, soll mit diesem Unterkapitel verdeutlicht werden.
+\section{Implementierung des Agenten in Python} \label{sec:imp_agent}
+Zuvor wurde schon erwähnt, dass für diese Arbeit PyTorch verwendet wird, um den Agenten zu implementieren. Wie genau diese Implementierung nun umgesetzt wurde, soll mit diesem Unterkapitel verdeutlicht werden.
 
-\section{Umsetzung des Modells in Simulink} \label{sec:imp_simulink}
+Die erste Komponente des SAC Agenten, soll hier der Replay Buffer $\mathcal{D}$ sein, dieser wurde Implementiert als eine eigene Klasse, welche als Klassenattribute Listen besitzt um die verschiedenen Datenpunkte aus einer Transition $(s, a, r, s', d)$ zu speichern. Zum speichern einer neuen Transisiton wird die Methode \textit{store\_transition} verwendet. Um nun aus dem Replay Buffer einen Batch zu bekommen, wird die Methode \textit{sample\_buffer} verwendet. Das entnehmen, beziehungsweise Sampling erfolgt hierbei zufällig.
+
+Bevor nun die tatsächliche Klasse beschrieben werden kann, welche den Agenten selbst Implementiert. Soll erst einmal auf die verschiedenen neuronalen Netzwerke eingegangen werden, welche mit Hilfe von PyTorch Implementiert wurden. Wie zuvor in der Theorie zum SAC, werden ingesamt drei Arten von neuronalen Netzwerken verwendet, das Actor/Policy Netzwerk, die beiden Critic/Q-Function Netzwerke und das Value Netzwerk. Die Netzwerke selbst wurden alle jeweils als eine eigene Klasse implementiert, welche eine \textit{forward} Klassenmethode besitzen um eine propagation der Daten durch die Netzwerke zu ermöglichen. Alle drei Netzwerktypen verwenden die gleiche Grundlegende Netzwerktopologie von zwei auf einander geschichteten Dense Layern mit einer breite von 256 Neuronen. Analog zu den selben Netzwerktopologien, wurden auch in allen drei Fällen die selben Aktivierungsfunktionen und Optimierer verwendet. Für die Aktivierungsfunktionen wird ReLU verwendet, während für die Optimierer der Adam Algorithmus \cite[]{kingma2014method} verwendet wird. Gegeben durch die formale Definition der Policy, variiert das Policy Netzwerk ein wenig im Vergleich zu den anderen beiden Typen. Das Value Netzwerk wird verwendet um sowohl eine Standardabweichung als auch einen Mittelwert zu bestimmen, weshalb es hier zwei Ausgangsneuronen gibt. Bei den anderen beiden Netzwerktypen gibt es hingegen lediglich ein Neuron. Ein weiterer Unterschied bei den äußeren Schichten der neuronalen Netzwerke findet sich außerdem bei den Anzahlen der Eingangsneuronen. Nach formaler Definition benötigen die Critic/Q-Function Netzwerke sowohl den State als auch die Action, während das Value und Policy Netzwerk nur den State benötigt. Alle drei Netzwerktopologien finden sich noch einmal in vereinfachter Version Visualisert in den folgenden drei Abbildungen.
+
+\begin{figure}[H]
+    \includegraphics[width=0.7\textwidth]{graphics/critic.pdf}
+    \centering
+    \caption{Die vereinfachte Topologie des Critic Netzwerkes um die Q-Functions abzubilden. Hier mit dem State und den Actions als Eingangswerte und dem Q-Wert als Ausgang.}
+    \label{abb:critic_network}
+\end{figure}
+
+\begin{figure}[H]
+    \includegraphics[width=0.7\textwidth]{graphics/value.pdf}
+    \centering
+    \caption{Die vereinfachte Topologie des Value Netzwerkes um die Value-Function abzubilden. Mit dem State als Eingangswert und dem Wert des States als Ausgang.}
+    \label{abb:value_network}
+\end{figure}
+
+\begin{figure}[H]
+    \includegraphics[width=0.7\textwidth]{graphics/policy.pdf}
+    \centering
+    \caption{Die vereinfachte Topologie des Policy Netzwerkes. Mit dem State als Eingangswert und der Standardabweichung und dem Mittelwerk als Ausgang.}
+    \label{abb:policy_network}
+\end{figure}
+
+Innerhalb der Klasse, welche das Policy Netzwerk Implementiert, wurde zudem eine weitere Klassenmethode hinzugefügt. Nämlich die \textit{sample\_normal} Klassenmethode, welche genau der Funktion entspricht, welche dem Agenten oder der Policy die Fähigkeit bietet eine Action aus einer Gaussischen Verteilung zu wählen. Desweiteren bietet diese Methode die Möglichkeit eine Log-Likelihood zu ermitteln, welche unteranderem verwendet wird um dann das Target-Value Netzwerk zu aktualisieren während des Lernprozesses.
+
+Die Klasse, welche nun den SAC selbst beschreibt ist aufgebaut, indem zu erst einmal alle vorher Implementierten Netzwerktypen und der Replay Buffer initialisiert werden. Dabei kommen nun die folgenden Netzwerke in Frage,
+\begin{enumerate}
+    \item Poliy Netzwerk
+    \item Critic Netzwerk 1
+    \item Critic Netzwerk 2
+    \item Value Netzwerk
+    \item Target-Value Netzwerk
+\end{enumerate}
+Für das Sampling, oder wählen einer Action wird die Klassenmethode \textit{choose\_action} definiert, welche als Argument eine Observation verwendet. Die Observation wird innerhalb der Klassenmethode dann an die Klassenmethode \textit{sample\_normal} des Policy Netzwerkes weitergeben, welche die Observation für eine Standardabweichung und einem Mittelwerk durch das Netzwerk propagiert. Mit Hilfe der Standardabweichung und des Mittelwertes kann dann anschließend unter Verwendung des Reparameterisation-Tricks wie beschrieben in Gleichung \ref{eq:reparamtrick} eine Verteilung bestimmt werden, außer welcher dann eine Action genommen wird.
+
+Die Klassenmethode, welche das Updaten des Target-Value Netzwerkes vornimmt, ist Implementiert mit der \textit{update\_network\_parameters} Klassenmethode. Diese wird während des Lernprozesses aufgerufen und kopiert lediglich unter Verwendung der PyTorch Standardmethoden die Netzwerkparameter des Target Netzwerkes zum Target-Value Netzwerk.
+
+Die Klassenmethode \textit{learn}, ist mit die wichtigste Klassenmethode, da sie dem SAC die Möglichkeit bietet überhaupt lernen zu können. Sie funktioniert wie bereits in der Theorie beschrieben, indem zu erst ein Batch aus dem Replay Buffer genommen wird. Der Batch wird anschließend an die verschiedenen Netzwerke weitergegeben, damit die Daten dann durch die Netzwerke propagiert werden können. Anschließend folgen die verschiedenen Schritte definiert in den diversen formalen Gleichungen um die Loss Werte zu bestimmen, die Critic Netzwerke zu vergleichen und letztendlich alle Netzwerke mit den neuen gelernten Informationen anzupassen.
+
+Damit der SAC in seinen internen Replay Buffer schreiben kann, wurde die \textit{remember} Klassenmethode definiert, welche lediglich die Replay Buffer Methode \textit{store\_transition} aufruft und die Transition übergibt. Es existieren außerdem einige Hilfsmethoden, welche dafür sorgen, dass Netzwerke zwischen gespeichert werden können um zu einem späteren Zeitpunkt wieder verwendet werden zu können. Auch diese verwenden erneut die Standardmethoden von PyTorch um die Netzwerkparameter in ein Dictonary zu speichern, welches dann in eine Datei geschrieben wird.
+
+\section{Modellbildung des Schiffs mit Simulink} \label{sec:imp_simulink}
 Das in dieser Arbeit verwendete dynamische Modell, soll wie bereits in der Zielsetzung erwähnt ein Kräftemodell sein, welches eine Schiffsfahrt modelliert. Die Grundidee des Modells ist es dabei, dass das Schiff im Ursprung eines Koordinatensystems startet und dann das Ziel hat, innerhalb eines vordefinierten Bereichs nach rechts zu einer Ziellinie zu fahren. Hierbei gibt es das zweitrangige Ziel für das Schiff, dass es bei seiner Überfahrt so mittig im vordefinierten Bereich bleiben soll wie möglich. Die folgende Abbildung \ref*{abb:boat_frame_example_2} soll eine Visualisierung für das gewollte Modell bieten.
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{graphics/boat_frame_example_2.png}
@@ -610,19 +653,124 @@ Zusehen ist, dass das Modell in Python angetrieben wird durch eine $while$-Schle
     \includegraphics[width=\textwidth]{graphics/python_parachute_s_plot.png}
     \centering
     \caption{Plot der Höhe des Fallschirmspringers gegen die Zeit im Python Modell}
-    \label{fig:python_parachute_s_plot}
+    \label{abb:python_parachute_s_plot}
 \end{figure}
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{graphics/simulink_parachute_s_plot.png}
     \centering
     \caption{Plot der Höhe des Fallschirmspringers gegen die Zeit im Simulink Modell}
-    \label{fig:simulink_parachute_s_plot}
+    \label{abb:simulink_parachute_s_plot}
 \end{figure}
 
-\subsection{Aufbau des Schiffmodells TODO} \label{sec:aufbau_schiffsmodell}
+\subsection{Aufbau des Schiffmodells} \label{sec:aufbau_schiffsmodell}
+Das nun in Simulink gebildete Modell soll zusammen mit den zuvor erwähnten Methoden in Python implementiert werden. Als Grundlage wird hierfür ein Environment aus der Gym Bibliothek von OpenAI verwendet. Das gesamte Modell wird innerhalb der \textit{BoatEnv} Klasse definiert, welche von der Grundklasse für Environments aus Gym erbt. Gym schreibt einige Klassenattribute und Klassenmethoden vor, welche auf jeden Fall neu definiert werden müssen, damit das Environment von alleine funktionieren kann.
 
-\chapter{Ergebnisse TODO} \label{sec:ergebnisse}
+Das erste Klassenattribut ist der Actionspace, welcher dem Agenten seine möglichen Actions gibt, welche er durchführen kann. Da in dieser Arbeit der Agent das Schiff lediglich mit dem Rudern kontrollieren soll, wurde aus diesem Grund auch nur ein 1-Dimensionaler Actionsspace definiert, welcher eine Reichweite von $-1$ bis $1$ besitzt. An dieser Stelle ist es wichtig, dass außerdem der Actionsspace in einem von Gym vordefinierten \textit{Box}-Space definiert wird, da dies dafür sorgt, dass der Actionsspace auch tatsächlich kontinuierlich ist. Im weiteren Verlauf wurde festgestellt, dass die Reichweite des Actionsspaces zu extrem für die Regelung des Schiffes ist. Der Agent ist in Prinzip in der Lage, das Ruder von einem auf den andern Moment um $\SI{1}{\radian}$ zu bewegen, was bereits ziemlich realitätsfern ist. Da eine direkte Herunterskalierung der Reichweite des Actionsspaces selbst jedoch dazu führt, dass der SAC nicht mehr richtig funktioniert, beziehungsweise instabil wird. Stattdessen wird als Lösungsweg, die vom SAC gewählte Action durch 10 geteilt, um eine Herunterskalierung zu erlangen.
+
+Das zweite Klassenattribut, welches nun überschrieben beziehungsweise neudefiniert wurde, ist der Observationsspace. Für diese Arbeit wurde ein ziemlich großer Observationsspace gewählt, um dem Agenten somit möglichst viele Informationen geben zu können. Auch in diesem Fall wurde analog zum Actionsspace das vordefinierte \textit{Box}-Space verwendet, um Kontinuität zu besitzen. Es wurde ein Observationspace verwendet, welcher die folgenden Informationen über das Environment trägt,
+\begin{enumerate}
+    \item Schiffsposition und Ausrichtung $(s_x, s_y, s_r)$
+    \item Schiffgeschwindigkeit und Winkelgeschwindigkeit $(v_x, v_y, v_r)$
+    \item Schiffbeschleunigung und Winkelbeschleunigung $(a_x, a_y, a_r)$
+    \item Ausrichtung des Ruders und restlicher Treibstoff $(\alpha, f_{uel})$
+\end{enumerate}
+Die Größen der einzelnen Informationen wurden auf einen Bereich von $0$ bis $1$ normiert, da neuronale Netzwerke und somit der Agent dadurch deutlich effizienter funktionieren können. \cite[]{normalization_importance}
+
+Ein Gym Environment besitzt nun eine Reihe an Klassenmethoden, welche zusätzlich neben dem Actionsspace und dem Observationsspace implementiert werden müssen, damit ein Environment auch vollständig funktionieren kann. Die wichtigsten Klassenmethoden sind in diesem Fall die \textit{step} und \textit{reset} Methoden. Es gibt noch weitere, wie \textit{render}, diese wurden allerdings nicht verwendet beziehungsweise selbst auf anderem Wege implementiert.
+
+Die \textit{step} Methode ist die Klassenmethode, welche dafür sorgt, dass innerhalb einer Episode auch ein Schritt ausgeführt werden kann. Als Argument besitzt die Methode die Action, welche vom Agenten gewählt wurde. Das heißt, wenn der Agent eine Winkeländerung des Ruders von $\SI{0.2}{\radian}$ vornehmen möchte, sorgt diese Methode jetzt dafür, dass auch das Modell demnach angepasst wird und ein Simulationsschritt ausgeführt wird. Die Simulation des Schiffs, welche unter anderem durch die \textit{step} Methode angetrieben wird, wurde implementiert innerhalb einer eigenen Klasse, auf welche zusammen mit dem Wind später eingegangen werden soll. Während eines Schrittes innerhalb einer Episode wird auch der Reward berechnet, welcher der Agent nun erhält, für die Action und dem State in welchen er das Environment gebracht hat. Für die Berechnung des Rewards, wurde eine Reward Function Klasse konstruiert, welche abhängig davon wo das Schiff sich momentan befindet einen Reward bestimmt. Bei der Entwicklung und Visualisierung der mathematischen Funktionen, welche den Reward berechnen, wurde der Online Grafikrechner Desmos \cite[]{desmos} verwendet. Der in dieser Arbeit verwendete Reward wird abhängig von der aktuellen Position in der y-Achse berechnet durch,
+\begin{align}
+    r & = -f_y(s_y)                                                          \\
+      & = - \frac{\frac{|s_y|}{g_b}}{1 + e^{\frac{-a}{b}(|s_y| - 0.2 g_w)}}.
+\end{align}
+Es wurde zuvor damit experimentiert außerdem die Position in der x-Achse zu verwenden, jedoch sorgte dieses für eine Rewardverteilung welche nahe der Ziellinie zu viele positive Punkte am Rand des Spielfeldes gibt. Ein Resultat dadurch war, dass der Agent nicht stark genug am Rand bestraft wurde und ihn somit vermehrt ansteuerte und es zu frühzeitigen Episoden Beendungen kam. Stattdessen wird nun nur noch die y-Position verwendet, welche zu einer Rewardverteilung wie in Abbildung \ref{abb:reward_field} führt.
+
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{graphics/reward_field.png}
+    \centering
+    \caption{Visualisierung der Rewardverteilung über das gesamte Spielfeld des Schiffmodells.}
+    \label{abb:reward_field}
+\end{figure}
+
+Erkennbar in Abbildung \ref{abb:reward_field} ist nun, dass der Reward für den Agenten dauerhaft so gewählt ist, dass er zwangsweise in der Mitte des Spielfeldes bleiben muss, um nicht bestraft zu werden. Bewegt er sich von der Mitte weg, so wird er immer stärker bestraft.
+
+Es wurde zuvor bereits angedeutet, dass der Agent auch für seine ausgeführte Action einen Reward bekommt. Das Modell wurde so gebildet, dass sich das Ruder nicht außerhalb eines Winkels von $-\frac{\pi}{3} \leq \alpha \leq \frac{\pi}{3}$ befinden darf. Es wurde somit eine Bestrafung eingeführt für den Agenten, wenn er eine Action wählt, welche das Ruder in einen Winkel von $-\frac{\pi}{4} \leq \alpha \leq \frac{\pi}{4}$ setzen würde. Die Bestrafung wird hierbei linear größer, je weiter sich der Agent dem wirklichen Winkel nähert, welcher das Ruder zerstören würde. Erreicht der Agent die $-\frac{\pi}{3} \leq \alpha \leq \frac{\pi}{3}$ Grenze, so wird die Episode frühzeitig beendet. Des Weiteren wird der Agent dafür bestraft, dass er das Schiff so umlenkt, dass es von rechts nach links fahren würde. Eine positive Belohnung wird verteilt, wenn er erfolgreich die Ziellinie erreicht.
+
+Die folgende Liste, soll noch einmal darstellen, welche Kriterien existieren, die zu einer frühzeitigen (-) oder erfolgreichen (+) Beendigung einer Episode führen,
+\begin{enumerate}
+    \item[+] Das Schiff fährt in die Ziellinie
+    \item[-] Das Schiff fährt gegen den Rand des Spielfeldes
+    \item[-] Das Schiff besitzt keinen Treibstoff mehr
+    \item[-] Die maximale Simulationszeit wurde überschritten
+    \item[-] Das Ruder wurde zerstört
+\end{enumerate}
+
+Die letzte Klassenmethode aus dem Gym Environment, welche noch neudefiniert werden musste, ist die \textit{reset} Methode. Die Aufgabe dieser Methode ist es, das komplette Environment wieder in seinen Ursprungsstate zurückzusetzen. Hier werden also Aufgaben übernommen, wie die Generierung von neuen Windparametern, das Zurücksetzen des Schiffes auf den Ursprung und das Zurücksetzen der gesammelten Rewards dieser Episode.
+
+Die gesamte Simulation beziehungsweise das Modell des Schiffes wurde in eine gebundene Klasse implementiert. Das Ziel hierbei ist, die Übersicht klar zuhalten im Sinne der Softwareentwicklung, und außerdem eine Kapselung und damit Modularität zu besitzen. Innerhalb dieser Klasse finden sich nun unter anderem all die Integratoren, wie sie in Kapitel \ref{sec:integrator_test} beschrieben wurden. Analog zum Beispiel mit dem Fallschirmspringer, welcher vorgestellt wurde, um die in Python implementierten Integratoren zu testen, wurden auch hier erneut Klassenattribute verwendet, um die verschiedenen Laufvariablen für die Simulation zu definieren. Die drei Bewegungsgleichungen wurden jeweils in eine eigene Klassenmethode umgesetzt, welche beim Aufrufen aus einer \textit{run} Methode die Klassenattribute dementsprechend anpassen und einen Zeitschritt in der Simulation ausführen. Auch die Normalisierung der Werte, welche für den Observationsspace benötigt werden, wird hier durchgeführt. Die Maxima und Minima der jeweiligen Werte wurden experimentell in Simulink bestimmt, und innerhalb des Python-Modells als feste Werte verwendet. Im Beispiel des Fallschirmspringers wurde eine $while$-Schleife verwendet, um die gesamte Simulation anzutreiben. Diese existiert in diesem Fall nicht, da die Simulation von außerhalb mit der \textit{step} Methode des Gym Environments angetrieben wird und somit nur für die Länge einer Episode existiert bis sie zurückgesetzt wird. Es wurde dennoch eine maximale Laufzeit $t_{max}$ zusammen mit einer aktuellen Zeit $t$ implementiert. Diese dienen jedoch nur dazu, um sicherzustellen, dass das Modell auch wirklich beendet wird, falls von außerhalb Komplikationen unabhängig von der Simulation auftreten. Die Zeit $t$ wird außerdem verwendet, um Zugriff auf die Größen des Windes zu haben, welche per Index in diversen Listen gespeichert sind.
+
+Der Wind wurde wie auch die Simulation des Schiffes ausgelagert in eine eigene Klasse, für eine bessere Übersicht und mehr Kontrolle über die gewollten Eigenschaften des Windes. Im Grunde ist das Hauptziel der Wind-Klasse, die Möglichkeit zu bieten, alle sechs gewollten Wind Konfigurationen zu erstellen. Es wurde somit eine Klassenmethode erstellt, welche abhängig von einem Parameter, welcher in einer Konfigurationsdatei gesetzt werden kann, einen jeweiligen Wind erstellt. Einige Konfigurationen verlangen nach Kurvenverläufen, welche eine rein zufällig erstellt werden müssen. Hierfür wurde eine Hilfsmethode implementiert, welche $n$ Punkte mit gleichem Abstand in einer Reihe generiert. Die einzelnen Punkte, welche gesetzt wurden und einen zufälligen Wert zwischen 0 und 1 besitzen, werden dann abschließend per kubischen Interpolation miteinander verbunden.
+
+
+
+\chapter{Experimente und Ergebnisse TODO} \label{sec:ergebnisse}
+Im folgenden Kapitel werden die Experimente vorgestellt, welche mit der kompletten Implementierung des Agenten und seinem Environments durchgeführt wurden. Nach der Vorstellung der Experimente folgt dann abschließend die Präsentation der Ergebnisse mit der dazugehörigen Auswertung.
+
+\section{Experimente}
+Für diese Arbeit wurde die Untersuchung des dynamischen Modells und seiner Regelung durch einen SAC Agenten in insgesamt sechs Experimente aufgeteilt. Die Experimente befassen sich dabei in jeder Instanz darum, inwiefern der Agent in der Lage ist, das Schiff von der Startposition in die Ziellinie zuführen. Unterschieden wird zwischen den Experimenten dadurch, inwiefern die Störgröße von außen kontrolliert wird, welche den Agenten aus seiner Fahrbahn bringen soll. Das erste Experiment fängt ziemlich leicht an, schrittweise werden sie jedoch schwieriger. Somit soll das Limit des Agenten getestet werden, um herauszufinden, wo gegebenenfalls mehr Untersuchungen vonnöten sind, um den Agenten oder die Methodik selbst zu verbessern.
+
+Grundsätzlich gibt es dennoch gleichbleibende Einstellung bei den unterschiedlichen Experimenten. In jedem Experiment wurde dieselbe Rewardverteilung verwendet, wie sie bereits in Abbildung \ref{abb:reward_field} vorgestellt wurde. Außerdem sind die Eigenschaften des Spielbrettes selbst gleichbleibend. So wurde die Ziellinie immer bei 5900 auf der x-Achse gesetzt. Die Spielbrettbreite ist auch stetig so gewählt, dass die insgesamt 800 Einheiten groß ist. Die Koeffizienten und Größen, welche für die Modellierung des Schiffs verwendet wurden, verändern sich mit den Experimenten nicht.
+
+Die Abbildungen, welche hier in den einzelnen Experimenten verwendet werden, um unter anderen die Windeigenschaften zu visualisieren, wurden ohne Einfluss eines SAC Agenten generiert. Hier wurde nur eine konstante Propeller-Drehgeschwindigkeit gesetzt, um den Einfluss des Windes auf das Schiff zu erkennbar zu machen.
+
+\subsection*{Experiment 1}
+Das erste Experiment ist sehr einfach gehalten. Das Ziel ist es hier, die Ziellinie zu erreichen, ohne dass überhaupt eine Störgröße von Außen auf das Schiff wirkt. Der Wind ist hier komplett deaktiviert und das Schiff startet in der regulären Startposition, welches links auf dem Spielbrett liegt. Das Ziel dieses Experiments ist es vor allem zu überprüfen, ob der Agent überhaupt in der Lage ist, das Schiff in seiner Grundform ohne von außen wirkenden Störungen zu regeln. Es dient außerdem als eine Testumgebung, in welcher die Grundeinstellungen des Schiffs überprüft werden können, bevor später zu schwierigeren Szenarien übergegangen wird. So wurden hier unter anderem die Rewardverteilungen getestet, oder welche Kriterien für frühzeitige Beendungen sich wirklich lohnen.
+\subsection*{Experiment 2}
+Das zweite Experiment ist in Prinzip dem ersten Experiment ziemlich gleich. Auch hier weht aus keiner Richtung ein Wind als Störgröße. Der Unterschied liegt nur darin, dass hier die Startposition des Schiffes ein wenig variiert wird. Die Startposition wird hier auch links vom Spielfeld gewählt, jedoch wird zufällig eine Position der y-Achse gewählt. Es existiert hierbei eine oberere und unterere Grenze, in welcher das Schiff platziert werden kann, damit es nicht zu nah am äußeren Rand liegt und gewissen Spielraum hat noch irgendwie in die Mitte zu kommen. Ziel dieses Experiments soll es sein zu untersuchen, wie schnell der Agent in der Lage ist, das Schiff wieder in die Mitte des Spielbrettes zu kommen, um anschließend erfolgreich die Ziellinie zu erreichen. Ein Beispiel wie das Schiff in einem Experiment dieser Schwierigkeitsstufe startet, ist zu erkennen in der folgenden Abbildung,
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{graphics/settings/s2.png}
+    \centering
+    \caption{Ein Beispiel Ausschnitt von einem Experiment mit Schwierigkeitsstufe 2, deutlich zu erkennen ist, dass hier kein Wind weht und das Schiff in einer weit verschobenen Position nach unten beginnt.}
+    \label{abb:setting2}
+\end{figure}
+\subsection*{Experiment 3}
+Innerhalb des dritten Experiments wird das erste Mal untersucht, inwiefern der Agent auf den Wind reagiert. Für dieses Experiment soll der Wind jedoch nur aus einer Richtung wehen und stetig mit gleicher Geschwindigkeit. Die Windrichtung wird hier so gewählt, dass sie von unten nach oben im Spielbrett weht. Es wird eine konstante Geschwindigkeit von $\SI{0.5}{\m\per\s}$. Diese Größe wurde so gewählt, da sie durch Versuche gezeigt hat, dass sie einen vernünftigen Einfluss auf das Schiff hat, aber nicht so groß ist, dass der Agent überhaupt keine Chance hat dagegen wirken zu können. Die Startposition wird mit diesem Experiment nicht mehr variiert wie es im vorherigen Experiment der Fall war. Die folgende Abbildung zeigt wie der Wind das Schiff konstant von der Bahn schiebt,
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{graphics/settings/s3.png}
+    \centering
+    \caption{Das dritte Experiment, welches mit konstanter Windgeschwindigkeit das Schiff deutlich zu erkennen aus der Bahn nach außen drückt.}
+    \label{abb:setting3}
+\end{figure}
+\subsection*{Experiment 4}
+Mit dem vierten Experiment wird das dritte Experiment noch einmal schwieriger, indem nun außerdem die Windgeschwindigkeit fluktuiert und nicht mehr konstant bei $\SI{0.5}{\m\per\s}$ gehalten wird. Die Windrichtung wird erneut so gewählt, dass er von unten nach oben weht, hingegen wird die Windgeschwindigkeit jetzt zufällig in einem Bereich von $\SI{0}{\m\per\s}$ bis $\SI{0.5}{\m\per\s}$ gesetzt. Ein Beispiel zum Verlauf des Windes ist zu erkennen in der folgenden Abbildung \ref{abb:setting4},
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{graphics/settings/s4.png}
+    \centering
+    \caption{Ein Ausschnitt, wie das Initiale State aus einem Experiment mit Schwierigkeitsstufe 4 aussieht. Hier zu erkennen, wie der Wind mit variierender Geschwindigkeit auf das Schiff wirken wird innerhalb der Episode.}
+    \label{abb:setting4}
+\end{figure}
+In diesem Beispiel ist unter anderem zu erkennen, dass der Wind zum Beginn der Episode recht milde weht, hingegen wird er gegen Ende sehr vergleichsweise stark sein.
+
+\subsection*{Experiment 5}
+Das fünfte Experiment hat das Ziel, das erste Mal zu untersuchen, wie nun der Agent auf verschiedene Windrichtungen wirkt. Die Richtung ist jedoch noch immer in einem limitieren Bereich definiert. Innerhalb dieses Experiments soll er nämlich nur von entweder oben nach unten oder unten nach oben wehen. Er verfügt somit nicht die Möglichkeit das Schiff irgendwie in der longitudinalen Richtung zu beschleunigen, kann es jedoch trotzdem jetzt in zwei Richtungen von der Bahn lenken. Für dieses Experiment wird der Wind jedoch so gewählt, dass er erneut eine strickte Geschwindigkeit von $\SI{0.5}{\m\per\s}$ besitzt. Abbildung \ref{abb:setting4} soll zeigen, wie der Wind in diesem Fall aussehen würde, wenn er zufällig generiert wird.
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{graphics/settings/s5.png}
+    \centering
+    \caption{Ein Experiment mit Schwierigkeitsstufe 5, hier unter anderem zu erkennen, wie der Wind die Form einer Rechteckkurve annimmt, da er lediglich aus zwei Richtungen wehen kann.}
+    \label{abb:setting5}
+\end{figure}
+
+\subsection*{Experiment 6}
+Das letzte und schwierigste Experiment soll aus den vorherigen Experimenten allerlei Elemente zusammenfassen. Die einzige Eigenschaft, welche hier nicht übernommen wurde, ist die der verschobenen Anfangspositionen. Da hier ein Wind aus allen Richtungen wehen kann, kam es bei ersten Versuchen oft zu der Situation, dass das Schiff innerhalb von nur wenigen Schritten schon aus dem Spielfeld geschoben wurde. Dem SAC Agenten war es somit gar nicht möglich, überhaupt eine Regelung vorzunehmen. Die anderen Eigenschaften werden jedoch übernommen, es ist somit nun möglich, dass der Wind mit variierender Geschwindigkeit aus allen Richtungen wehen kann. Das Schiff kann also von der Bahn gelenkt werden und außerdem eine Beschleunigung in longitudinaler Richtung erfahren. Ein Ausschnitt, der nun zeigt, wie dies aussieht, findet sich in Abbildung \ref{abb:setting6},
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{graphics/settings/s6.png}
+    \centering
+    \caption{Das Experiment der Schwierigkeitsstufe 6, hier zu erkennen, wie der Wind nun aus allen Richtungen wehen kann und seine Geschwindigkeit variabel ist.}
+    \label{abb:setting6}
+\end{figure}
+
+\section{Ergebnisse und Auswertung}
 
 \chapter{Diskussion TODO} \label{sec:diskussion}
 
