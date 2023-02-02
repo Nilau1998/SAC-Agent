@@ -37,14 +37,14 @@ class Wind:
                 self.wind_angle = np.full(self.wind_range_length, 0)
                 # y position changing happens in boat_env.py
 
-            case 3:  # Constant wind velocity, direction bottom to top
+            case 3:  # Constant wind velocity, wind direction bottom to top
                 max_velocity = float(self.config.wind.max_velocity)
                 self.wind_velocity = np.full(
                     self.wind_range_length, max_velocity)
                 angle = float(self.config.wind.direction) * (np.pi/180)
                 self.wind_angle = np.full(self.wind_range_length, angle)
 
-            case 4:  # Changing wind velocity, direction bottom to top
+            case 4:  # Changing wind velocity, wind direction bottom to top
                 max_velocity = float(self.config.wind.max_velocity)
                 self.wind_velocity = self.generate_random_curve() * max_velocity
                 angle = float(self.config.wind.direction) * (np.pi/180)
@@ -57,10 +57,10 @@ class Wind:
                 self.wind_angle = (self.rect_random_curve(
                     middle=0.5) * np.pi) + np.pi/2
 
-            case 6:  # Changing wind velocity, all directions random
+            case 6:  # Changing wind velocity, all wind directions random
                 max_velocity = float(self.config.wind.max_velocity)
                 self.wind_velocity = self.generate_random_curve() * max_velocity
-                self.wind_angle = self.generate_random_curve() * np.pi
+                self.wind_angle = self.generate_random_curve() * np.pi * 2
 
             case _:
                 raise ValueError(

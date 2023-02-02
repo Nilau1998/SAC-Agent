@@ -177,7 +177,8 @@ class ControlCenter:
 
 
 if __name__ == '__main__':
-    subdir = 'testing'
+    subdir = 'setting_' + \
+        str(get_config('original_config.yaml').base_settings.experiment)
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-t', '--train',

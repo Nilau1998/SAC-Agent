@@ -161,7 +161,9 @@ dmypy.json
 # Personal settings
 .vscode/
 toy.py
+test.py
 experiments/
+not_evaluated/
 notes
 out.profile
 .gitlab-ci.yml

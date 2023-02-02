@@ -43,14 +43,19 @@ class RewardFunction:
         y = position[1]
 
         def f_x(x):
-            return self.x_b * (x / self.track_length)
+            return 0
 
         def f_y(y):
             return (np.abs(y)/self.track_width) / \
-                (1+np.exp((-self.y_a/self.y_b)*(np.abs(y)-(self.track_width * 0.2))))-0.1
+                (1+np.exp((-self.y_a/self.y_b)*(np.abs(y)-(self.track_width * 0.2))))
 
-        def f_x(x):
-            return 0
         self.visualize_reward_field(f_x, f_y)
 
         return f_x(x) - f_y(y)
+
+
+"""
+def f_x(x):
+            return self.x_b * (x / self.track_length)
+
+"""

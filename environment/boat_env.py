@@ -105,7 +105,7 @@ class BoatEnv(Env):
             self.info['rudder_broken'] += 1
 
         if self.boat.rudder_angle > np.pi/4 or self.boat.rudder_angle < -np.pi/4:
-            self.reward -= 100
+            self.reward -= np.abs(self.boat.rudder_angle) * 100
 
         if np.abs(self.boat.s_r) > np.pi/2:
             self.reward -= 1
