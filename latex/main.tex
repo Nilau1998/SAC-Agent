@@ -391,11 +391,11 @@ Innerhalb der Klasse, welche das Policy Netzwerk Implementiert, wurde zudem eine
 
 Die Klasse, welche nun den SAC selbst beschreibt ist aufgebaut, indem zu erst einmal alle vorher Implementierten Netzwerktypen und der Replay Buffer initialisiert werden. Dabei kommen nun die folgenden Netzwerke in Frage,
 \begin{enumerate}
-    \item Poliy Netzwerk
-    \item Critic Netzwerk 1
-    \item Critic Netzwerk 2
-    \item Value Netzwerk
-    \item Target-Value Netzwerk
+    \item[-] Poliy Netzwerk
+    \item[-] Critic Netzwerk 1
+    \item[-] Critic Netzwerk 2
+    \item[-] Value Netzwerk
+    \item[-] Target-Value Netzwerk
 \end{enumerate}
 Für das Sampling, oder wählen einer Action wird die Klassenmethode \textit{choose\_action} definiert, welche als Argument eine Observation verwendet. Die Observation wird innerhalb der Klassenmethode dann an die Klassenmethode \textit{sample\_normal} des Policy Netzwerkes weitergeben, welche die Observation für eine Standardabweichung und einem Mittelwerk durch das Netzwerk propagiert. Mit Hilfe der Standardabweichung und des Mittelwertes kann dann anschließend unter Verwendung des Reparameterisation-Tricks wie beschrieben in Gleichung \ref{eq:reparamtrick} eine Verteilung bestimmt werden, außer welcher dann eine Action genommen wird.
 
@@ -670,10 +670,10 @@ Das erste Klassenattribut ist der Actionspace, welcher dem Agenten seine möglic
 
 Das zweite Klassenattribut, welches nun überschrieben beziehungsweise neudefiniert wurde, ist der Observationsspace. Für diese Arbeit wurde ein ziemlich großer Observationsspace gewählt, um dem Agenten somit möglichst viele Informationen geben zu können. Auch in diesem Fall wurde analog zum Actionsspace das vordefinierte \textit{Box}-Space verwendet, um Kontinuität zu besitzen. Es wurde ein Observationspace verwendet, welcher die folgenden Informationen über das Environment trägt,
 \begin{enumerate}
-    \item Schiffsposition und Ausrichtung $(s_x, s_y, s_r)$
-    \item Schiffgeschwindigkeit und Winkelgeschwindigkeit $(v_x, v_y, v_r)$
-    \item Schiffbeschleunigung und Winkelbeschleunigung $(a_x, a_y, a_r)$
-    \item Ausrichtung des Ruders und restlicher Treibstoff $(\alpha, f_{uel})$
+    \item[-] Schiffsposition und Ausrichtung $(s_x, s_y, s_r)$
+    \item[-] Schiffgeschwindigkeit und Winkelgeschwindigkeit $(v_x, v_y, v_r)$
+    \item[-] Schiffbeschleunigung und Winkelbeschleunigung $(a_x, a_y, a_r)$
+    \item[-] Ausrichtung des Ruders und restlicher Treibstoff $(\alpha, f_{uel})$
 \end{enumerate}
 Die Größen der einzelnen Informationen wurden auf einen Bereich von $0$ bis $1$ normiert, da neuronale Netzwerke und somit der Agent dadurch deutlich effizienter funktionieren können. \cite[]{normalization_importance}
 
@@ -712,7 +712,27 @@ Die gesamte Simulation beziehungsweise das Modell des Schiffes wurde in eine geb
 
 Der Wind wurde wie auch die Simulation des Schiffes ausgelagert in eine eigene Klasse, für eine bessere Übersicht und mehr Kontrolle über die gewollten Eigenschaften des Windes. Im Grunde ist das Hauptziel der Wind-Klasse, die Möglichkeit zu bieten, alle sechs gewollten Wind Konfigurationen zu erstellen. Es wurde somit eine Klassenmethode erstellt, welche abhängig von einem Parameter, welcher in einer Konfigurationsdatei gesetzt werden kann, einen jeweiligen Wind erstellt. Einige Konfigurationen verlangen nach Kurvenverläufen, welche eine rein zufällig erstellt werden müssen. Hierfür wurde eine Hilfsmethode implementiert, welche $n$ Punkte mit gleichem Abstand in einer Reihe generiert. Die einzelnen Punkte, welche gesetzt wurden und einen zufälligen Wert zwischen 0 und 1 besitzen, werden dann abschließend per kubischen Interpolation miteinander verbunden.
 
+\section{Training und Hyperparameteroptimierung}
+Innerhalb dieser Arbeit wurden insgesamt sechs Experimente untersucht, auf die Details der einzelnen Experimente und was genau mit ihnen überprüft wird, soll im nächsten Kapitel eingegangen werden. Dennoch soll jetzt schon einmal darauf eingegangen werden, wie nun das tatsächliche Trainieren der Agenten stattgefunden hat und wie zum Beispiel die Hyperparameter des SAC Agenten gewählt wurden.
 
+Algorithmen aus dem maschinellen Lernen besitzen in den meisten Fällen immer eine bestimmte Menge an Eigenschaften, welche sehr großen Einfluss auf die Performanz haben. So können neuronale Netzwerke zum Beispiel mit verschiedenen Anzahlen an Schichten erstellt werden, hinzu kommt, dass dann auch noch die Breiten der einzelnen Schichten gewählt werden können, was für eine Aktivierungsfunktion verwendet wird und viele andere Einstellungen. Diese Eigenschaften oder Einstellungen, welche hier gewählt werden können, werden in der Literatur oft als sogenannte Hyperparameter bezeichnet. Wird erneut das neuronale Netzwerk Beispiel verwendet und es wird außerdem angenommen, dass nun kein Vorwissen über diese Hyperparameter und deren Einfluss besteht, so kommt die Frage auf, wie diese nun an besten gewählt werden sollen. Es besteht immerhin ein Wunsch danach, das optimale Set an Hyperparametern zu verwenden, da ihr Einfluss auf die Ergebnisse so groß ist. Es hilft an dieser Stelle oft, bereits eine gewisse Menge an Vorerfahrung mitzubringen, umso die Möglichkeit zu besitzen aus eigenem Wissen abschätzen zu können, was für eine Breite an besten passt, oder wie viele Schichten notwendig sind. Dennoch wird es wahrscheinlich sein, dass die Gesetzen Hyperparameter dann immer noch nicht das Optimum bilden.
+
+Abhilfe für dieses Problem soll die Hyperparameteroptimierung bieten. Das Ziel einer solchen Optimierung ist es, per automatischen Verfahren ein optimales oder fast optimales Set an Hyperparametern bestimmen. Es gibt eine ganze Anzahl an verschiedenen Verfahren, wie eine solche Optimierung nun funktionieren kann. Letztendlich basieren sie allerdings alle darauf, dass viele Modelle oder Agenten trainieren werden müssen, mit verschiedenen Parametern und anschließend eine Auswertung stattfindet, um das bisher beste Ergebnis zu finden. Ansätze können unter anderem darauf basieren, dass vorherige Ergebnisse und deren Hyperparameter Sets gespeichert werden und die neuen Sets auf Basis von Wahrscheinlichkeiten neu generiert werden. Existiert dabei ein Trend, dass gewisse Hyperparameter gute Ergebnisse liefern, so wählt ein Optimierer automatisch ein neues Set mit ähnlichen Hyperparametern.
+
+Der Ansatz, welcher in dieser Arbeit verwendet wurde, basiert jedoch auf eine komplett zufällige Suche. Die folgende Tabelle gibt eine Übersicht, welche Hyperparameter angepasst werden,
+\begin{table}[H]
+    \begin{tabular}{l|l}
+        Learning Rate:                & $0.001 \leq \alpha \leq 0.01$  \\ \hline
+        Learning Rate:                & $0.0008 \leq \beta \leq 0.008$ \\ \hline
+        Target Smoothing Coefficient: & $0.001 \leq \tau \leq 0.01$    \\ \hline
+        Discount Factor:              & $0.95 \leq \gamma \leq 0.99$
+    \end{tabular}
+    \caption{Eine Übersicht der verschiedenen Hyperparameter, welche in dieser Arbeit beim Trainieren des SAC dynamisch angepasst wurden.}
+    \label{tab:hps}
+\end{table}
+Die Learning Rates $\alpha$ und $\gamma$ dienen dazu, die Optimierer in den neuronalen Netzwerken anzupassen. Die Learning Rate $\alpha$ passt dabei das Policy Netzwerk an, während $\beta$ die Optimierer der restlichen Netzwerke anpassen. Der Target Smoothing Coefficient dient dazu bei dem überschreiben der Value und Target-Value Netzwerke eine gewisse Menge an Streuung einzubringen, welche dazu führt, es weniger Abweichungen innerhalb der Netzwerke gibt und somit ein Overfitting unwahrscheinlicher wird. \cite[]{https://doi.org/10.48550/arxiv.1802.09477} Der Discount Factor ist jener Wert, welcher bereits in der Theorie in den Gleichungen \ref{eq:finite_horizon_undiscounted} und \ref{eq:infinite_horizon_discounted} erwähnt wurde.
+
+Das Trainieren der Agenten wurde nun so durchgeführt, dass zuerst ein Experiment gewählt wurde und dessen Einstellungen eingespielt wurden. Anschließend wird das Training gestartet für eine bestimmte Anzahl an Durchläufen. Ein Durchlauf besitzt eine Länge von insgesamt 250 Episoden und es wird ein Hyperparameter Set zufällig aus den Reichweiten gewählt. Das Training des Agenten wird durchgeführt, bis es vollendet und es wird neu gestartet. Im Schnitt dauerte das Training eines einzelnen Durchlaufes mit 250 Episoden etwa 5 Stunden, wobei hier immer 5 Agenten gleichzeitig auf derselben Hardware trainiert wurden.
 
 \chapter{Experimente und Ergebnisse TODO} \label{sec:ergebnisse}
 Im folgenden Kapitel werden die Experimente vorgestellt, welche mit der kompletten Implementierung des Agenten und seinem Environments durchgeführt wurden. Nach der Vorstellung der Experimente folgt dann abschließend die Präsentation der Ergebnisse mit der dazugehörigen Auswertung.
