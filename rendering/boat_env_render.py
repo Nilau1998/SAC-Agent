@@ -8,7 +8,7 @@ from scipy import ndimage
 import imageio
 from postprocessing.replayer import Replayer
 from utils.config_reader import get_experiment_config
-from utils.plotting import plot_learning_curve
+from utils.plotting import plot_learning_curve, plot_stacked_area
 import math
 import os
 import matplotlib.pyplot as plt
@@ -31,7 +31,8 @@ class BoatEnvironmentRenderer:
             self.config.base_settings.avg_lookback,
             os.path.join(self.experiment_dir, 'plots', 'reward.png'))
         plt.close('all')
-
+        plot_stacked_area(self.experiment_dir)
+        plt.close('all')
         self.fig, (self.axb, self.axwa, self.axwf) = plt.subplots(
             3, 1, height_ratios=[3, 1, 1])
         self.plt_objects = {}
@@ -107,6 +108,10 @@ class BoatEnvironmentRenderer:
 
         self.expand_current_path(env_data, dt)
         self.set_previous_best_path(env_data)
+
+        self.axb.grid(False)
+        self.axwa.grid(False)
+        self.axwf.grid(False)
 
         self.plt_objects['text1'] = self.axb.text(
             y=self.config.boat_env.track_width + self.config.boat_env.track_width * 0.1,

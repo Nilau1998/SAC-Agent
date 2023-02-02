@@ -213,7 +213,7 @@ if __name__ == '__main__':
     if args['paramstune']:
         processes = []
         start = time.time()
-        model_batch_size = 5
+        model_batch_size = 2
         num_models = list(range(int(args['paramstune'])))
         model_batches = np.array_split(
             num_models, np.arange(model_batch_size, len(num_models), model_batch_size))

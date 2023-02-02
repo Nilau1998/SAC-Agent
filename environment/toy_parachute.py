@@ -1,4 +1,4 @@
-from control_theory.control_blocks import Integrator
+from control_theory.control_blocks import Integrator, Scope
 
 """
 Example usage of the integrator to model a parachute guy jumping from h_0 and opening his parachute at h_1. Included is aerodrag and so on.
@@ -17,6 +17,7 @@ if __name__ == '__main__':
 
     a_integrator = Integrator()
     v_integrator = Integrator(initial_value=h_0)
+    scope = Scope(labels=['Position y'])
 
     total_a = 0
     while t <= t_max:
@@ -35,5 +36,6 @@ if __name__ == '__main__':
             F_w = v**2 * 0.5 * p * c_w * A_s
         # Turn force into acceleration
         total_a = F_w / m
-
+        scope.record_signals([s])
         t += dt
+    scope.create_time_scope(file_name='python_parachute_s_plot')

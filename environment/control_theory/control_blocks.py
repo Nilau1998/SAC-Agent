@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 class Integrator:
@@ -63,11 +64,16 @@ class Scope:
                 self.signals[i].append(signal)
 
     def create_time_scope(self, file_name='scope'):
+        sns.set_style("whitegrid", {'axes.grid': True,
+                                    'axes.edgecolor': 'black'})
         for signal in self.signals:
-            plt.plot(self.time, signal)
+            sns.lineplot(data=signal)
         plt.legend(self.labels)
-        plt.grid()
-        plt.savefig(f"{file_name}.png")
+        plt.xlabel('Zeitschritt t')
+        plt.ylabel('Position y')
+        plt.title('Fallschirmspringer Beispiel')
+        sns.despine()
+        plt.savefig(f"{file_name}.png", dpi=300)
         plt.close()
 
 

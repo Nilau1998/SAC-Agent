@@ -2,6 +2,7 @@ import numpy as np
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib.cm as cm
+import seaborn as sns
 import os
 
 
@@ -27,13 +28,15 @@ class RewardFunction:
             x = np.linspace(0., self.track_length, n)
             y = np.linspace(-self.track_width, self.track_width, n)
             X, Y = np.meshgrid(x, y)
-
+            sns.set_style("whitegrid", {'axes.grid': True,
+                                        'axes.edgecolor': 'black'})
             Z = f_x(X) - f_y(Y)
-
             plt.pcolormesh(X, Y, Z, cmap=cm.Blues)
             plt.colorbar()
-            plt.title('Reward Field')
-            plt.savefig(reward_field_file)
+            plt.xlabel('Position x')
+            plt.ylabel('Position y')
+            plt.title('Rewardverteilung')
+            plt.savefig(reward_field_file, dpi=400)
             plt.close('all')
 
     def exponential_reward(self, position):
