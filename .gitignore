@@ -163,6 +163,7 @@ dmypy.json
 toy.py
 test.py
 experiments/
+experiments_backup/
 not_evaluated/
 notes
 out.profile

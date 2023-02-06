@@ -6,7 +6,7 @@ base_settings:
   avg_lookback: 50
   dt: 0.25
   t_max: 2500
-  experiment: 1
+  experiment: 5
 
 # Agent settings
 agent:

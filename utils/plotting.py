@@ -7,20 +7,19 @@ import os
 
 def plot_learning_curve(scores, rng_avg, figure_file):
     plt.close('all')
-    if not os.path.exists(figure_file):
-        sns.set_style("whitegrid", {'axes.grid': True,
-                                    'axes.edgecolor': 'black'})
-        running_avg = np.zeros(len(scores))
-        for i in range(len(running_avg)):
-            running_avg[i] = np.mean(scores[max(0, i-rng_avg):(i+1)])
-        sns.lineplot(data=running_avg, ci=95)
-        # plt.plot(range(len(scores)), running_avg)
-        plt.xlabel('Steps')
-        plt.ylabel('Episoden Reward Mittelwert')
-        plt.title('Gleitender Mittelwert über 50 Episoden des Rewards')
-        sns.despine()
-        plt.savefig(figure_file, dpi=300)
-        plt.close('all')
+    sns.set_style("whitegrid", {'axes.grid': True,
+                                'axes.edgecolor': 'black'})
+    running_avg = np.zeros(len(scores))
+    for i in range(len(running_avg)):
+        running_avg[i] = np.mean(scores[max(0, i-rng_avg):(i+1)])
+    sns.lineplot(data=running_avg, ci=95)
+    # plt.plot(range(len(scores)), running_avg)
+    plt.xlabel('Schritte')
+    plt.ylabel('Episoden Reward Mittelwert')
+    plt.title('Gleitender Mittelwert über 50 Episoden des Rewards')
+    sns.despine()
+    plt.savefig(figure_file, dpi=300)
+    plt.close('all')
 
 
 def plot_stacked_area(experiment_dir):
@@ -28,8 +27,8 @@ def plot_stacked_area(experiment_dir):
     plt.close('all')
     data = pd.read_csv(data, sep=';')
     data = data.drop(['termination', 'episode_reward'], axis=1)
-    new_columns = data.columns[data.loc[data.last_valid_index()].argsort()]
-    data = data[new_columns]
+    # new_columns = data.columns[data.loc[data.last_valid_index()].argsort()]
+    # data = data[new_columns]
 
     # color_map = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
     sns.set_style("whitegrid", {'axes.grid': True,
@@ -39,8 +38,11 @@ def plot_stacked_area(experiment_dir):
                   labels=data.keys())
     plt.xlabel('Episode')
     plt.ylabel('Häufigkeit einer Beendung')
-    plt.title('Häufigkeit der Episodenenden über die Episoden')
-    plt.legend(loc='upper left')
+    plt.title(
+        'Häufigkeit der Episodenenden\nDurchschnittliches Ergebnis - Experiment 4')
+    labels = ['Ziel erreicht', 'Randberührung', 'Treibstoff leer',
+              'Ruder zerbrochen', 'Zeitlimit erreicht']
+    plt.legend(loc='upper left', labels=labels)
     sns.despine()
     plt.savefig(os.path.join(experiment_dir, 'stacked_plot.png'), dpi=300)
     plt.close('all')

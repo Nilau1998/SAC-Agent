@@ -148,6 +148,8 @@ class ControlCenter:
         )
         renderer = BoatEnvironmentRenderer(experiment_dir)
 
+        # to_render = [50, 65, 250]
+
         relevant_episodes, best_episodes = renderer.replayer.analyse_experiment()
         episode_left = len(relevant_episodes) - 1
         for episode_index in relevant_episodes:
@@ -158,7 +160,7 @@ class ControlCenter:
                 renderer.previous_best_tmp = episode_index
             else:
                 renderer.previous_best_tmp = -1
-            for dt in table_rendering(range(renderer.replayer.total_dt)):
+            for dt in table_rendering(range(1)):
                 table_rendering.next_row()
                 if dt % self.config.base_settings.render_skip_size == 0 or dt == renderer.replayer.total_dt:
                     renderer.update_objects_on_image(episode_index, dt)
@@ -213,7 +215,7 @@ if __name__ == '__main__':
     if args['paramstune']:
         processes = []
         start = time.time()
-        model_batch_size = 2
+        model_batch_size = 3
         num_models = list(range(int(args['paramstune'])))
         model_batches = np.array_split(
             num_models, np.arange(model_batch_size, len(num_models), model_batch_size))
