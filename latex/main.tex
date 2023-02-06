@@ -10,6 +10,7 @@
 \usepackage{hyperref}
 \usepackage{subcaption}
 \usepackage{siunitx}
+\usepackage{pdfpages}
 
 \usepackage{amsmath}
 \usepackage{algorithm}
@@ -65,7 +66,7 @@ Reinforcement Learning Algorithmen}
 % \pagenumbering{roman}
 \input{iat_title}
 %Urherberrechtserklärung / Confirmation of Conformity Comment if not needed
-\input{declaration_conformity}
+% \input{declaration_conformity}
 
 \tableofcontents
 
@@ -73,23 +74,22 @@ Reinforcement Learning Algorithmen}
 
 \chapter{Einleitung} \label{sec:einleitung}
 \section{Motivation} \label{sec:motivation}
-Die dynamischen Systeme oder auch Regelstrecken, welche es heutzutage überall auf der Welt gibt, werden immer größer und komplexer. Sie finden sich als kleine, einfach zu regelnde Systeme, wie eine automatische Heizung, die per Zweipunktregler in ihrem Thermostat die Raumtemperatur konstant auf einem Wert halten soll. Allerdings finden sich auch als komplexe Regelkreise wieder, wie in Fabriken oder in Kraftwerken wie dem Bremer Müllheizkraftwerk wieder. Hier existieren auch zum Beispiel Messeinheiten, welche die momentanen Prozesstemperaturen aufnehmen, und verwendet werden, um einen Soll-/Istwert vergleich, als Eingang für einen Regler zu verwenden. Nur existieren viele Störgrößen, welche einen gezielten Reglerentwurf sehr schwierig machen. Störgrößen können unbekannt oder gar ungeplant sein. So kann im Falle des Bremer Müllheizkraftwerks auf die Menge, welche zu einem Zeitpunkt verbrannt wird, eingegangen werden. Wie heiß die nächste Ladung an Müll jedoch brennen wird, ist relativ unbekannt und stark variierend. Abhilfe für den Reglerentwurf für komplexe Regelkreise sollen Algorithmen bieten, welche selbstständig und autonom lernen können, den richtigen Stelleingriff in einem spezifischen Systemzustand vorzunehmen.
-\section{Zielsetzung EDIT} \label{sec:zielsetzung}
-Das Ziel dieser Arbeit soll sein, mittels eines Reinforcement Learning Agenten ein beispielhaftes dynamisches Modell zu regeln. \textbf{Gezeigt werden sollen außerdem Methoden, um dynamische Systeme mithilfe von bestehenden Methodiken zu erstellen und sie anschließend mit dem Agenten zu verbinden.} Um die Modelle für diesen Ansatz zu erstellen, wird die Software Simulink/MATLAB von Mathworks eingesetzt. \cite[]{simulink} Der Grund hierfür ist, da bereits ein bestehendes Grundverständnis für das Toolkit existiert und Simulink mit seinen zahlreichen Schaltblöcken eine elegante und bewährte Methode anbietet, um Modellbildung durchzuführen. Das in Simulink erstellte Modell, soll anschließend in ein Python-Modell transformiert werden. Für das Training des RL-Agenten eignet sich Python \cite[]{python} besonders, da es viele vorimplementierte Algorithmen gibt, die verhältnismäßig einfach an die Problematik angepasst werden können. Als beispielhaftes dynamisches Modell soll ein Kräftemodell eines Schiffes verwendet werden, welches Störgrößen wie einem Wind besitzt, welcher aus allen möglichen Richtungen mit verschiedener Geschwindigkeit wehen kann. Des Weiteren werden indirekte Störgrößen, wie die Trägheit des Schiffes modelliert, um eine Regelung für den Agenten durch Verzögerungseffekte komplizierter zu machen. Der Agent soll lernen das Modell korrekt zu regeln, in dem er mit dem Ruder des Schiffes interagieren darf.
+Die Regelstrecken oder dynamischen Systeme, die wir heute im Alltag und in industriellen Anwendungen finden, zeichnen sich durch eine enorme Komplexität und Größe aus. Sie reichen von einfachen, leicht zu regelnden Systemen wie einer Thermostat-gesteuerten Heizung, die die Raumtemperatur per Zweipunktregler konstant auf einem Wert halten soll, bis hin zu komplexen Regelkreisen in Fabriken und Kraftwerken. In solchen Anlagen finden sich oft auch Messeinheiten, die die aktuellen Prozesstemperaturen erfassen und verwendet werden, um einen Soll-/Istwert vergleich, als Eingang für einen Regler zu funktionieren. Dennoch stellen Störgrößen oft eine große Herausforderung für den Reglerentwurf dar, da sie entweder unbekannt oder unvorhergesehen sein können. Ein Beispiel hierfür ist das Bremer Müllheizkraftwerk, bei welchem die Regelstrecke zum Beispiel die Verbrennungstemperatur des Mülls sein kann. Die unbekannten und unvorhergesehen Störgrößen können dann die unterschiedlichen Kompositionen des Mülls sein. So kann eine Ladung von der anderen variieren, was zur Folge hat, dass jede Ladung unterschiedlich stark oder schnell brennt. Um die Herausforderungen bei der Regelung komplexer Systeme zu meistern, sollen Algorithmen, welche selbstständig und autonom lernen, eine potenzielle Lösung bieten. Sie sollen die Regler ersetzen und autonom lernen, den richtigen Stelleingriff in einem spezifischen Systemzustand vorzunehmen.
+\section{Zielsetzung} \label{sec:zielsetzung}
+Das Ziel dieser Arbeit ist es, ein dynamisches Modell mithilfe eines Reinforcement Learning (RL) Agenten zu steuern. Dabei soll auch demonstriert werden, wie ein solches dynamisches System mit bestehenden Methoden erstellt und wie der Agent mit dem Modell verbunden wird durch die verschiedenen Schnittstellen beider. Das Toolkit Simulink/MATLAB von Mathworks \cite[]{simulink} wird für die Erstellung der Modelle eingesetzt, da es bereits ein bekanntes Verständnis für das Toolkit gibt und Simulink mit seinen vielen Bausteinen eine elegante und bewährte Methode für die Modellbildung darstellt. Das Modell, das in Simulink erstellt wurde, soll dann in ein Python-Modell überführt werden, da Python \cite[]{python} besonders geeignet für das Training des RL-Agents ist, da es viele vor implementierte Algorithmen bietet, die an die spezifischen Bedürfnisse angepasst werden können. Als Beispiel für ein dynamisches Modell wird ein Kraftmodell eines Schiffes verwendet, welches Störgrößen wie einen Wind besitzt, welcher aus allen möglichen Richtungen mit verschiedener Geschwindigkeit wehen kann. Des Weiteren werden indirekte Störgrößen, wie die Trägheit des Schiffes modelliert, um eine Regelung für den Agenten durch Verzögerungseffekte komplizierter zu machen. Der Agent soll lernen, das Modell korrekt zu regeln, in dem er mit dem Ruder des Schiffes interagieren darf.
 
 \section{Aufbau der Arbeit} \label{sec:aufbau_arbeit}
-Bevor das dynamische Modell erstellt und anschließend in ein Environment umgewandelt werden kann, soll zuerst geklärt werden, woher der Begriff des Reinforcement Learnings überhaupt kommt. In Kapitel \ref{sec:reinforcement_learning} wird das Reinforcement Learning vorgestellt und in die drei Arten des maschinellen Lernens eingeordnet. Anschließend wird eine Übersicht gegeben, in welcher die verschiedenen wichtigen Reinforcement Learning Algorithmen miteinander verglichen werden. Da für die Problemstellung in dieser Arbeit, der Soft Actor-Critic (SAC) \cite[]{sacv2} Algorithmus sich an besten eignet, soll für diesem folgend auf die allgemeine Übersicht der Algorithmen, ein tieferes Verständnis für diesen aufgebaut werden.\\
-Nachdem der Teil des maschinellen Lernens verdeutlicht wurde, folgen Einblicke in die tatsächliche Implementierung des SAC Agenten in Python der PyTorch Bibliothek \cite[]{pytorch}, welche für diese Arbeit als Framework für das maschinelle Lernen gewählt wurde. Es soll gezeigt werden, wie die Hauptkomponenten implementiert wurden, und wie die Schnittstellen mit dem Environment in Python aufgebaut sind. Anschließend folgt das Unterkapitel \ref{sec:imp_simulink}, in welchem die Modellbildung für das Schiffmodell in Simulink erläutert wird. Hierbei soll gezeigt werden, wie sich das gewählte Schiffmodell zusammensetzt und was für Kraftgleichungen aufgestellt wurden, um diese zu realisieren. Damit soll dem Leser klar werden, welche Störgrößen existieren, wo genau der Agent Kontrolle über das Schiff hat und wie das Verhalten des Schiffes in den Simulationen ist. Da der Agent in Python bereits implementiert wurde, folgt auf die Modellbildung in Simulink die Umsetzung des erstellten Modells in Python. Hierfür soll vorerst, Anhand eines einfacheren Modells gezeigt werden, wie diese Umsetzung funktioniert. Es wird dabei auf die Implementierung der Integratoren aus Simulink innerhalb von Python eingegangen, da diese mit ein Kernstück bilden, für die ganze Modellbildung und demnach unverzichtbar sind. Nach der Beispielumsetzung, folgt die Umsetzung des Schiffmodells in Python und wie dieses in ein Gym Environment von OpenAI \cite[]{brockman2016openai} eingebunden wurde. Abschließend werden dann die verschiedenen Ergebnisse dieser Arbeit präsentiert, zusammen mit einer Diskussion wie diese zustande kommen und einer anschließenden Zusammenfassung mit einem Ausblick auf weiterführenden Arbeiten.
+Bevor das dynamische Modell erstellt und anschließend in ein Environment umgewandelt werden kann, soll zuerst geklärt werden, woher der Begriff des RL überhaupt kommt. In Kapitel \ref{sec:reinforcement_learning} wird das RL vorgestellt und in die drei Arten des maschinellen Lernens eingeordnet. Anschließend wird eine Übersicht gegeben, in welcher die verschiedenen wichtigen RL Algorithmen miteinander verglichen werden. Da für die Problemstellung in dieser Arbeit, der Soft Actor-Critic (SAC) \cite[]{sacv2} Algorithmus sich an besten eignet, soll für diesem folgend auf die allgemeine Übersicht der Algorithmen, ein tieferes Verständnis für diesen aufgebaut werden. Nachdem der Teil des maschinellen Lernens verdeutlicht wurde, folgen Einblicke in die tatsächliche Implementierung des SAC Agenten in Python der PyTorch Bibliothek \cite[]{pytorch}, welche für diese Arbeit als Framework für das maschinelle Lernen gewählt wurde. Es soll gezeigt werden, wie die Hauptkomponenten implementiert wurden, und wie die Schnittstellen mit dem Environment in Python aufgebaut sind. Anschließend folgt das Unterkapitel \ref{sec:imp_simulink}, in welchem die Modellbildung für das Schiffmodell in Simulink erläutert wird. Hierbei soll gezeigt werden, wie sich das gewählte Schiffmodell zusammensetzt und was für Kraftgleichungen aufgestellt wurden, um diese zu realisieren. Damit soll dem Leser klar werden, welche Störgrößen existieren, wo genau der Agent Kontrolle über das Schiff hat und wie das Verhalten des Schiffes in den Simulationen ist. Da der Agent in Python bereits implementiert wurde, folgt auf die Modellbildung in Simulink die Umsetzung des erstellten Modells in Python. Hierfür soll vorerst, anhand eines einfacheren Modells gezeigt werden, wie diese Umsetzung funktioniert. Es wird dabei auf die Implementierung der Integratoren aus Simulink innerhalb von Python eingegangen, da diese mit ein Kernstück bilden, für die ganze Modellbildung und demnach unverzichtbar sind. Nach der Beispielumsetzung folgt die Umsetzung des Schiffmodells in Python und wie dieses in ein Gym Environment von OpenAI \cite[]{brockman2016openai} eingebunden wurde. Abschließend werden dann die verschiedenen Ergebnisse dieser Arbeit präsentiert, zusammen mit einer Diskussion wie diese zustande kommen und einer Zusammenfassung mit einem Ausblick auf weiterführenden Arbeiten.
 
 \chapter{Reinforcement Learning} \label{sec:reinforcement_learning}
 Im Zeitalter der Information, in welchem wir uns heutzutage befinden, gibt es eine unbegreiflich große und stetig wachsende Menge an Daten. Dies erkannte bereits der Trend- und Zukunftsforscher John Naisbitt im Jahre 1982 in seinem Buch Megatrends.
 \begin{align*}
     \text{Wir ertrinken in Informationen, aber hungern nach Wissen. - John Naisbitt \cite[]{murphy2012machine}}
 \end{align*}
-Aufgrund dieser riesigen Menge an Daten, gibt es eine große Nachfrage nach automatisierten Methoden, diese Daten auch auswerten und analysieren zu können. Abhilfe für diese Nachfrage, beziehungsweise für dieses Problem soll das Teilgebiet des maschinellen Lernens aus dem Oberbegriff der künstlichen Intelligenz bieten. Das maschinelle Lernen bietet hierbei eine Facette aus verschiedenen Algorithmen und Methoden, um innerhalb der untersuchten Daten das zu finden, was der Benutzer braucht. Hierbei können die Daten nach bereits bekannten Mustern untersucht werden, oder es kann nach unbekannten Mustern gesucht werden, es können auch Vorhersagen getroffen werden aus dem bestehenden Datensatz umso zum Beispiel Marktforschung betreiben zu können. Wie sich das maschinelle Lernen als Oberthema nun zusammensetzt, und wo genau der Schwerpunkt dieser Arbeit, das Reinforcement Learning, sich als Begriff wieder findet, soll in diesem Kapitel verständigt werden.
+Aufgrund dieser riesigen Menge an Daten, gibt es eine große Nachfrage nach automatisierten Methoden, diese Daten auch auswerten und analysieren zu können. Abhilfe für diese Nachfrage, beziehungsweise für dieses Problem soll das Teilgebiet des maschinellen Lernens aus dem Oberbegriff der künstlichen Intelligenz bieten. Das maschinelle Lernen bietet hierbei eine Facette aus verschiedenen Algorithmen und Methoden, um innerhalb der untersuchten Daten das zu finden, was der Benutzer braucht. Hierbei können die Daten nach bereits bekannten Mustern untersucht werden, oder es kann nach unbekannten Mustern gesucht werden, es können auch Vorhersagen getroffen werden aus dem bestehenden Datensatz umso zum Beispiel Marktforschung betreiben zu können. Wie sich das maschinelle Lernen als Oberthema nun zusammensetzt, und wo genau der Schwerpunkt dieser Arbeit, das RL, sich als Begriff wieder findet, soll in diesem Kapitel verständigt werden.
 
 \section{Maschinelles Lernen} \label{sec:machine_learning}
-Das maschinelle Lernen, auch Machine Learning oder kurz ML, kann im Ganzen in drei Kategorien unterteilt werden. Hierbei gibt es das überwachte Lernen, unüberwachte Lernen und das bestärkende Lernen, wobei letzteres dem in dieser Arbeit fokussierte Reinforcement Learning entspricht, wie es im Großteil der Literatur genannt wird. \cite[]{Sutton1998} Bevor die tatsächlichen Grundlagen des Reinforcement Learnings erklärt werden, soll auf die beiden anderen Algorithmen Arten eingegangen werden, um für eine Übersicht und somit für ein besseres Verständnis zu sorgen.
+Das maschinelle Lernen, auch Machine Learning oder kurz ML, kann im Ganzen in drei Kategorien unterteilt werden. Hierbei gibt es das überwachte Lernen, unüberwachte Lernen und das bestärkende Lernen, wobei letzteres dem in dieser Arbeit fokussierte RL entspricht, wie es im Großteil der Literatur genannt wird. \cite[]{Sutton1998} Bevor die tatsächlichen Grundlagen des RLs erklärt werden, soll auf die beiden anderen Algorithmen Arten eingegangen werden, um für eine Übersicht und somit für ein besseres Verständnis zu sorgen.
 
 \subsection{Überwachtes Lernen} \label{sec:ueberwachtes_lernen}
 Machine Learning Konzepte, welche sich innerhalb des Bereichs des überwachten Lernens finden, sind zusammen mit dem unüberwachten Lernens mit an verbreitetsten. Bei ihnen kann unterschieden werden zwischen Ansätzen, welche zur Klassifizierung dienen und jene Ansätze, welche Regressionsprobleme lösen sollen. Grundsätzlich kann gesagt werden, dass beide dieser Ansätze dennoch demselben Prinzip folgen. Beim überwachten Lernen werden große Mengen an Daten verwendet, um diverse ML Konzepte wie neuronale Netzwerke, Support Vector Machines oder Decision Trees zu trainieren. Die Datensätze definieren sich dabei durch eine Abbildung von den sogenannten Features auf die Labels. Im Fall des Trainingsprozesses bekommen die Implementierung, welche auf dem Konzept des überwachten Lernens basieren, beide Seiten der Abbildung. Dies bedeutet, dass im Falle eines neuronalen Netzwerkes der Input Layer die Features des Datensatzes bekommen würde, während der Output Layer die zu dem Feature gehörenden Labels bekommt.\\
@@ -119,7 +119,7 @@ Für das Training von neuronalen Netzwerken werden sogenannte Optimierer wie Ada
 
 \newpage
 \section{Grundkonzept und Terminologie zum Reinforcement Learning} \label{sec:grundkonzept_rf}
-Im Wesentlichen gibt es zwei Elemente, welche zusammen die Grundbasis für alle Arten und Implementierungen im Bereich des Reinforcement Learnings definieren, nämlich der Agent und das Environment. Das Environment bietet dem Agenten eine Umgebung, mit der er interagieren kann. Ein Environment besitzt immer einen State $s$, welcher die kompletten aktuellen Informationen zu einem trägt. Diese Informationen können zum Beispiel im Falle dieser Arbeit die aktuellen Eigenschaften des Schiffs sein, wie die Position, Geschwindigkeit und Beschleunigung. Der Agent besitzt die Möglichkeit in das Environment zu betrachten durch eine Observation $o$, um Informationen aus dem aktuellen State $s$ zu erhalten und damit arbeiten zu können. Die Observation $o$, kann dabei gleich $s$ sein, oder lediglich einer Schnittmenge von $s$ entsprechen. Definiert wird $o$ durch einen Observationspace, welcher festlegt, welche Informationen der Agent aus $s$ entnehmen kann. Im Falle $o=s$, wird von einer vollkommenen Observation gesprochen, wobei $o \cap s$ einer partiellen Observation entspricht. \cite[]{SpinningUp2018} \cite[]{Sutton1998}
+Im Wesentlichen gibt es zwei Elemente, welche zusammen die Grundbasis für alle Arten und Implementierungen im Bereich des RLs definieren, nämlich der Agent und das Environment. Das Environment bietet dem Agenten eine Umgebung, mit der er interagieren kann. Ein Environment besitzt immer einen State $s$, welcher die kompletten aktuellen Informationen zu einem trägt. Diese Informationen können zum Beispiel im Falle dieser Arbeit die aktuellen Eigenschaften des Schiffs sein, wie die Position, Geschwindigkeit und Beschleunigung. Der Agent besitzt die Möglichkeit in das Environment zu betrachten durch eine Observation $o$, um Informationen aus dem aktuellen State $s$ zu erhalten und damit arbeiten zu können. Die Observation $o$, kann dabei gleich $s$ sein, oder lediglich einer Schnittmenge von $s$ entsprechen. Definiert wird $o$ durch einen Observationspace, welcher festlegt, welche Informationen der Agent aus $s$ entnehmen kann. Im Falle $o=s$, wird von einer vollkommenen Observation gesprochen, wobei $o \cap s$ einer partiellen Observation entspricht. \cite[]{SpinningUp2018} \cite[]{Sutton1998}
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{graphics/agent_env_loop.pdf}
@@ -156,7 +156,7 @@ Ein kontinuierlicher Actionsspace und somit eine Diagonal Gaussian Policy beschr
 \cite[]{SpinningUp2018}
 
 \subsection{Trajectories}
-Die Trajectory $\tau$ im Reinforcement Learning beschreibt eine Sequenz an States und Actions, welcher ein Agent innerhalb eines Environments betrachten und ausführen kann. Definiert wird sie durch Gleichung \ref{eq:trajectory},
+Die Trajectory $\tau$ im RL beschreibt eine Sequenz an States und Actions, welcher ein Agent innerhalb eines Environments betrachten und ausführen kann. Definiert wird sie durch Gleichung \ref{eq:trajectory},
 \begin{align}
     \tau = (s_0, a_0, s_1, a_1, \dots) \label{eq:trajectory}.
 \end{align}
@@ -178,7 +178,7 @@ wobei hingegen der Stochastische Fall sich beschreibt durch die folgende Gleichu
 \end{align}
 
 \subsection{Reward und Return Functions} \label{sec:reward}
-Der Reward $r$ spielt eine sehr entscheidende Rolle und ist eines der wichtigsten Konzepte im Reinforcement Learning. Für den Agenten ist dieser Reward insofern wichtig, da dieser die treibende Kraft für ihn ist. Abhängig davon, was für eine Trajectory der Agent wählt, hat er das Ziel den Reward, beziehungsweise die kumulative Summer aller Rewards einer Trajectory zu maximieren. Definiert wird der Reward durch Gleichung \ref{eq:reward_function},
+Der Reward $r$ spielt eine sehr entscheidende Rolle und ist eines der wichtigsten Konzepte im RL. Für den Agenten ist dieser Reward insofern wichtig, da dieser die treibende Kraft für ihn ist. Abhängig davon, was für eine Trajectory der Agent wählt, hat er das Ziel den Reward, beziehungsweise die kumulative Summer aller Rewards einer Trajectory zu maximieren. Definiert wird der Reward durch Gleichung \ref{eq:reward_function},
 \begin{align}
     r_t = R(s_t, a_t, s_{t+1}) \label{eq:reward_function}.
 \end{align}
@@ -193,7 +193,7 @@ und
 Werden beide Gleichungen betrachtet und verglichen, so fällt auf, dass ein $\gamma^t$ in Gleichung \ref{eq:infinite_horizon_discounted} verwendet wird und die Summe in die Unendlichkeit läuft. Hingegen existiert dieses $\gamma$ für Gleichung \ref{eq:finite_horizon_undiscounted} nicht und die Summe läuft stattdessen lediglich gegen einen Wert $T$. Das $\gamma$ entspricht dem Discount Factor, welcher manuell als Hyperparameter gesetzt werden kann und somit die Möglichkeit bietet zu wählen, wie relevant spätere Rewards innerhalb einer Trajectory sind. Die zwei Discount Functionen bieten den Vorteil, dass sie einerseits die Implementierung vereinfachen, da nun nicht mehr unendlich lange Summen gebildet werden müssen, welche unter Umständen nicht Konvergieren. Nicht konvergierende Endwerte sorgen für eine Anzahl an Problemen beim Implementieren und dieses Problem wird somit elegant umgangen. Elegant vor allem durch den zweiten Vorteil, welcher zuvor schon einmal kurz erwähnt wurde, nämlich dass spätere Rewards für den Agenten an Relevanz verlieren, da diese kaum noch Wirkung auf die Gesamtsumme haben. Ein Resultat hierdurch ist, dass der Agent vermehrt einen Greedy-Algorithmus entspricht und es somit bevorzugt schnell großen Reward zu bekommen. \cite[]{SpinningUp2018} \cite[]{Sutton1998}
 
 \subsection{Reinforcement Learning im Gesamten}
-Die Ideen der Policies, Trajectories und auch der Reward Functionen können nun zusammengesetzt werden, um Reinforcement Learning als gesamtes zu definieren. Reinforcement Learning definiert oder beschreibt ein Optimierungsproblem, welches das Ziel hat, die richtige Policy zu wählen, um den gesamten erwarteten Return aus den Rewards einer Trajectory zu maximieren.
+Die Ideen der Policies, Trajectories und auch der Reward Functionen können nun zusammengesetzt werden, um RL als gesamtes zu definieren. RL definiert oder beschreibt ein Optimierungsproblem, welches das Ziel hat, die richtige Policy zu wählen, um den gesamten erwarteten Return aus den Rewards einer Trajectory zu maximieren.
 
 Wird ein Environment betrachtet, in welchem sowohl die Policy als auch die Transisitons stochastisch sind, so definiert sich Wahrscheinlichkeit für eine Trajectory mit $T$ Schritten durch Gleichung die folgende Gleichung \ref{eq:prob_of_step_trajectory},
 \begin{align}
@@ -210,7 +210,7 @@ Das Optimierungsproblem kann somit zusammengefasst werden durch,
 wobei $\pi^*$ der optimalen Policy, also der Policy entspricht mit dem größten erwarteten Reward. \cite[]{SpinningUp2018} \cite[]{Sutton1998}
 
 \subsection{Value Functions}
-Viele Reinforcement Learning Algorithmen verwenden sogenannte Value Functions, welche die Aufgabe haben dem Agenten einen Weg zu bieten, einen State in dem er sich gerade befindet zu bewerten. Außerdem gibt sie dem Agenten die Möglichkeit zu bewerten, wie gut eine die potenzielle Ausführung einer Action im momentanen State ist. Eine solche Bewertung beträgt als quantitative Größe dabei den erwarteten Reward. Unterschieden werden kann die Value Function in vier verschiedene Typen. Der erste Typ, die sogennante On-Policy Value Function $V^{\pi}(s)$ beschrieben in Gleichung \ref{eq:on_policy_value_function}, gibt den erwarteten Reward zurück für den Fall, dass mit einem State $s$ gestartet wird und immer nach der Policy $\pi$ agiert wird.
+Viele RL Algorithmen verwenden sogenannte Value Functions, welche die Aufgabe haben dem Agenten einen Weg zu bieten, einen State in dem er sich gerade befindet zu bewerten. Außerdem gibt sie dem Agenten die Möglichkeit zu bewerten, wie gut eine die potenzielle Ausführung einer Action im momentanen State ist. Eine solche Bewertung beträgt als quantitative Größe dabei den erwarteten Reward. Unterschieden werden kann die Value Function in vier verschiedene Typen. Der erste Typ, die sogennante On-Policy Value Function $V^{\pi}(s)$ beschrieben in Gleichung \ref{eq:on_policy_value_function}, gibt den erwarteten Reward zurück für den Fall, dass mit einem State $s$ gestartet wird und immer nach der Policy $\pi$ agiert wird.
 \begin{align}
     V^{\pi}(s) = \underset{\tau \backsim \pi}{E}\left[R(\tau)|s_0 = s\right] \label{eq:on_policy_value_function}
 \end{align}
@@ -250,17 +250,19 @@ und
     Q^*(s,a) = \underset{s' \backsim P}{E}\left[r(s,a)+\gamma \max_{a'}Q^*(s', a')\right]. \label{eq:bellman_opq_on_policy}
 \end{align} \cite[]{SpinningUp2018}
 
-\section{Arten des Reinforcement Learnings TODO} \label{sec:arten_rf}
-Im Reinforcement Learning gibt es eine ganze Reihe an verschiedenen Arten und Implementationen von Algorithmen. Im groben kann jedoch schon dadurch entschieden werden, ob es sich um Model-Free oder Model-Based Reinforcement Learning handelt. Eine allgemeine Übersicht soll Abbildung \ref{abb:rl_overview} bieten. Hier sind die Model-Free Algorithmen auf der linken Seite zu erkennen, während die Model-Based Algortihmen auf der rechten Seite liegen.
+\section{Arten des Reinforcement Learnings} \label{sec:arten_rf}
+Im RL gibt es eine ganze Reihe an verschiedenen Arten und Implementationen von Algorithmen. Im groben kann jedoch schon dadurch entschieden werden, ob es sich um Model-Free oder Model-Based RL handelt. Eine allgemeine Übersicht soll Abbildung \ref{abb:rl_overview} bieten. Hier sind die Model-Free Algorithmen auf der linken Seite zu erkennen, während die Model-Based Algortihmen auf der rechten Seite liegen.
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{graphics/rl_overview.png}
     \centering
-    \caption{Übersicht der verschiedenen Reinforcement Learning Algorithmen und wo sie sich einordnen. \cite[]{SpinningUp2018}}
+    \caption{Übersicht der verschiedenen RL Algorithmen und wo sie sich einordnen. \cite[]{SpinningUp2018}}
     \label{abb:rl_overview}
 \end{figure}
-Wird ein Agent in einem Modell oder Environment implementiert wie es in dieser Arbeit zum Beispiel der Fall mit dem Schiffsmodell ist, so sagt dieses nicht aus, dass nun ein Model-Based Algorithmus verwendet wird. Es sagt auch nicht direkt aus, ob nun ein Model-Free Algortihmus verwendet wurde. Beide Begriffe deuten auf die Art des Lernens und eine gewisse Eigenschaft, welche jedes Environment, oder zum Beispiel Kräftemodell aus der Regelungstechnik anbieten kann. Beide Begriffe sollen somit nicht verwechselt werden mit den Modellen aus der Regelungstechnik, beziehungsweise dem Environments, in welchen der Agent agiert.
+Wird ein Agent in einem Modell oder Environment implementiert, wie es in dieser Arbeit zum Beispiel der Fall, mit dem Schiffsmodell ist, so sagt dieses nicht aus, dass nun ein Model-Based Algorithmus verwendet wird. Es sagt auch nicht direkt aus, ob ein Model-Free Algortihmus verwendet wurde. Beide Begriffe deuten auf die Art des Lernens und eine gewisse Eigenschaft, welche jedes Environment, oder zum Beispiel Kräftemodell aus der Regelungstechnik anbieten kann. Beide Begriffe sollen somit nicht verwechselt werden mit den Modellen aus der Regelungstechnik, beziehungsweise den Environments, in welchen der Agent agiert. Grundsätzlich sagen die Begriffe Model-Free und Model-Based aus, wie ein jeweiliger Algorithmus seine Entscheidung trifft.
 
-Grundsätzlich sagen die Begriffe Model-Free und Model-Based aus, wie ein jeweiliger Algorithmus seine Entscheidung trifft. Ein Algorithmus welcher auf einem Model-Based Ansatz implementiert ist, besitzt die Möglichkeit mehr oder weniger ein Modell beziehungsweise eine Funktion zu befragen, was passieren würde, wenn nun Action $a$ ausgeführt wird. Die Antwort auf eine solche Frage, kann dann Informationen sein, wie der potenzielle Reward, wenn Action $a$ auch wirklich ausgeführt wird. Model-Based Algorithmen verfügen somit also über die besondere Funktion, vorraus zu planen und genau zu wissen was passiert, wenn verschiedene Actions ausgeführt werden. Ausgewählt werden kann dann die Action, welche letztendlich den besten gesamt Reward liefert.
+Ein Algorithmus, welcher auf einem Model-Based Ansatz implementiert ist, besitzt die Möglichkeit mehr oder weniger ein Modell beziehungsweise eine Funktion zu befragen, was passieren würde, wenn nun Action ausgeführt wird. Die Antwort auf eine solche Frage, kann dann Informationen sein, wie der potenzielle Reward, wenn Action auch wirklich ausgeführt wird. Model-Based Algorithmen verfügen somit über die besondere Funktion, vorauszuplanen und genau zu wissen, was passiert, wenn verschiedene Actions ausgeführt werden. Ausgewählt werden kann dann die Action, welche letztendlich den besten gesamt Reward liefert. Die Fähigkeit ist unter anderem der größte Vorteil von Model-Based Algorithmen, da sie auf deutlich weniger Zufall basieren und somit schneller bessere Ergebnisse liefern können. Ihr Nachteil ist allerdings auch, dass durch das vordefinierte Modell ein Bias entstehen kann, so können diese Algorithmen perfekt ihr modelliertes Problem bewältigen, versagen dann aber in realen Szenarien. Model-Free basierte Algorithmen besitzen eine solche Funktion nicht, welche verwendet werden kann, um alle potenziellen Actions zu überprüfen. Sie basieren hingegen auf der Idee einen erwarteten Reward zu bestimmen und verwenden dazu vorher erzeugtes Wissen, um Abschätzungen zu machen, was die nächste beste Action sein könnte. Sie verlieren durch diese Eigenschaft die Effizienz und den Vorteil, welchen Based-Models haben, sind in der Regel allerdings robuster, wenn sie zum Beispiel in reale Szenarien übernommen werden.
+
+Zu erkennen in Abbildung \ref{abb:rl_overview} ist nun außerdem, dass die beiden Algorithmen Arten Model-Free und Model-Based jeweils noch einmal unterteilt werden können in vier weitere Untergruppen. Das sind für die Model-Free Algorithmen, die Konzepte der Policy Optimization und das Q-Learning, während Model-Based sich weiter aufspaltet in Learn The Model und Given the Model. Angefangen mit den Model-Free Algorithmen, ist deutlich zu erkennen, dass es zwischen den beiden Untergruppen Schnittstellen zwischen den Algorithmen gibt und welcher Gruppe sie genau sind. Auch der SAC, welcher in dieser Arbeit, findet sich dort in einer solchen Schnittmenge wieder. Solche Schnittstellen enstehen, da sich die jeweiligen Algorithmen an den Vorteilen beider Gruppen bedienen, vorgestellt werden diese Vorteile im kommenden Kapitel \ref{sec:howto_sac} für den SAC. Wie zuvor in der Theorie des RL beschrieben, geht es in der Policy Optimization darum, eine Policy zu optimieren durch das Anpassen der verschiedenen Parameter, beschrieben in $\theta$. Verwendet werden dabei Konzepte wie Gradientenverfahren, um diese optimalen Parameter zu finden, durch das Annähern eines lokalen oder globalen Minimums. Q-Learning Algorithmen hingegen versuchen ihre optimale Action-Value Function $Q(s,a)$ zu optimieren. In der Theorie wurde bereits einmal darauf eingegangen, wie ein Q-Learning Algorithmus lernt und funktioniert, die Grundidee ist jedoch, dass der Algorithmus den State $s$ in dem er sich befindet, bewertet und darauf basierend eine nächst beste Action wählt. Sogenannte Learn the Model Algorithmen verwenden die Funktion, welche ihnen die nächste beste Action gibt, um daraus einen festen Fahrplan zu bilden. Der Fahrplan beschreibt dabei, welche Actions nun in den nächsten $n$ Schritten ausgeführt werden müssen, um den besten Reward zu bekommen. Der Fahrplan wird dabei immer neu erstellt, sobald der Agent mit seinem Environment interagiert. Algorithmen, die auf Given the Model basieren, verwenden eine Policy zusammen mit einem sogenannten Experten. Dabei wird die Policy verwendet, um erneut eine Art Fahrplan zu erstellen, mit Actions welche gewählt werden sollen. Der Experte ist ein weiterer Algorithmus, welcher das Ziel hat, einen noch besseren Fahrplan zu erstellen. Die Policy des Agenten wird dann entsprechend nach dem besseren Plan angepasst und lernt dadurch. \cite[]{SpinningUp2018} \cite[]{Sutton1998}
 
 \section{Soft Actor-Critic (SAC) Agenten} \label{sec:howto_sac}
 Der Soft Actor-Critic (SAC) Algorithmus ist jener, welcher für das Regeln beziehungsweise Kontrollieren des dynamischen Modells in dieser Arbeit verwendet wurde. Er findet sich in der Gruppe der Model-Free RL Algorithmen wieder und basiert zum Teil auf Ideen aus früheren Algorithmen wie DDPG und soll eine Kombination aus den Vorteilen dieser darstellen.
@@ -410,10 +412,10 @@ Das in dieser Arbeit verwendete dynamische Modell, soll wie bereits in der Ziels
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{graphics/boat_frame_example_2.png}
     \centering
-    \caption{Visualisierung des Schiff-Agentens während einer Überfahrt mit Windeinfluss (Blauer Pfeil) und Richtungs-Vektor (Roter Pfeil). Zusehen sind außerdem die Windkurven für die Windgeschwindigkeit und dem Winkel von wo der Wind weht. Ein Winkel von $\frac{\pi}{2}$ würde einer Windrichtung von unten innerhalb der Abbildung bedeuten.}
+    \caption{Visualisierung des Schiff-Agenten während einer Überfahrt mit Windeinfluss (Blauer Pfeil) und Richtungs-Vektor (Roter Pfeil). Zusehen sind außerdem die Windkurven für die Windgeschwindigkeit und dem Winkel von wo der Wind weht. Ein Winkel von $\frac{\pi}{2}$ würde einer Windrichtung von unten innerhalb der Abbildung bedeuten.}
     \label{abb:boat_frame_example_2}
 \end{figure}
-In Abbildung \ref*{abb:boat_frame_example_2} ist zu erkennen, wie das Schiff eine grüne Ziellinie hat, welche es unbedingt erreichen soll, damit eine Episode innerhalb des Reinforcement Learnings erreicht ist. Außerdem ist durch schwarze Linien ein äußerer Bereich gekennzeichnet, welches das Schiff nicht überschreiten soll. Ein Überschreiten führt beim Training des Agenten zu einer frühzeitigen Beendigung der Episode. Des Weiteren soll eine Störgröße das Schiff beziehungsweise den Agenten bei seiner Überfahrt beeinflussen, damit der Agent lernen soll, diese Störgröße automatisch auszugleichen. Die Störgröße in Form von einem Wind im Modell vorhanden sein, der Wind kann dabei aus jeder Richtung wehen und verändert sich mit der Zeit in der Richtung und in der Windgeschwindigkeit.\\
+In Abbildung \ref*{abb:boat_frame_example_2} ist zu erkennen, wie das Schiff eine grüne Ziellinie hat, welche es unbedingt erreichen soll, damit eine Episode innerhalb des RLs erreicht ist. Außerdem ist durch schwarze Linien ein äußerer Bereich gekennzeichnet, welches das Schiff nicht überschreiten soll. Ein Überschreiten führt beim Training des Agenten zu einer frühzeitigen Beendigung der Episode. Des Weiteren soll eine Störgröße das Schiff beziehungsweise den Agenten bei seiner Überfahrt beeinflussen, damit der Agent lernen soll, diese Störgröße automatisch auszugleichen. Die Störgröße in Form von einem Wind im Modell vorhanden sein, der Wind kann dabei aus jeder Richtung wehen und verändert sich mit der Zeit in der Richtung und in der Windgeschwindigkeit.\\
 Die Modellbildung selbst findet nun statt aus der Perspektive des Schiffs, die tatsächliche Kinematik, sprich zum Beispiel die tatsächliche Richtung, in welche sich das Schiff dann im Environment bewegt wird in einem späteren Schritt dann umgerechnet.
 
 Die größte Inspiration für die Modellbildung kommt aus dem Beitrag von Knud Benedict \& Matthias Kirchhoff, welche zusammen eine Einführung in die Modellbildung für Schiffe und deren Dynamik in ihrer Veröffentlichung \glqq Explaining Ships Dynamic and Handling Using MATLAB \& SIMULINK as Simulation Tool in Teaching Maritime Students\grqq{} \cite[]{Benedict2007ExplainingSD} bieten. Das Schiff wird in diesem Modell durch drei Bewegungsgleichungen modelliert, welche die Kräfte in longitudinaler, transversaler und das Giermoment des Schiffs beschreiben. Visualisiert sind diese in Abbildung \ref{abb:ship_eoms}.
@@ -425,7 +427,7 @@ Die größte Inspiration für die Modellbildung kommt aus dem Beitrag von Knud B
 \end{figure}
 
 \subsection{Verwendete Konstanten und Parameter in der Modellbildung}
-Für die Modellbildung wurden verschiedene Konstanten, Koeffizienten und Parameter verwendet, welche sowohl aus Quellen stammen, als auch durch eigenes Experimentieren bestimmt wurden. Experimentell bestimmte Werte wurden frei nach eigenem Gefühl gewählt und rein davon abhängig gemacht, inwiefern das Modell sich innerhalb einer Simulink Simulation verhalten hat. So wurde die Masse des Schiffs zum Beispiel so angepasst, dass es einem \glqq realistischem\grqq{} Verhalten nachahmt, wenn eine Kurve gefahren wird. Wird die Masse jedoch verglichen mit der Propellerlänge, so ist schnell zu erkennen, das diese ziemlich unrealistisch erscheint. Eine perfekte Modellierung eines Schiffes würde jedoch leider über diese Arbeit hinausgehen, und sie erscheint auch nicht als nötig. Das bestehende Modell wirkte sich als mehr als ausreichend für die Experimente, welche durchgeführt wurden, um die Anwendung des Reinforcement Learning Agenten zu testen.
+Für die Modellbildung wurden verschiedene Konstanten, Koeffizienten und Parameter verwendet, welche sowohl aus Quellen stammen, als auch durch eigenes Experimentieren bestimmt wurden. Experimentell bestimmte Werte wurden frei nach eigenem Gefühl gewählt und rein davon abhängig gemacht, inwiefern das Modell sich innerhalb einer Simulink Simulation verhalten hat. So wurde die Masse des Schiffs zum Beispiel so angepasst, dass es einem \glqq realistischem\grqq{} Verhalten nachahmt, wenn eine Kurve gefahren wird. Wird die Masse jedoch verglichen mit der Propellerlänge, so ist schnell zu erkennen, das diese ziemlich unrealistisch erscheint. Eine perfekte Modellierung eines Schiffes würde jedoch leider über diese Arbeit hinausgehen, und sie erscheint auch nicht als nötig. Das bestehende Modell wirkte sich als mehr als ausreichend für die Experimente, welche durchgeführt wurden, um die Anwendung des RL Agenten zu testen.
 
 Die verwendeten Konstanten und Koeffizienten finden sich in der folgenden Tabelle \ref{tab:constants} wieder. Werte, die für dieses Modell durch Experimentieren bestimmt wurden, sind markiert durch ein [E]. Jene Werte, die sowohl ein [E] wurden experimentell angepasst, basieren aber aus Inspiration aus der jeweiligen Quelle, um einen Richtwert zu haben.
 \begin{table}[H]
@@ -721,7 +723,7 @@ Abhilfe für dieses Problem soll die Hyperparameteroptimierung bieten. Das Ziel 
 
 Der Ansatz, welcher in dieser Arbeit verwendet wurde, basiert jedoch auf eine komplett zufällige Suche. Die folgende Tabelle gibt eine Übersicht, welche Hyperparameter angepasst werden,
 \begin{table}[H]
-    \begin{tabular}{l|l}
+    \begin{tabular}{l|c}
         Learning Rate:                & $0.001 \leq \alpha \leq 0.01$  \\ \hline
         Learning Rate:                & $0.0008 \leq \beta \leq 0.008$ \\ \hline
         Target Smoothing Coefficient: & $0.001 \leq \tau \leq 0.01$    \\ \hline
@@ -734,10 +736,10 @@ Die Learning Rates $\alpha$ und $\gamma$ dienen dazu, die Optimierer in den neur
 
 Das Trainieren der Agenten wurde nun so durchgeführt, dass zuerst ein Experiment gewählt wurde und dessen Einstellungen eingespielt wurden. Anschließend wird das Training gestartet für eine bestimmte Anzahl an Durchläufen. Ein Durchlauf besitzt eine Länge von insgesamt 250 Episoden und es wird ein Hyperparameter Set zufällig aus den Reichweiten gewählt. Das Training des Agenten wird durchgeführt, bis es vollendet und es wird neu gestartet. Im Schnitt dauerte das Training eines einzelnen Durchlaufes mit 250 Episoden etwa 5 Stunden, wobei hier immer 5 Agenten gleichzeitig auf derselben Hardware trainiert wurden.
 
-\chapter{Experimente und Ergebnisse TODO} \label{sec:ergebnisse}
+\chapter{Experimente und Ergebnisse} \label{sec:ergebnisse}
 Im folgenden Kapitel werden die Experimente vorgestellt, welche mit der kompletten Implementierung des Agenten und seinem Environments durchgeführt wurden. Nach der Vorstellung der Experimente folgt dann abschließend die Präsentation der Ergebnisse mit der dazugehörigen Auswertung.
 
-\section{Experimente}
+\section{Übersicht der Experimente}
 Für diese Arbeit wurde die Untersuchung des dynamischen Modells und seiner Regelung durch einen SAC Agenten in insgesamt sechs Experimente aufgeteilt. Die Experimente befassen sich dabei in jeder Instanz darum, inwiefern der Agent in der Lage ist, das Schiff von der Startposition in die Ziellinie zuführen. Unterschieden wird zwischen den Experimenten dadurch, inwiefern die Störgröße von außen kontrolliert wird, welche den Agenten aus seiner Fahrbahn bringen soll. Das erste Experiment fängt ziemlich leicht an, schrittweise werden sie jedoch schwieriger. Somit soll das Limit des Agenten getestet werden, um herauszufinden, wo gegebenenfalls mehr Untersuchungen vonnöten sind, um den Agenten oder die Methodik selbst zu verbessern.
 
 Grundsätzlich gibt es dennoch gleichbleibende Einstellung bei den unterschiedlichen Experimenten. In jedem Experiment wurde dieselbe Rewardverteilung verwendet, wie sie bereits in Abbildung \ref{abb:reward_field} vorgestellt wurde. Außerdem sind die Eigenschaften des Spielbrettes selbst gleichbleibend. So wurde die Ziellinie immer bei 5900 auf der x-Achse gesetzt. Die Spielbrettbreite ist auch stetig so gewählt, dass die insgesamt 800 Einheiten groß ist. Die Koeffizienten und Größen, welche für die Modellierung des Schiffs verwendet wurden, verändern sich mit den Experimenten nicht.
@@ -791,12 +793,177 @@ Das letzte und schwierigste Experiment soll aus den vorherigen Experimenten alle
 \end{figure}
 
 \section{Ergebnisse und Auswertung}
+Es sollen nun die Ergebnisse der einzelnen Experimente vorgestellt werden, gefolgt von einer anschließenden Auswertung dieser. Für jedes der sechs Experimente wurden insgesamt jeweils 50 Ergebnisse produziert beziehungsweise trainiert. Es wurden somit insgesamt 300 Ergebnisse gesammelt in einem Zeitraum von etwa 300 Stunden, da die Rechenzeit dementsprechend lange gedauert hat. Die Ergebnisse sollen veranschaulicht werden, mithilfe von einigen Kriterien, welche unter anderem die Möglichkeit bieten, die Experimente somit auch untereinander vergleichen zu können und eine Idee entwickeln zu können, wo denn jetzt die Grenzen des Agenten liegen. Untersucht werden soll nun unter Verwendung der folgenden vier Kriterien beziehungsweise Punkte,
+\begin{enumerate}
+    \item Das Schiff ist in der Ziellinie angekommen
+    \item Die Anzahl der Episoden in welchen das Schiff im Ziel angekommen ist
+    \item Die Verteilung der Episoden, in welchen das Schiff angekommen ist
+    \item Die Optimierung des Agenten der erfolgreichen Überfahrten über die Episoden
+\end{enumerate}
 
-\chapter{Diskussion TODO} \label{sec:diskussion}
+Im ersten Kriterium soll untersucht werden, wie oft der Agent es überhaupt schafft innerhalb der 250 Episoden die Ziellinie mindestens einmal zu erreichen. Die Idee dieses Kriteriums ist es überhaupt erstmal eine Idee zu kommen, ob das Experiment nicht gegebenenfalls zu schwer ist zu regeln. Eine Übersicht dieses Kriteriums angewendet an die Ergebnisse soll Tabelle \ref{tab:crit1} bieten. Hier sind vier verschiedene Spalten zu erkennen, welche Auskunft über veschiedene Informationen geben,
+\begin{table}[H]
+    \begin{tabular}{l|c|c|c|c}
+                     & Anzahl an Ergebnisse & Nach Kriterium 1 & Delta & Erfolgsrate \\ \hline
+        Experiment 1 & 50                   & 44               & -6    & $88\%$      \\ \hline
+        Experiment 2 & 50                   & 49               & -1    & $98\%$      \\ \hline
+        Experiment 3 & 50                   & 47               & -3    & $94\%$      \\ \hline
+        Experiment 4 & 50                   & 27               & -23   & $54\%$      \\ \hline
+        Experiment 5 & 50                   & 26               & -24   & $52\%$      \\ \hline
+        Experiment 6 & 50                   & 33               & -17   & $66\%$
+    \end{tabular}
+    \caption{Übersicht der Ergebnisse und inwiefern der Agent mindestens einmal das Ziel in einem Experiment erreichen konnte.}
+    \label{tab:crit1}
+\end{table}
+Die Tabelle kann bereits verwendet werden, um erste Aussagen zu treffen über die Performanz des Agenten. Werden die ersten drei Experimente betrachtet, so ist hier zu erkennen, dass diese eine ziemlich gute Erfolgsrate besitzen. Der Agent war hier also in der Lage überhaupt das Ziel zu erreichen, mit einer ziemlich guten Wahrscheinlichkeit und das unabhängig davon, was für ein Hyperparameter Set verwendet wird. Schwieriger wird es erst mit den Experimenten 4 und 5, denn hier bricht die Erfolgsrate sehr ein und der Agent ist nicht mehr in der Lage mindestens einmal in das Ziel zukommen. Hingegen steigt die Erfolgsrate wieder um etwa 10\% bei Experiment 6. Die Gründe für das Verhalten dieser Ergebnisse in Verbindung zum jeweiligen Experiment kann vielschichtig sein. So kann der Grund bereits sein, dass es dem Agenten schon schwieriger fällt, die unterschiedlichen Windeigenschaften zu kompensieren beziehungsweise zu regeln. Der Grund könnte aber auch die Verteilung der Hyperparameter Sets sein. Da diese zufällig gewählt werden, existiert die Möglichkeit, dass eine gewisse Reichweite an Hyperparametern und ihre Kombinationen dafür sorgen, dass der Agent nicht mehr in der Lage ist richtig zu lernen.
 
-\chapter{Zusammenfassung und Ausblick TODO} \label{sec:zsmfassung_ausblick}
+Im ersten Kriterium wurde soeben veranschaulicht, wie oft der Agent das Schiff überhaupt mindestens einmal in die Ziellinie führen konnte. Nun soll eine genauere Betrachtung auf die Verteilungen gesetzt werden, welche zeigen sollen, wie oft der Agent es innerhalb der Ergebnisse mehrmals in das Ziel geschafft hat. Die folgenden beiden Histogramme \ref{abb:histo1} und \ref{abb:histo2} sollen bei dieser Visualisierungen helfen. Hier zu erkennen sind auf der y-Achse die Anzahlen der Ergebnisse, eines jeweiligen Experiments, auf der x-Achse finden sich die Episodenenden \glqq Ziel erreich\grqq{} und wie oft diese innerhalb eines Ergebnisses erreicht wurden.
+
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{graphics/goal_reached_histogram_1.png}
+    \centering
+    \caption{Eine Übersicht der Verteilung von Episodenenden, welche einem erreichen des Ziels entsprechen, für die ersten drei Experimente. Auf der y-Achse findet sich die Anzahl der Ergebnisse, auf der x-Achse wie oft das Ziel innerhalb eines Ergebnisses erreicht wurde.}
+    \label{abb:histo1}
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{graphics/goal_reached_histogram_2.png}
+    \centering
+    \caption{Eine Übersicht der Verteilung von Episodenenden, welche einem erreichen des Ziels entsprechen, für die letzten drei Experimente. Auf der y-Achse findet sich die Anzahl der Ergebnisse, auf der x-Achse wie oft das Ziel innerhalb eines Ergebnisses erreicht wurde.}
+    \label{abb:histo2}
+\end{figure}
+
+Deutlich zu erkennen ist innerhalb dieser beiden Abbildungen, dass die meisten Ergebnisse sich auf der linken Seite befinden, also da wo es an wenigsten erfolgreiche Überfahrten gibt. Dieses verhalten konnte allerdings auch schon in der Untersuchung vom ersten Kriterium erkannt werden, da Ergebnisse ohne erfolgreicher Überfahrt sich eben gerade am Anfang anhäufen werden. Interessant ist jedoch, dass Experiment 1 die besten Ergebnisse produziert, was mit der Erwartung übereinstimmt da Experiment 1 gerade das leichteste ist. Wird Experiment 1 verglichen mit den anderen Experimenten, so fällt hier auf das Experiment 1 unter anderem das einzige ist, welches in einigen Ergebnissen bis zu über 120 Überfahrten erzielen konnte. Auch im Bereich davor sind einige Ergebnisse aus Experiment 1 zu erkennen. Die Verteilung am Anfang des Histogramms ist außerdem breiter, da es eben so wenig Ergebnisse gibt, in welchen das Schiff nicht bis zur Ziellinie fahren konnte. Insgesamt kann beobachtet werden, das sich die Experimente außer 1 in etwa gleich verhalten von den Anzahlen der erfolgreichen Überfahrten zu den Ergebnissen. Denn fast alle besitzen jeweils viele Ergebnisse in der ersten Hälfte des Histogramms und dann nur noch vereinzelnd Ergebnisse, die viele Überfahrten produzieren konnten. Auf die vereinzelten Ergebnisse wird im späteren Verlauf noch ein wenig mehr eingegangen, da diese gerade diese sind, welche auch die beste Performanz liefern können, wenn es zum Beispiel darum geht, wie mittig der Agent das Schiff halten konnte.
+
+Das dritte Kriterium beschäftigt sich damit, wie die erfolgreichen Überfahrten nun innerhalb der Ergebnisse verteilt sind. Da ein Ergebnis immer über 250 Episoden trainiert ist, ist es von Interesse zu sehen, wo diese Überfahrten stattfinden. Ein gradueller Anstieg der Überfahrten gegen Ende des Trainings würde gerade dafür sprechen, dass der Agent lernt, wie er die Überfahrt bewältigen kann. Ein Musterloses-Verhalten der Überfahrten, wie in etwa das der Agent am Anfang des Trainings zufällig eine Überfahrt schafft und dann nur noch alle paar Episoden, wäre auch Interesse. Denn dieses würde könnte dafür sprechen, dass der Agent gar nicht in der Lage ist zu lernen, mit dem Wind umzugehen. Stattdessen könnten diese Überfahrten lediglich dafürsprechen, dass der Wind so generiert wurde, dass eine Überfahrt zufällig vergleichsweise leicht war. Das wäre ein Wind, der beispielsweise nur von unten weht, aber so generiert wurde, dass er fast konstant \SI{0}{\m\per\s} schnell ist. Für die Untersuchung dieses Kriteriums sollen nun die besten Ergebnisse verwendet werden, welche produziert werden konnten. Da jedoch ein Bias durch das Verwenden der besten Ergebnisse entsteht, werden auch noch einmal Ergebnisse in Betrachtet gezogen, die weniger Überfahrten produzieren konnten. Das Limit wird hierbei so gesetzt, dass nur Ergebnisse zählen mit mindestens 20 Ergebnissen. Dieser Wert wurde so gewählt, nach Betrachtung der Histogramme \ref{abb:histo1} und \ref{abb:histo2}. Ergebnisse unter diesem Wert besitzen in den meisten Fällen lediglich 0 bis 5 Überfahrten, welche sehr für eine zufällige Überfahrt sprechen.
+
+Die folgenden Schichtdiagramme sollen eine Übersicht darüber geben, wie die besten Ergebnisse während des Trainings ihre Episoden beendet haben. Zu erkennen sind in den Diagrammen auf der x-Achse die Episoden, die y-Achse entspricht den Häufigkeiten der jeweiligen Episodenenden aufeinander gesetzt. Diese Art von Diagramm wurde gewählt, um einfach erkennen zu können, wie sich die Episodenenden mit der Zeit verändern.
+
+\begin{figure}[H]
+    \includegraphics[width=0.8\textwidth]{graphics/stacked_best/stacked_plot_bs1.png}
+    \centering
+    \caption{Veranschaulichung der Episodenenden während des Trainings des besten Ergebnisses für Experiment 1.}
+    \label{abb:stacked_plot_bs1}
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=0.8\textwidth]{graphics/stacked_best/stacked_plot_bs2.png}
+    \centering
+    \caption{Veranschaulichung der Episodenenden während des Trainings des besten Ergebnisses für Experiment 2.}
+    \label{abb:stacked_plot_bs2}
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=0.8\textwidth]{graphics/stacked_best/stacked_plot_bs3.png}
+    \centering
+    \caption{Veranschaulichung der Episodenenden während des Trainings des besten Ergebnisses für Experiment 3.}
+    \label{abb:stacked_plot_bs3}
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=0.8\textwidth]{graphics/stacked_best/stacked_plot_bs4.png}
+    \centering
+    \caption{Veranschaulichung der Episodenenden während des Trainings des besten Ergebnisses für Experiment 4.}
+    \label{abb:stacked_plot_bs4}
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=0.8\textwidth]{graphics/stacked_best/stacked_plot_bs5.png}
+    \centering
+    \caption{Veranschaulichung der Episodenenden während des Trainings des besten Ergebnisses für Experiment 5.}
+    \label{abb:stacked_plot_bs5}
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=0.8\textwidth]{graphics/stacked_best/stacked_plot_bs6.png}
+    \centering
+    \caption{Veranschaulichung der Episodenenden während des Trainings des besten Ergebnisses für Experiment 6.}
+    \label{abb:stacked_plot_bs6}
+\end{figure}
+
+Das Erste, was bei Betrachtung der Diagramme auffällt, ist ein nahezu gleiches Verhalten der Beendungen, welche ausgelöst werden durch ein gebrochenes Ruder (rot). Hier beginnt der Agent stets damit auszuprobieren, wo die Limits mit seinen Actions liegen und findet diese dann auch relativ schnell heraus. Dies führt dazu, dass im späteren Verlauf das Ruder fast gar nicht mehr zerbrochen wird. Der Grund wird hierfür wie gewollt sein, nämlich dass der Verlust an Reward zu groß ist und es sich mehr lohnt, die Episode auf anderem Wege zu beenden. Interessant ist hier außerdem, dass in Experiment 2 und 3 das ganze so weit geführt hat, dass der Agent sein Ruder überhaupt nicht zerbrochen hat, da der Rewardverlust zu groß war und er sofort lernen konnte nicht in den Bereich zu gehen, wo das Ruder zerbrechen könnte.\\
+Die Diagramme zeigen außerdem, dass der Agent an meisten seine Episode beendet durch das Berühren des Randes. Dieses Verhalten ist allerdings zu erwarten, da das Schiff ohne Agent nur durch den Einfluss der Störgröße am Rand enden würde. Es ist somit unter Einfluss der Störgröße ein natürliches Ende für eine Episode. Experiment 1 ist dabei eine Ausnahme, da hier keine direkte Störgröße existiert und das Schiff immer im Ziel enden würde ohne Agent, da hier die Starteigenschaften bereits dafür sorgen, dass das Schiff richtig ausgerichtet ist.\\
+Im Bezug zu den erfolgreichen Überfahrten fiel es dem Agenten in Experiment 1 an einfachsten diese zu bewältigen. Diese Erkenntnis ergibt sich allerdings auch schon aus den vorherigen Kriterien. Viel wichtiger ist hier anzumerken, wie schnell die erste Überfahrt jedoch erreicht werden konnte, mit einem wenig verzögerten stetig weiteren Anstieg der Überfahrten. Auch die Experimente 4, 5 und 6 konnten ähnliche schnell die erste Überfahrt meistern, jedoch kam es hier im Vergleich zum ersten Experiment erst sehr verzögert zu mehr Überfahrten. Die ersten erfolgreichen Überfahrten könnten somit andeuten, dass sie zufällig geschehen sind durch einfach generierten Windeigenschaften. Dies hätte dann zufolge, dass der Verlauf dadurch beschrieben werden kann, dass der Agent lediglich mehr Zeit benötigt hat, sich dem Experiment anzupassen, bis es dann schließlich zu ersten Überfahrten kommt.\\
+Es ist dennoch ein klarer Trend erkennbar, nämlich dass es dem Agenten möglich war in jedem Experiment nach einiger Zeit zunehmend mehr Überfahrten zu bewältigen. Es gibt Fälle, in denen der Anstieg dann wieder ein bisschen nachgelassen hat, aber dennoch existierte. In dem Sinne zeigen diese Ergebnisse, dass 250 Episoden beim Training nicht ausreichen, sondern deutlich mehr vonnöten sind, um dann gegebenenfalls immer eine Überfahrt zu haben. Erkennbar ist dies besonders in den Diagrammen für die Experimente 1 und 4, da hier das Training beendet wurde, während die Menge an erfolgreichen Überfahrten steil wächst. Insgesamt deuten diese Ergebnisse auch daraufhin, dass sie eine sehr gute Grundbasis bieten und die Hyperparameter für zukünftige Trainingsprozesse im selben Bereich gewählt werden sollten.
+
+Ergebnisse, welche nicht so viele Überfahrten erzielen konnten, sollen in den folgenden beiden Diagrammen noch einmal vorgestellt werden. Diese sollen als Beispiel zählen, in welchen der Agent nur langsam Fortschritt machen konnte beim Trainieren. Die hier vorgestellten Diagramme stammen aus Experiment 4 und 5, und haben beide lediglich ca. 20 Überfahrten erreich bei insgesamt 250 Episoden.
+
+\begin{figure}[H]
+    \includegraphics[width=0.8\textwidth]{graphics/stacked_meh/stacked_plot_nb4.png}
+    \centering
+    \caption{Ein Beispiel für ein Ergebnis aus Experiment 4, welches erfolgreiche Überfahrten besitzt, allerdings mit einem Agenten der nur wenig Trainingsfortschritt machen konnte.}
+    \label{abb:stacked_plot_nb4}
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=0.8\textwidth]{graphics/stacked_meh/stacked_plot_nb5.png}
+    \centering
+    \caption{Ein weiteres Beispiel für ein Ergebnis aus Experiment 5, welches auch erfolgreiche Überfahrten besitzt, allerdings auch mit einem Agenten der kaum Fortschritte beim Training machen konnte.}
+    \label{abb:stacked_plot_nb5}
+\end{figure}
+
+Es ist ziemlich schnell zu erkennen, dass hier die Überfahrten stetig bewältigt werden konnten, jedoch der Agent dann nicht mehr in der Lage war dasselbe zu erzielen in späteren Episoden. Dies könnte dafür sprechen, dass hier der Temperatur Parameter des Agenten zu hoch gewählt wurde, oder der Agent im späteren Verlauf mehr auf Erkundung statt Ausnutzung gesetzt hat. Dass dies der Fall ist, wird angedeutet dadurch, dass vor allem in Diagramm \ref{abb:stacked_plot_nb5} der Agent wieder anfängt, mit dem Ruder zu experimentieren und dies dadurch vermehrt zerbricht. Ähnliches kann auch in Diagramm \ref{abb:stacked_plot_nb4} erkannt werden, hier aber nicht so stark.
+
+Es soll nun der letzte Punkt der Liste untersucht werden. Mit dieser abschließenden Analyse der Ergebnisse, soll untersucht werden, inwiefern der Agent fähig ist seine erfolgreichen Überfahrten zu optimieren. Hierbei wird danach bewertet, wie gut der Agent das Schiff in der Mitte des Spielbrettes halten kann. Erneut werden hier die besten Ergebnisse betrachtet, da diese die beste Basis bieten diese Untersuchung durchzuführen. Ergebnisse, welche wenig bis gar keine Überfahrten produzieren konnten, bieten wenig Auskunft darüber, ob der Agent mit späteren Episoden und gegen Ende des Trainings sein zu lösendes Problem optimieren konnte. Die Untersuchungen der Experimente finden so statt, dass immer betrachtet wird, was die beste bisherige Überfahrt zu einer bestimmten Episode gewesen sind. Dabei werden die Episoden so gewählt, dass die Abbildungen untereinander eine signifikante Veränderung verdeutlichen. Es können hier keine festen Werte definiert werden für die Episoden, welche betrachtet werden sollen. Denn es ist möglich, dass der Agent durchaus eine Überfahrt schafft, diese allerdings nicht einem neuen Optimum entspricht.
+
+Für das erste Experiment, wurde in der Untersuchung zum 3. Kriterium bereits festgestellt, dass hier die Überfahrten ziemlich schnell bewältigt werden konnten, und diese auch stetig mehr wurden. Wie sich nun die der optimale Pfad (Gold) verändert hat, mit den zunehmenden Episoden soll Abbildungen \ref{abb:opti1} zeigen. Erkennbar ist hier, wie sich innerhalb von nur wenigen Episoden der optimale Pfad der Mitte ziemlich genau angepasst hat. Ein noch besserer Pfad, welcher auch das letzte Stück korrigiert, wurde jedoch leider nicht mehr von dem Agenten gefunden.
+\begin{figure}[H]
+    \includegraphics[width=0.7\textwidth]{graphics/optimum_s1/optimum_s1.png}
+    \centering
+    \caption{Übersicht der Episoden in welchen es signifikante Verbesserung bei dem bisherigen besten Pfad gab für Experiment 1.}
+    \label{abb:opti1}
+\end{figure}
+Experiment 2 liefert ein ähnliches Verhalten, der große Unterschied liegt hier nur darin, dass es vier signifikante Anpassungen gab und diese alle relativ spät im Trainingsprozess passierten. Zu finden sind die Episoden in Abbildung \ref{abb:opti2}.
+\begin{figure}[H]
+    \includegraphics[width=0.7\textwidth]{graphics/optimum_s2/optimum_s2.png}
+    \centering
+    \caption{Übersicht der Episoden in welchen es signifikante Verbesserung bei dem bisherigen besten Pfad gab für Experiment 2.}
+    \label{abb:opti2}
+\end{figure}
+Sehr spät im Trainingsprozess kam es zu den Pfad Optimierungen in Experiment 3 welches sich in Abbildung \ref{abb:opti3} wiederfindet. Hier konnten 3 Episoden gefunden werden, welche signifikante Veränderungen zeigen. Außerdem zu erkennen, dass hier trotz spätem Zeitpunkt im Trainingsprozess dennoch ein Pfad vorliegt, der sich noch nicht gut der Mitte anpassen konnte, wie es in vorherigen Experimenten der Fall ist.
+\begin{figure}[H]
+    \includegraphics[width=0.7\textwidth]{graphics/optimum_s3/optimum_s3.png}
+    \centering
+    \caption{Übersicht der Episoden in welchen es signifikante Verbesserung bei dem bisherigen besten Pfad gab für Experiment 3.}
+    \label{abb:opti3}
+\end{figure}
+Abbildung \ref{abb:opti4} zeigt den Verlauf des besten Pfades für Experiment 4. Hier gibt es die erste signifikante Veränderung recht am Anfang des Trainingsprozesses, die letzte große Anpassung findet dann erst fast am Ende des Trainings statt. Interessant ist hier, dass zwei Veränderungen direkt nacheinander stattgefunden haben, trotz der langen Pause seit der ersten Veränderung.
+\begin{figure}[H]
+    \includegraphics[width=0.7\textwidth]{graphics/optimum_s4/optimum_s4.png}
+    \centering
+    \caption{Übersicht der Episoden in welchen es signifikante Verbesserung bei dem bisherigen besten Pfad gab für Experiment 4.}
+    \label{abb:opti4}
+\end{figure}
+Das fünfte Experiment, welches sich definiert durch die veränderliche Windgeschwindigkeit, allerdings aus nur zwei fixierten Richtungen findet sich in Abbildung \ref{abb:opti5}. Erkennbar sind hier ziemlich eckige Kurven, welche gerade an den Punkten stattgefunden haben, wo es eine Änderung der Windrichtung gab. Da der Agent nicht weiß, von wo und wie stark der Wind weht, dauerte es hier jeweils immer einen Augenblick bis er angefangen hat gegen den Wind zu steuern. Es ist ihm trotzdem gelungen, mit der Zeit Pfade abzufahren, welche sich immer mehr dem Optimum in der Mitte genähert haben.
+\begin{figure}[H]
+    \includegraphics[width=0.7\textwidth]{graphics/optimum_s5/optimum_s5.png}
+    \centering
+    \caption{Übersicht der Episoden in welchen es signifikante Verbesserung bei dem bisherigen besten Pfad gab für Experiment 5.}
+    \label{abb:opti5}
+\end{figure}
+Das letzte Experiment, Experiment 6 besitzt vergleichsweise ziemlich viele signifikante Veränderungen, welche interessant sind zu betrachten. Sie finden sich in Abbildung \ref{abb:opti61} und \ref{abb:opti62}. Der Agent ist in diesem Experiment in der Lage gewesen, ziemlich schnell einen Pfad zu befahren, welcher sehr nahe dem Optimum liegt. Dies passierte schon in Episode 26. Schon in der nächsten Episode gelang es ihm hier auch am Ende noch eine kleine Optimierung durchzuführen. Über die nächsten Veränderungen schaffte er es dann auch letztendlich den Pfad fast genau der Mitte anzupassen. Die Verteilung der Episoden ist dabei ziemlich verteilt, wobei es eine Weile dauert, bis auch die letzte Optimierung stattgefunden hat.
+\begin{figure}[H]
+    \includegraphics[width=0.7\textwidth]{graphics/optimum_s6/optimum_s61.png}
+    \centering
+    \caption{Übersicht der Episoden in welchen es signifikante Verbesserung bei dem bisherigen besten Pfad gab für Experiment 6 Teil 1.}
+    \label{abb:opti61}
+\end{figure}
+\begin{figure}[H]
+    \includegraphics[width=0.7\textwidth]{graphics/optimum_s6/optimum_s62.png}
+    \centering
+    \caption{Übersicht der Episoden in welchen es signifikante Verbesserung bei dem bisherigen besten Pfad gab für Experiment 1 Teil 2.}
+    \label{abb:opti62}
+\end{figure}
+
+\chapter{Fazit, Erkenntnisse und Ausblick} \label{sec:fazit_ausblick}
+\section{Zusammenfassung}
+Die Zielstellung dieser Arbeit war es, einen auf den SAC Algorithmus basierenden RL Agenten zusammen mit einem dynamischen Modell als Environment zu entwickeln. Der RL Agent sollte dann mit dem Environment, welches das dynamische Modell beschreibt, verbunden werden, damit anschließend Untersuchungen gemacht werden können. Die Untersuchungen befassten sich damit, inwiefern der Agent in der Lage ist, das dynamische Modell zu regeln. Hierfür wurden sechs Experimente entwickelt, welche mit steigender Schwierigkeit den Agenten auf die Probestellen, damit anschließend per Auswertung ein Fazit entwickelt werden konnte.
+
+\section{Fazit \& Erkenntnisse}
+Es zeigt sich, dass der SAC Algorithmus sich durchaus als ein Algorithmus anbietet, welcher für die Regelung von dynamischem System eine sehr gute Grundbasis bietet. Dies kann auch hinterlegt werden durch die verschiedenen Experimente, welche innerhalb dieser Arbeit durchgeführt und ausgewertet wurden. Die Ergebnisse der Experimente zeigen, dass der SAC Algorithmus selbst mit zunehmender Schwierigkeitsstufe in der Lage ist, das Schiff in die Ziellinie zu führen und dabei analog langsam eine Optimierung des Pfades durchzuführen. Es zeigt sich allerdings durch die Ergebnisse auch, dass eine deutlich längere Trainingszeit beziehungsweise höhere Anzahl an Episoden während des Trainingsprozesses empfohlen wird. Der Agent ist durchaus in der Lage, die verschiedenen Probleme, welche die Experimente beschreiben, zu lösen, allerdings zeigen die Ergebnisse, dass der Agent in manchen Experimenten sehr lange damit beschäftigt ist, überhaupt das erste Mal in der Ziellinie anzukommen. Dieses Verhalten ist besonders in den späteren Experimenten mit höherer Schwierigkeitsstufe zu erkennen. Das erste Experiment, in welchem der Agent grundsätzlich nur lernen muss, das Ruder stillzuhalten, da keine direkte Störgröße existiert, hat er auch dementsprechend schnell gemeistert und eine erste Überfahrt gemacht, auf welcher er sein Wissen aufbauen kann. Die Störgröße, welche dort fehlt, existiert jedoch in späteren Experimenten, weshalb er lernen muss, mit dieser erst einmal um gehen zu können.
+
+Während des Trainings und somit dem Erstellen der Ergebnisse stellte sich auch heraus, dass ein besserer Optimierer hätte verwendet werden sollen bei der Suche nach den richtigen Hyperparametern. Es wurden durchaus Ergebnisse produziert, welche somit auch gute Hyperparameter besitzen. Dennoch sind solche Ergebnisse eher selten entstanden. Der Grund hierfür ist dadurch einfach zu erklären, da in dieser Arbeit auf reinem Zufall bei der Wahl der Hyperparameter Sets gesetzt wurde. Wenn beim Training also schon relativ früh ein gutes Ergebnis gefunden wurde, hätte hier mehr fokussiert trainiert werden sollen, mit ungefähr denselben Hyperparametern. Dieser Prozess hätte vollkommen automatisch funktionieren können durch die Verwendung eines Optimierers basierend auf dem Bayesschen Prinzip. Insgesamt hätte dies beim Training sehr wahrscheinlich viel Zeit gespart, da schneller gute Ergebnisse erzielt hätten können.
+
+Die Auswertung und das Erstellen der Ergebnisse zeigt außerdem, dass Python eine sehr gute Entwicklungsbasis bietet, um die Simulation des dynamischen Modells und Verbindung mit RL Algorithmen herzustellen. Durch die große Anzahl an bereits existierenden Bibliotheken wie PyTorch, Gym und Matplotlib, ist eine Implementation des Modells zusammen mit dem RL Agenten sehr einfach und bietet Modularität, auf welcher in Zukunft mit weiteren Funktionen aufgebaut werden kann.
+\section{Ausblick}
+Mit dieser Arbeit zeigte sich, dass der SAC Algorithmus durchaus eine sehr gute Grundbasis bietet. Es sollte allerdings noch weiter untersucht werden, inwiefern die gewählte Reward Function einen Einfluss auf die Ergebnisse hat und wie diese gegebenenfalls verbessert werden kann. Innerhalb dieser Arbeit wurde die Reward Function während der Entwicklung sehr oft verändert, da das Experimentieren mit ihr zeigte, dass in vielen Fällen keine Ergebnisse gebildet werden konnten. Letztendlich wurde ein Ansatz gewählt, welcher den Agenten in den meisten Fällen bestraft, statt ihn zu belohnen. Es ist somit gegebenenfalls, mit einem neuen Ansatz, welcher mehr belohnt, noch besserer Ergebnisse zu erzielen.
+
+Es gibt außerdem Untersuchungen dazu \cite[]{10.1609/aaai.v33i01.33013387}, welche sich damit befassen, wie RL Ansätze durch sogenannte Barrier Functions besser kontrolliert werden können. Diese sollen eine Möglichkeit bieten den Agenten beizubringen, dass er manche Actions unter keinen Umständen durchführen darf. Innerhalb dieser Arbeit würde dieses in etwa dem regeln des Ruders darstellen, da dieses weiter ausgelenkt werden kann, als es in einem realistischen Szenario überhaupt möglich ist. Die Einführung solcher Barrier Functions könnte somit von Vorteil sein, da das Ruder bisher nur so limitiert wurde, dass der Agent massiv bestraft wurde dafür, wenn er das Ruder falsch bedient hat.
 
 
 \printbibliography
-
+\includepdf[pages=-]{einverstaendnis.pdf}
 \end{document}

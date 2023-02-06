@@ -1,5 +1,21 @@
 % Deep Learning in general
 
+@inproceedings{10.1609/aaai.v33i01.33013387,
+  author    = {Cheng, Richard and Orosz, G\'{a}bor and Murray, Richard M. and Burdick, Joel W.},
+  title     = {End-to-End Safe Reinforcement Learning through Barrier Functions for Safety-Critical Continuous Control Tasks},
+  year      = {2019},
+  isbn      = {978-1-57735-809-1},
+  publisher = {AAAI Press},
+  url       = {https://doi.org/10.1609/aaai.v33i01.33013387},
+  doi       = {10.1609/aaai.v33i01.33013387},
+  abstract  = {Reinforcement Learning (RL) algorithms have found limited success beyond simulated applications, and one main reason is the absence of safety guarantees during the learning process. Real world systems would realistically fail or break before an optimal controller can be learned. To address this issue, we propose a controller architecture that combines (1) a model-free RL-based controller with (2) model-based controllers utilizing control barrier functions (CBFs) and (3) online learning of the unknown system dynamics, in order to ensure safety during learning. Our general framework leverages the success of RL algorithms to learn high-performance controllers, while the CBF-based controllers both guarantee safety and guide the learning process by constraining the set of explorable polices. We utilize Gaussian Processes (GPs) to model the system dynamics and its uncertainties.Our novel controller synthesis algorithm, RL-CBF., guarantees safety with high probability during the learning process, regardless of the RL algorithm used, and demonstrates greater policy exploration efficiency. We test our algorithm on (1) control of an inverted pendulum and (2) autonomous car-following with wireless vehicle-to-vehicle communication, and show that our algorithm attains much greater sample efficiency in learning than other state-of-the-art algorithms and maintains safety during the entire learning process.},
+  booktitle = {Proceedings of the Thirty-Third AAAI Conference on Artificial Intelligence and Thirty-First Innovative Applications of Artificial Intelligence Conference and Ninth AAAI Symposium on Educational Advances in Artificial Intelligence},
+  articleno = {416},
+  numpages  = {9},
+  location  = {Honolulu, Hawaii, USA},
+  series    = {AAAI'19/IAAI'19/EAAI'19}
+}
+
 @inproceedings{andrychowicz2021what,
   title     = {What Matters for On-Policy Deep Actor-Critic Methods? A Large-Scale Study},
   author    = {Marcin Andrychowicz and Anton Raichuk and Piotr Sta{\'n}czyk and Manu Orsini and Sertan Girgin and Rapha{\"e}l Marinier and Leonard Hussenot and Matthieu Geist and Olivier Pietquin and Marcin Michalski and Sylvain Gelly and Olivier Bachem},
